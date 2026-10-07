@@ -1,0 +1,16 @@
+{
+  "device": "Apple M3 Max",
+  "display": "macOS",
+  "engine": "4.7.2-stable (official)",
+  "frames_above_20ms": 599,
+  "max_ms": 31.281,
+  "mean_ms": 25.0129166666667,
+  "median_ms": 24.999,
+  "p95_ms": 26.447,
+  "p99_ms": 27.699,
+  "renderer": "gl_compatibility",
+  "samples": 600,
+  "scenario": "Moving gameplay nodes, living tissue, animated cilia/granules, 29 subtle pond organisms, 264 instanced suspension particles, and drifting depth layers: 24 cells, 6 Drifters, 8 recovering cells, closed 8-cell preview; 120 warmup frames; cap 60 fps; VSync disabled",
+  "static_node_control": false,
+  "window_pixels": "(1152, 810)"
+}

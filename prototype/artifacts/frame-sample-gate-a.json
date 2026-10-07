@@ -1,0 +1,15 @@
+{
+  "device": "Apple M3 Max",
+  "display": "macOS",
+  "engine": "4.7.2-stable (official)",
+  "frames_above_20ms": 1,
+  "max_ms": 23.372,
+  "mean_ms": 16.666135,
+  "median_ms": 16.667,
+  "p95_ms": 17.504,
+  "p99_ms": 17.657,
+  "renderer": "gl_compatibility",
+  "samples": 600,
+  "scenario": "24 cells, 6 Drifters, 8 recovering cells, closed 8-cell preview; 120 warmup frames; cap 60 fps; VSync disabled",
+  "window_pixels": "(1920, 1080)"
+}

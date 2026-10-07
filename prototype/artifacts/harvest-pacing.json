@@ -1,0 +1,103 @@
+{
+  "method": "current visible positions, 12px safety margin, 0.8s planning, 3–4 actual segments/sec; geometric oracle, not human validation",
+  "samples": [
+    {
+      "captures": 6,
+      "different_routes": 5,
+      "empty": 0,
+      "integrity": 5,
+      "max_rate": 3.00000000000017,
+      "nourishment": 18,
+      "poison": 0,
+      "rate": 3.0,
+      "route_sizes": {
+        "3": 6
+      },
+      "seconds": 25.18,
+      "seed": 73,
+      "state": "success"
+    },
+    {
+      "captures": 7,
+      "different_routes": 8,
+      "empty": 0,
+      "integrity": 4,
+      "max_rate": 3.00000000000017,
+      "nourishment": 18,
+      "poison": 1,
+      "rate": 3.0,
+      "route_sizes": {
+        "3": 8
+      },
+      "seconds": 29.25,
+      "seed": 103,
+      "state": "success"
+    },
+    {
+      "captures": 7,
+      "different_routes": 6,
+      "empty": 0,
+      "integrity": 4,
+      "max_rate": 3.00000000000017,
+      "nourishment": 18,
+      "poison": 1,
+      "rate": 3.0,
+      "route_sizes": {
+        "3": 6,
+        "4": 1
+      },
+      "seconds": 28.25,
+      "seed": 271,
+      "state": "success"
+    },
+    {
+      "captures": 6,
+      "different_routes": 5,
+      "empty": 0,
+      "integrity": 5,
+      "max_rate": 4.00000000000023,
+      "nourishment": 18,
+      "poison": 0,
+      "rate": 4.0,
+      "route_sizes": {
+        "3": 6
+      },
+      "seconds": 24.52,
+      "seed": 73,
+      "state": "success"
+    },
+    {
+      "captures": 6,
+      "different_routes": 7,
+      "empty": 0,
+      "integrity": 4,
+      "max_rate": 4.00000000000023,
+      "nourishment": 18,
+      "poison": 1,
+      "rate": 4.0,
+      "route_sizes": {
+        "3": 7
+      },
+      "seconds": 28.58,
+      "seed": 103,
+      "state": "success"
+    },
+    {
+      "captures": 7,
+      "different_routes": 6,
+      "empty": 0,
+      "integrity": 4,
+      "max_rate": 4.00000000000023,
+      "nourishment": 18,
+      "poison": 1,
+      "rate": 4.0,
+      "route_sizes": {
+        "3": 6,
+        "4": 1
+      },
+      "seconds": 28.05,
+      "seed": 271,
+      "state": "success"
+    }
+  ]
+}

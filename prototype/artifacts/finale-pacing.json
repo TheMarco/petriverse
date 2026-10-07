@@ -1,0 +1,116 @@
+{
+	"limits": "Three sampled builds at seed 73; scripted local observations, not human difficulty or enjoyment.",
+	"profiles": [
+		{
+			"abandoned_poison": 0,
+			"build": "fission",
+			"captures": 12,
+			"cause": "",
+			"contacts": 4,
+			"empty": 3,
+			"encounter": 12,
+			"food": 3,
+			"integrity": 2,
+			"max_rate": 2.00000000000011,
+			"missed_input": 0,
+			"mode": "boss",
+			"mutations": [
+				"fission",
+				"grazer",
+				"lure",
+				"frenzy",
+				"nursery"
+			],
+			"name": "The Conjoined",
+			"objective": 3,
+			"plans": 52,
+			"poison": 0,
+			"profile": "deliberate",
+			"route_sizes": {
+				"3": 3,
+				"4": 6,
+				"5": 3
+			},
+			"search_misses": 40,
+			"seconds": 92.2,
+			"seed": 260,
+			"spoiled": 0,
+			"stage": 11,
+			"state": "success"
+		},
+		{
+			"abandoned_poison": 0,
+			"build": "elastic",
+			"captures": 11,
+			"cause": "",
+			"contacts": 1,
+			"empty": 3,
+			"encounter": 12,
+			"food": 6,
+			"integrity": 4,
+			"max_rate": 2.00000000000011,
+			"missed_input": 3,
+			"mode": "boss",
+			"mutations": [
+				"elastic",
+				"feast",
+				"enzyme",
+				"filter",
+				"catalyst"
+			],
+			"name": "The Conjoined",
+			"objective": 3,
+			"plans": 59,
+			"poison": 0,
+			"profile": "deliberate",
+			"route_sizes": {
+				"3": 6,
+				"4": 3,
+				"5": 2
+			},
+			"search_misses": 45,
+			"seconds": 103.22,
+			"seed": 260,
+			"spoiled": 0,
+			"stage": 11,
+			"state": "success"
+		},
+		{
+			"abandoned_poison": 0,
+			"build": "symbiosis",
+			"captures": 13,
+			"cause": "",
+			"contacts": 2,
+			"empty": 4,
+			"encounter": 12,
+			"food": 6,
+			"integrity": 4,
+			"max_rate": 2.00000000000011,
+			"missed_input": 0,
+			"mode": "boss",
+			"mutations": [
+				"symbiosis",
+				"enzyme",
+				"residual",
+				"frenzy",
+				"nursery"
+			],
+			"name": "The Conjoined",
+			"objective": 3,
+			"plans": 69,
+			"poison": 0,
+			"profile": "deliberate",
+			"route_sizes": {
+				"3": 5,
+				"4": 6,
+				"5": 2
+			},
+			"search_misses": 56,
+			"seconds": 109.33,
+			"seed": 260,
+			"spoiled": 4,
+			"stage": 11,
+			"state": "success"
+		}
+	]
+}

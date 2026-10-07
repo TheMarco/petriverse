@@ -1,0 +1,153 @@
+{
+  "method": "20 identical seeds per profile (73 + index * 37); 3\u20135-node local contours plus the inner eight-node defense ring; choose among 4/6/10 candidate routes near one target; 0.85s to switch after unsuccessful search; 1.5\u20133.5s think delay after observing; actual swept pointer traces at 1.5\u20133 segments/s with 4\u201310px endpoint error; 0.3\u20130.65s release delay; learning profile sometimes aborts a gesture. Current preview used to cancel poison before release; no future-state access.",
+  "limits": "Synthetic policies with exact geometric perception and limited but arbitrary search. These are not human win rates. Native input and visible opportunity checks complement them. Profile difficulty is not a linear estimate of human skill.",
+  "before": {
+    "goal": 24,
+    "seconds": 90,
+    "groups": [
+      {
+        "losses": {
+          "Time ran out.": 20
+        },
+        "mean_abandoned_poison": 0.8,
+        "mean_food": 8.5,
+        "mean_poison": 0.15,
+        "mean_search_misses": 52.1,
+        "mean_seconds": 90.02,
+        "mean_spoiled": 0.7,
+        "profile": {
+          "aim": 6.0,
+          "mistake_every": 0,
+          "name": "deliberate",
+          "rate": 2.0,
+          "review": 0.45,
+          "routes": 6,
+          "think": 2.5
+        },
+        "runs": 20,
+        "wins": 0
+      },
+      {
+        "losses": {
+          "Time ran out.": 20
+        },
+        "mean_abandoned_poison": 1.05,
+        "mean_food": 4.2,
+        "mean_poison": 0.1,
+        "mean_search_misses": 41.15,
+        "mean_seconds": 90.02,
+        "mean_spoiled": 0.9,
+        "profile": {
+          "aim": 10.0,
+          "mistake_every": 7,
+          "name": "learning",
+          "rate": 1.5,
+          "review": 0.65,
+          "routes": 4,
+          "think": 3.5
+        },
+        "runs": 20,
+        "wins": 0
+      },
+      {
+        "losses": {
+          "Time ran out.": 20
+        },
+        "mean_abandoned_poison": 0.3,
+        "mean_food": 12.6,
+        "mean_poison": 0.1,
+        "mean_search_misses": 64.55,
+        "mean_seconds": 90.02,
+        "mean_spoiled": 0.5,
+        "profile": {
+          "aim": 4.0,
+          "mistake_every": 0,
+          "name": "practiced",
+          "rate": 3.0,
+          "review": 0.3,
+          "routes": 10,
+          "think": 1.5
+        },
+        "runs": 20,
+        "wins": 0
+      }
+    ]
+  },
+  "after": {
+    "goal": 18,
+    "seconds": 120,
+    "groups": [
+      {
+        "losses": {
+          "Time ran out.": 9
+        },
+        "mean_abandoned_poison": 0.05,
+        "mean_food": 15.6,
+        "mean_poison": 0.1,
+        "mean_search_misses": 73.15,
+        "mean_seconds": 101.726,
+        "mean_spoiled": 0.3,
+        "profile": {
+          "aim": 6.0,
+          "mistake_every": 0,
+          "name": "deliberate",
+          "rate": 2.0,
+          "review": 0.45,
+          "routes": 6,
+          "think": 2.5
+        },
+        "runs": 20,
+        "wins": 11
+      },
+      {
+        "losses": {
+          "The mother was eaten.": 8,
+          "Time ran out.": 6
+        },
+        "mean_abandoned_poison": 0.1,
+        "mean_food": 13.4,
+        "mean_poison": 0.05,
+        "mean_search_misses": 63.95,
+        "mean_seconds": 107.881,
+        "mean_spoiled": 0.6,
+        "profile": {
+          "aim": 10.0,
+          "mistake_every": 7,
+          "name": "learning",
+          "rate": 1.5,
+          "review": 0.65,
+          "routes": 4,
+          "think": 3.5
+        },
+        "runs": 20,
+        "wins": 6
+      },
+      {
+        "losses": {
+          "Time ran out.": 7
+        },
+        "mean_abandoned_poison": 0.0,
+        "mean_food": 17.0,
+        "mean_poison": 0.0,
+        "mean_search_misses": 80.75,
+        "mean_seconds": 95.633,
+        "mean_spoiled": 0.2,
+        "profile": {
+          "aim": 4.0,
+          "mistake_every": 0,
+          "name": "practiced",
+          "rate": 3.0,
+          "review": 0.3,
+          "routes": 10,
+          "think": 1.5
+        },
+        "runs": 20,
+        "wins": 13
+      }
+    ]
+  },
+  "baseline_source": {
+    "harvest.gd.txt": "f8a81a315d7de617067640f873269fc5c927df8e1ff96cf7116b14b3d6a7b628",
+    "harvest_organism.gd.txt": "7c984798a515cdd133da5773e3687ee8aa1a4559e5a517b8306bac3582567a64"
+  }
+}

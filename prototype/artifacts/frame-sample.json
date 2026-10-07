@@ -1,0 +1,15 @@
+{
+  "device": "Apple M3 Max",
+  "display": "macOS",
+  "engine": "4.7.2-stable (official)",
+  "frames_above_20ms": 463,
+  "max_ms": 32.961,
+  "mean_ms": 23.05933,
+  "median_ms": 24.016,
+  "p95_ms": 26.256,
+  "p99_ms": 27.275,
+  "renderer": "gl_compatibility",
+  "samples": 600,
+  "scenario": "Moving gameplay nodes, living tissue, animated cilia/granules and drifting depth layers: 24 cells, 6 Drifters, 8 recovering cells, closed 8-cell preview; 120 warmup frames; cap 60 fps; VSync disabled",
+  "window_pixels": "(1920, 1080)"
+}

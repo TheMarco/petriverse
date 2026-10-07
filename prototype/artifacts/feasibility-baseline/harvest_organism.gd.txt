@@ -1,0 +1,34 @@
+extends "res://scripts/drifter.gd"
+## A plankton bloom shares a current, while individual bodies separate slowly.
+## Motion is gameplay state: preview, drawing and capture see these same nuclei.
+const LIFETIME := 27.0
+var bearing := 0.0
+var lane := 230.0
+var offset := Vector2.ZERO
+var phase := 0.0
+var current := 1.0
+
+func _init(number: int, species: String, angle: float, radial_lane: float, local_offset: Vector2, seed_phase: float, direction: float, center: Vector2) -> void:
+	super(number, center, 0.0, species)
+	bearing = angle
+	lane = radial_lane
+	offset = local_offset
+	phase = seed_phase
+	current = direction
+	nucleus = position_at(0.0, center)
+
+func position_at(seconds: float, center: Vector2) -> Vector2:
+	var axis := Vector2.from_angle(bearing + seconds * 0.013 * current)
+	var radial := lane + offset.x + sin(seconds * 0.19 + phase) * 18.0
+	var sideways := offset.y + sin(seconds * 0.24 + phase * 1.7) * 27.0
+	return center + axis * radial + axis.orthogonal() * sideways
+
+func step(delta: float, center: Vector2) -> void:
+	age += delta
+	var destination := position_at(age, center)
+	heading = (destination - nucleus).normalized()
+	nucleus = destination
+
+func opacity() -> float:
+	# Fade into the deeper focal plane before the current carries this bloom out.
+	return 1.0 - smoothstep(LIFETIME - 3.0, LIFETIME, age)

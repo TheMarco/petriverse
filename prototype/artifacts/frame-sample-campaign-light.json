@@ -1,0 +1,17 @@
+{
+  "device": "Apple M3 Max",
+  "display": "macOS",
+  "engine": "4.7.2-stable (official)",
+  "frames_above_20ms": 1,
+  "max_ms": 20.226,
+  "mean_ms": 17.8487266666667,
+  "median_ms": 17.862,
+  "p95_ms": 18.516,
+  "p99_ms": 19.124,
+  "quality": "light",
+  "renderer": "gl_compatibility",
+  "samples": 600,
+  "scenario": "Moving gameplay nodes, living tissue, animated cilia/granules, small photographic pond specimens and instanced suspension particles at the recorded quality level, and advected microscopy plate: 24 cells, 18 enemy bodies (6 Twinspore pairs, 3 Shellbacks, 3 Drifters), 8 recovering cells, closed 8-cell preview; 120 warmup frames; cap 60 fps; VSync disabled",
+  "static_node_control": false,
+  "window_pixels": "(1920, 1080)"
+}
