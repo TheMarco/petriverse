@@ -1,0 +1,98 @@
+[
+  {
+    "shot": "hook",
+    "start": 0,
+    "duration": 8,
+    "file": "footage/hook.mp4"
+  },
+  {
+    "shot": "reveal",
+    "start": 8,
+    "duration": 6,
+    "file": "footage/reveal.mp4"
+  },
+  {
+    "shot": "loop",
+    "start": 14,
+    "duration": 12,
+    "file": "footage/loop.mp4"
+  },
+  {
+    "shot": "nudge",
+    "start": 26,
+    "duration": 8,
+    "file": "footage/nudge.mp4"
+  },
+  {
+    "shot": "danger",
+    "start": 34,
+    "duration": 7,
+    "file": "footage/danger.mp4"
+  },
+  {
+    "shot": "defend",
+    "start": 41,
+    "duration": 7,
+    "file": "footage/defend.mp4"
+  },
+  {
+    "shot": "evolve",
+    "start": 48,
+    "duration": 8,
+    "file": "footage/evolve.mp4"
+  },
+  {
+    "shot": "world_a",
+    "start": 56,
+    "duration": 4,
+    "file": "footage/world_a.mp4"
+  },
+  {
+    "shot": "world_b",
+    "start": 60,
+    "duration": 4,
+    "file": "footage/world_b.mp4"
+  },
+  {
+    "shot": "world_c",
+    "start": 64,
+    "duration": 4,
+    "file": "footage/world_c.mp4"
+  },
+  {
+    "shot": "rare_a",
+    "start": 68,
+    "duration": 3,
+    "file": "footage/rare_a.mp4"
+  },
+  {
+    "shot": "rare_b",
+    "start": 71,
+    "duration": 3,
+    "file": "footage/rare_b.mp4"
+  },
+  {
+    "shot": "boss_a",
+    "start": 74,
+    "duration": 3,
+    "file": "footage/boss_a.mp4"
+  },
+  {
+    "shot": "boss_b",
+    "start": 77,
+    "duration": 3,
+    "file": "footage/boss_b.mp4"
+  },
+  {
+    "shot": "boss_c",
+    "start": 80,
+    "duration": 3,
+    "file": "footage/boss_c.mp4"
+  },
+  {
+    "shot": "end",
+    "start": 83,
+    "duration": 7,
+    "file": "footage/end.mp4"
+  }
+]

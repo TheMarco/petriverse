@@ -1,0 +1,16 @@
+{
+  "provider": "ElevenLabs",
+  "name": "nimble-layer",
+  "endpoint": "sound-generation",
+  "request": {
+    "text": "Seamless sparse rounded liquid-glass micro-plucks on A5 E6 B5, with long quiet spaces and delicate floating tails. Intimate, light, curious, meditative. Irregular natural timing, no repeated rhythmic pattern, beat, ticking or sharp treble. Stable suspended harmony, no beginning or ending. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+    "duration_seconds": 24.0,
+    "loop": true,
+    "prompt_influence": 0.65,
+    "model_id": "eleven_text_to_sound_v2"
+  },
+  "loop": true,
+  "request_id": null,
+  "credit_cost": "240",
+  "sha256": "fd81eb8c0f98752af2efbb8b57dd3abc3e2f1e1b28fef43579730441063d123a"
+}

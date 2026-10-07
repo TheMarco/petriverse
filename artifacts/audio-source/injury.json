@@ -1,0 +1,16 @@
+{
+  "provider": "ElevenLabs",
+  "name": "injury",
+  "endpoint": "sound-generation",
+  "request": {
+    "text": "One fragile living membrane gently tears under water, a muted rounded low droplet followed by a short descending glass sigh and fine bubbles escaping. Tender, melancholy, immediately noticeable but never alarming. Quiet isolated game feedback, no crunch or explosion. No music. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+    "duration_seconds": 1.8,
+    "loop": false,
+    "prompt_influence": 0.65,
+    "model_id": "eleven_text_to_sound_v2"
+  },
+  "loop": false,
+  "request_id": null,
+  "credit_cost": "18",
+  "sha256": "376a70a9ef0a70c4645f65846ba716b719531e30d16be52f4ddf2d01e6f83f97"
+}

@@ -1,0 +1,75 @@
+{
+	"duration": 10.0,
+	"events": [
+		{
+			"sound": "connect",
+			"time": 1.5
+		},
+		{
+			"sound": "connect",
+			"time": 2.7
+		},
+		{
+			"sound": "connect",
+			"time": 3.9
+		},
+		{
+			"capture": {
+				"armor_hits": 0,
+				"bodies": 2,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"filtered": 0,
+				"food": 2,
+				"food_bonuses": {},
+				"ids": [
+					37,
+					38
+				],
+				"kills": 2,
+				"mastery": [],
+				"nodes": [
+					0,
+					8,
+					9
+				],
+				"points": 50,
+				"poison": 0,
+				"polygon": "[(622.8132, 334.5349), (612.9988, 207.3304), (781.9982, 282.4781)]",
+				"positions": [
+					"(675.9129, 269.0601)",
+					"(660.4648, 267.8574)"
+				],
+				"prey_forms": [
+					"",
+					""
+				],
+				"prey_kinds": [
+					"food",
+					"food"
+				],
+				"purified": 0,
+				"raw_food": 2,
+				"recovery": 3.0,
+				"rescued": 0,
+				"restored_node": -1,
+				"salvage": 0,
+				"threats": 0,
+				"valid": true,
+				"wardens": 0
+			},
+			"sound": "close",
+			"time": 6.26666666666667
+		},
+		{
+			"sound": "absorb",
+			"time": 6.96666666666667
+		}
+	],
+	"failures": [],
+	"frames": 300,
+	"integrity": 5,
+	"nourishment": 2,
+	"shot": "loop",
+	"source": "Native Godot simulation, camera and title overlays only; staged isolated encounters"
+}

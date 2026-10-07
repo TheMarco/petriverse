@@ -1,0 +1,16 @@
+{
+  "provider": "ElevenLabs",
+  "name": "absorb",
+  "endpoint": "sound-generation",
+  "request": {
+    "text": "A tiny translucent cell draws liquid inward, slowly dissolves and absorbs another cell: very soft swirling viscous water, fine wet granular fizz and a few microscopic bubbles, ending in a warm pearlescent exhale. Beautiful, delicate and nourishing, not disgusting. Quiet close-up texture, no big splash, suction horror or bass impact. No music. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+    "duration_seconds": 2.5,
+    "loop": false,
+    "prompt_influence": 0.65,
+    "model_id": "eleven_text_to_sound_v2"
+  },
+  "loop": false,
+  "request_id": null,
+  "credit_cost": "25",
+  "sha256": "58091ff6b2722545b3fa3d5e28a1cbae1b3e607e16c7dae0234663bb3bdc9508"
+}

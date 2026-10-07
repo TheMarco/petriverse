@@ -1,0 +1,16 @@
+{
+  "provider": "ElevenLabs",
+  "name": "mastery",
+  "endpoint": "sound-generation",
+  "request": {
+    "text": "One small beautiful musical blossom: three rounded liquid-glass notes A5 E6 B6 spread gently over two seconds, overlapping warm shimmering overtones and a soft pearly water exhale. Restrained, intimate, satisfying discovery. Smooth quiet decay, no fanfare, percussion or background track. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+    "duration_seconds": 3.8,
+    "loop": false,
+    "prompt_influence": 0.65,
+    "model_id": "eleven_text_to_sound_v2"
+  },
+  "loop": false,
+  "request_id": null,
+  "credit_cost": "38",
+  "sha256": "05dbef342cbda7a49db1fec6408152eb12126670963fd8e13ef42f516e6d8687"
+}

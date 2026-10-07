@@ -1,0 +1,16 @@
+{
+  "provider": "ElevenLabs",
+  "name": "connect",
+  "endpoint": "sound-generation",
+  "request": {
+    "text": "One single tiny rounded water droplet with a warm delicate glass resonance, a soft musical A4 note. Immediate gentle pluck at time zero, short clean decay into silence. Intimate, tactile, tranquil, almost ASMR. Not a cartoon pop or a computer beep. No background ambience or music. No voices, no speech, no harsh transients, no distortion. Original isolated sound design for a soothing microscopic pond-life game.",
+    "duration_seconds": 0.65,
+    "loop": false,
+    "prompt_influence": 0.65,
+    "model_id": "eleven_text_to_sound_v2"
+  },
+  "loop": false,
+  "request_id": null,
+  "credit_cost": "6",
+  "sha256": "b3d0fed144a4582620548743bdba74eee54a03a760fb139362e824d53cd436ce"
+}

@@ -1,0 +1,16 @@
+{
+  "provider": "ElevenLabs",
+  "name": "evolve",
+  "endpoint": "sound-generation",
+  "request": {
+    "text": "One serene ascending blossom of soft glass harmonics in A major pentatonic, like an underwater flower opening, with a tiny breath of liquid bubbles. A tender three-note musical reward, warm luminous airy tail, unhurried, soothing and intimate. No beat, fanfare or background track. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+    "duration_seconds": 4.0,
+    "loop": false,
+    "prompt_influence": 0.65,
+    "model_id": "eleven_text_to_sound_v2"
+  },
+  "loop": false,
+  "request_id": null,
+  "credit_cost": "40",
+  "sha256": "2194a2ce1e0725ad3c9c21dde1f84a580232ed16f4f870c708e05f73145ac11a"
+}

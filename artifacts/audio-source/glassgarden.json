@@ -1,0 +1,15 @@
+{
+  "provider": "ElevenLabs",
+  "name": "glassgarden",
+  "endpoint": "music",
+  "request": {
+    "prompt": "Original instrumental ambient score for a microscopic garden of etched glass diatoms. Meditative, intimate, curious, spacious. A major pentatonic with sustained A and E overtones, sparse tiny felted celesta gestures, resonant glass bowls, soft brushed crystal harmonics and warm velvety pads. More translucent and crystalline than a pond score but never shrill or tinkling. No drum beat, no rhythmic ostinato, no ticking, no arpeggiator, no dramatic rise or finale. Extremely gentle dynamic range with long breathing spaces. Sensation of 48 BPM without explicit pulse. Rounded attacks and softened treble. A continuous living atmosphere from first to last second, ending on the same suspended A harmony to allow a five-second crossfade. No fade to silence. Absolutely no voices, singing, choir, speech, percussion or heavy bass.",
+    "music_length_ms": 120000,
+    "force_instrumental": true,
+    "model_id": "music_v2"
+  },
+  "loop": true,
+  "request_id": null,
+  "credit_cost": null,
+  "sha256": "28afffc91497cd2774e86507ee66e6b70d1ef1515e93296c8e2fb848774c506c"
+}

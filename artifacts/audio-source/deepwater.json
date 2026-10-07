@@ -1,0 +1,15 @@
+{
+  "provider": "ElevenLabs",
+  "name": "deepwater",
+  "endpoint": "music",
+  "request": {
+    "prompt": "Original instrumental ambient meditation music for discovering a majestic two-hearted microscopic organism in a dark blue pond. Peaceful concentration and compassionate wonder, never battle music. A major pentatonic, warm slowly breathing low pads, airy bowed glass, very sparse soft rounded glass mallet notes, a few deep velvety water resonances, wide dreamy natural reverberation. The sensation of 48 BPM, no drums or explicit beat. Slightly deeper and more enveloping than a tranquil garden, still very soothing, gentle and safe. Gradual harmonic movement with suspended chords, no dramatic swells or tension risers, no harsh sounds, no ominous dissonance. Restrained even volume. Continuous atmosphere from beginning to end, finish in the same A suspended harmonic bed to crossfade seamlessly to the opening. No fade to silence or final cadence. No percussion, ostinato, arpeggiators, vocals, voices, singing, choir or speech.",
+    "music_length_ms": 90000,
+    "force_instrumental": true,
+    "model_id": "music_v2"
+  },
+  "loop": true,
+  "request_id": null,
+  "credit_cost": null,
+  "sha256": "44a78f66dcb8420d12fab52cc176bcdaea77426263bee60276a3c2f27ea2da9e"
+}

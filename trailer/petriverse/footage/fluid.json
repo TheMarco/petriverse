@@ -1,0 +1,15 @@
+{
+	"duration": 6.0,
+	"events": [
+		{
+			"sound": "close",
+			"time": 1.9
+		}
+	],
+	"failures": [],
+	"frames": 180,
+	"integrity": 5,
+	"nourishment": 0,
+	"shot": "fluid",
+	"source": "Native Godot simulation, camera and title overlays only; staged isolated encounters"
+}

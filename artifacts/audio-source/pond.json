@@ -1,0 +1,16 @@
+{
+  "provider": "ElevenLabs",
+  "name": "pond",
+  "endpoint": "sound-generation",
+  "request": {
+    "text": "Seamless almost-silent underwater micro-ambience. A soft warm current with scattered extremely tiny distant liquid bubbles and a faint silky aqueous rustle. Sparse, spacious, calm, close and delicate, no large ocean waves, birds, wind, splashes, heartbeat, melody or music. Consistent level, no beginning or ending. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+    "duration_seconds": 24.0,
+    "loop": true,
+    "prompt_influence": 0.65,
+    "model_id": "eleven_text_to_sound_v2"
+  },
+  "loop": true,
+  "request_id": null,
+  "credit_cost": "240",
+  "sha256": "573567750eee8f1abb1b83f02abbeb5c1905b8179a24ab477375d59f18c77304"
+}

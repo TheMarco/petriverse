@@ -1,0 +1,16 @@
+{
+  "provider": "ElevenLabs",
+  "name": "close",
+  "endpoint": "sound-generation",
+  "request": {
+    "text": "One delicate organic membrane closing: a rounded liquid tuck softly blooming into a luminous consonant A major suspended glass chord. Immediate tactile onset, smooth airy resonance, quiet satisfying resolution, soft short tail. No beat or background music. No voices, no speech, no harsh transients, no distortion. Original isolated sound design for a soothing microscopic pond-life game.",
+    "duration_seconds": 1.5,
+    "loop": false,
+    "prompt_influence": 0.65,
+    "model_id": "eleven_text_to_sound_v2"
+  },
+  "loop": false,
+  "request_id": null,
+  "credit_cost": "15",
+  "sha256": "97490efd0f296d44708b379ca43d8014c6a2b34be73703e29895fd3543c35349"
+}

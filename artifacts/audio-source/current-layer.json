@@ -1,0 +1,16 @@
+{
+  "provider": "ElevenLabs",
+  "name": "current-layer",
+  "endpoint": "sound-generation",
+  "request": {
+    "text": "Seamless soft watery texture for a living microscopic current. A warm airy liquid rustle with tiny silk-like bubbles, breathing slowly in irregular waves. Very sparse and delicate, calm anticipation without alarm or ticking. No distinct melody, beat, impact or large splash. Even level, no beginning or ending. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+    "duration_seconds": 24.0,
+    "loop": true,
+    "prompt_influence": 0.65,
+    "model_id": "eleven_text_to_sound_v2"
+  },
+  "loop": true,
+  "request_id": null,
+  "credit_cost": "240",
+  "sha256": "f98bdd684d9c45e305941905e5e19fe0d899b7df6a4959c16b8a856c8c2b055c"
+}

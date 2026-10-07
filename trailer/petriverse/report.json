@@ -1,0 +1,27 @@
+{
+  "edit": [
+    "hook",
+    "reveal",
+    "loop",
+    "fluid",
+    "amoeba",
+    "phages",
+    "evolve",
+    "world_a",
+    "world_b",
+    "world_c",
+    "rare_a",
+    "rare_b",
+    "boss_a",
+    "boss_b",
+    "boss_c",
+    "home",
+    "end"
+  ],
+  "transition": "cut",
+  "output": "trailer/Petriverse-trailer-0.2.0.mp4",
+  "poster": "trailer/petriverse/poster.jpg",
+  "mixer": "numpy",
+  "events_mixed": 15,
+  "validation_errors": []
+}
