@@ -1,0 +1,36 @@
+{
+  "version": "0.1.0",
+  "engine": "Godot 4.7.2.stable.official.ed1daf0bf",
+  "macos": {
+    "architectures": [
+      "arm64",
+      "x86_64"
+    ],
+    "developer_id": "Marco van Hylckama Vlieg (3ML6V62AF5)",
+    "notarization": "Accepted",
+    "submission_id": "33d7308c-cb7d-4505-ae9e-526004d63fe8",
+    "stapled": true,
+    "final_archive_extracted_signature": "valid",
+    "final_archive_extracted_gatekeeper": "accepted / Notarized Developer ID",
+    "native_launch": "home pond rendered successfully"
+  },
+  "packed_resources": {
+    "checks": 42,
+    "failures": 0,
+    "platform": "macOS",
+    "shared_pck_sha256": "c8e3ac5b004b832cd0c53a2c6545eae5eef64784a022df1e08981acfc21c4184"
+  },
+  "windows": {
+    "architecture": "x86_64",
+    "archive_integrity": "passed",
+    "native_runtime_tested": false,
+    "authenticode_signed": false
+  },
+  "linux": {
+    "architecture": "x86_64",
+    "archive_integrity": "passed",
+    "executable_permission": "preserved",
+    "native_runtime_tested": false
+  },
+  "content_note": "Current game snapshot. Newly discussed phage, node-swallowing amoeba, and persistent fluid simulation mechanics are not included."
+}

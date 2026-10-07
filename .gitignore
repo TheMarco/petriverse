@@ -1,0 +1,14 @@
+.DS_Store
+
+# Godot cache
+prototype/.godot/
+
+# Build outputs (keep docs, checksums, and reports)
+dist/*
+!dist/README.md
+!dist/SHA256SUMS.txt
+!dist/THIRD-PARTY-NOTICES.txt
+!dist/reports/
+
+# Uncompressed preview captures (mp4 copies are tracked)
+*.avi

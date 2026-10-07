@@ -1,0 +1,9 @@
+189346e8702e5730cb0db8447b6334f674df2a4cdfb2d843a781778ad6ade950  Microverse-0.1.0-linux-x86_64.tar.gz
+3eedfb3faa22da3e2921ecbd1228e0df0702b510705137cb42dc47eaaa436090  Microverse-0.1.0-macos-universal.zip
+899846c4a46ce174acb0c6190bb5f2830675c8df1781effb963424f40b0156c6  Microverse-0.1.0-windows-x86_64.zip
+4664dbf4ecf951509e1ac5e570815810e18eb4844b28117af0e0dda6963aa810  Microverse-0.1.1-linux-x86_64.tar.gz
+e5a6f3ab07b79e542941ca49efe46e901082041f228dc765f9706ef67d10ce42  Microverse-0.1.1-macos-universal.zip
+b110faeea65b57784ab0b7bea73a937b0a784d16e8c0bffcb0b9e5e21a46b298  Microverse-0.1.1-windows-x86_64.zip
+e4f040f55d8dd4bb346c4132e080e4c70b9a07da7936ca02b260d5a3621d3c5e  Petriverse-0.2.0-macos-universal.zip
+0c1f297a744a3a5ea35e3d22384b2a0aead570e2c7e4d7ec6e1a6bab55aeee75  Petriverse-0.2.0-windows-x86_64.zip
+6a4a2695c9f652e439f47c3f0d6fdf326e586b691e3f8cbf5d657232aed374de  Petriverse-0.2.0-linux-x86_64.tar.gz

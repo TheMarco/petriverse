@@ -1,0 +1,8 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 91.7 - Compatibility - Using Device: Apple - Apple M3 Max
+
+TRAILER defend 0/210
+TRAILER defend 60/210
+TRAILER defend 120/210
+TRAILER defend 180/210
+TRAILER COMPLETE defend {"duration":7.0,"events":[{"sound":"connect","time":1.16666666666667},{"sound":"connect","time":1.66666666666667},{"sound":"connect","time":2.16666666666667},{"capture":{"armor_hits":0,"bodies":2,"boss_layers":0,"filtered":0,"food":0,"food_bonuses":{},"ids":[37,902],"kills":1,"mastery":["guardian"],"nodes":[8,16,17],"points":0,"poison":0,"polygon":"[(600.7633, 210.913), (547.3891, 127.7317), (809.8262, 167.4864)]","positions":["(646.5256, 161.4778)","(648.2393, 161.4998)"],"prey_forms":["glasswing_spore",""],"prey_kinds":["spore","drifter"],"purified":0,"raw_food":0,"recovery":3.0,"rescued":1,"restored_node":-1,"salvage":0,"threats":1,"valid":true,"wardens":0},"sound":"close","time":2.86666666666667},{"sound":"absorb","time":3.56666666666667}],"failures":[],"frames":210,"integrity":5,"nourishment":0,"shot":"defend","source":"Native Godot simulation, camera and title overlays only; staged isolated encounters"}

@@ -1,0 +1,1055 @@
+[
+  {
+    "id": "02-intro",
+    "at": 8.15,
+    "text": "This is Microverse. Guide a living colony through a changing microscopic world.",
+    "creation": {
+      "identifier": "KLZx3wzkqp",
+      "status": "queued",
+      "expectTime": 0,
+      "tool": "voiceover-generator",
+      "credits": 16
+    },
+    "timing": {
+      "identifier": "KLZx3wzkqp",
+      "durationSeconds": 8,
+      "status": "ready",
+      "alignmentEndSeconds": 5.84,
+      "words": [
+        {
+          "text": "This",
+          "startSeconds": 0,
+          "endSeconds": 0.32
+        },
+        {
+          "text": "is",
+          "startSeconds": 0.4,
+          "endSeconds": 0.56
+        },
+        {
+          "text": "Microverse.",
+          "startSeconds": 0.64,
+          "endSeconds": 1.52
+        },
+        {
+          "text": "Guide",
+          "startSeconds": 1.68,
+          "endSeconds": 2.48
+        },
+        {
+          "text": "a",
+          "startSeconds": 2.52,
+          "endSeconds": 2.56
+        },
+        {
+          "text": "living",
+          "startSeconds": 2.606,
+          "endSeconds": 2.88
+        },
+        {
+          "text": "colony",
+          "startSeconds": 2.983,
+          "endSeconds": 3.6
+        },
+        {
+          "text": "through",
+          "startSeconds": 3.63,
+          "endSeconds": 3.84
+        },
+        {
+          "text": "a",
+          "startSeconds": 3.88,
+          "endSeconds": 3.92
+        },
+        {
+          "text": "changing",
+          "startSeconds": 3.982,
+          "endSeconds": 4.48
+        },
+        {
+          "text": "microscopic",
+          "startSeconds": 4.553,
+          "endSeconds": 5.36
+        },
+        {
+          "text": "world.",
+          "startSeconds": 5.427,
+          "endSeconds": 5.84
+        }
+      ],
+      "phrases": [
+        {
+          "text": "This is Microverse.",
+          "startSeconds": 0,
+          "endSeconds": 1.52,
+          "wordOffset": 0,
+          "wordCount": 3
+        },
+        {
+          "text": "Guide a living colony through a changing microscopic world.",
+          "startSeconds": 1.68,
+          "endSeconds": 5.84,
+          "wordOffset": 3,
+          "wordCount": 9
+        }
+      ],
+      "totalWords": 12,
+      "offset": 0,
+      "hasMore": false,
+      "nextOffset": null,
+      "instruction": "Timings are seconds in the source audio. Segments sharing a provider cell share its full interval; no intra-cell timing is inferred. Fetch remaining pages before planning; phrase groups are page-local. Use durationSeconds for the full clip, not alignmentEndSeconds. When replying to the user, use names, titles, webUrl, and plain descriptions — do not quote internal identifiers (UUIDs, folder references, session or request ids) unless they explicitly ask."
+    }
+  },
+  {
+    "id": "03-play",
+    "at": 14.35,
+    "text": "Drag through three or more blue cells. Close the loop around green food, then release. Your cells merge, absorb, and return.",
+    "creation": {
+      "identifier": "KLZx34Tkqp",
+      "status": "queued",
+      "expectTime": 0,
+      "tool": "voiceover-generator",
+      "credits": 26
+    },
+    "timing": {
+      "identifier": "KLZx34Tkqp",
+      "durationSeconds": 12,
+      "status": "ready",
+      "alignmentEndSeconds": 10.24,
+      "words": [
+        {
+          "text": "Drag",
+          "startSeconds": 0,
+          "endSeconds": 0.32
+        },
+        {
+          "text": "through",
+          "startSeconds": 0.35,
+          "endSeconds": 0.56
+        },
+        {
+          "text": "three",
+          "startSeconds": 0.627,
+          "endSeconds": 0.96
+        },
+        {
+          "text": "or",
+          "startSeconds": 1.013,
+          "endSeconds": 1.12
+        },
+        {
+          "text": "more",
+          "startSeconds": 1.168,
+          "endSeconds": 1.36
+        },
+        {
+          "text": "blue",
+          "startSeconds": 1.424,
+          "endSeconds": 1.68
+        },
+        {
+          "text": "cells.",
+          "startSeconds": 1.76,
+          "endSeconds": 2.48
+        },
+        {
+          "text": "Close",
+          "startSeconds": 2.68,
+          "endSeconds": 3.68
+        },
+        {
+          "text": "the",
+          "startSeconds": 3.72,
+          "endSeconds": 3.84
+        },
+        {
+          "text": "loop",
+          "startSeconds": 3.888,
+          "endSeconds": 4.08
+        },
+        {
+          "text": "around",
+          "startSeconds": 4.126,
+          "endSeconds": 4.4
+        },
+        {
+          "text": "green",
+          "startSeconds": 4.453,
+          "endSeconds": 4.72
+        },
+        {
+          "text": "food,",
+          "startSeconds": 4.8,
+          "endSeconds": 5.44
+        },
+        {
+          "text": "then",
+          "startSeconds": 5.472,
+          "endSeconds": 5.6
+        },
+        {
+          "text": "release.",
+          "startSeconds": 5.67,
+          "endSeconds": 6.36
+        },
+        {
+          "text": "Your",
+          "startSeconds": 6.4,
+          "endSeconds": 6.56
+        },
+        {
+          "text": "cells",
+          "startSeconds": 6.613,
+          "endSeconds": 6.88
+        },
+        {
+          "text": "merge,",
+          "startSeconds": 6.96,
+          "endSeconds": 7.52
+        },
+        {
+          "text": "absorb,",
+          "startSeconds": 7.6,
+          "endSeconds": 8.24
+        },
+        {
+          "text": "and",
+          "startSeconds": 8.26,
+          "endSeconds": 8.32
+        },
+        {
+          "text": "return.",
+          "startSeconds": 8.4,
+          "endSeconds": 10.24
+        }
+      ],
+      "phrases": [
+        {
+          "text": "Drag through three or more blue cells.",
+          "startSeconds": 0,
+          "endSeconds": 2.48,
+          "wordOffset": 0,
+          "wordCount": 7
+        },
+        {
+          "text": "Close the loop around green food, then release.",
+          "startSeconds": 2.68,
+          "endSeconds": 6.36,
+          "wordOffset": 7,
+          "wordCount": 8
+        },
+        {
+          "text": "Your cells merge, absorb, and return.",
+          "startSeconds": 6.4,
+          "endSeconds": 10.24,
+          "wordOffset": 15,
+          "wordCount": 6
+        }
+      ],
+      "totalWords": 21,
+      "offset": 0,
+      "hasMore": false,
+      "nextOffset": null,
+      "instruction": "Timings are seconds in the source audio. Segments sharing a provider cell share its full interval; no intra-cell timing is inferred. Fetch remaining pages before planning; phrase groups are page-local. Use durationSeconds for the full clip, not alignmentEndSeconds. When replying to the user, use names, titles, webUrl, and plain descriptions — do not quote internal identifiers (UUIDs, folder references, session or request ids) unless they explicitly ask."
+    }
+  },
+  {
+    "id": "04-nudge",
+    "at": 26.35,
+    "text": "Poison in your path? Nudge it aside. Make a clean meal.",
+    "creation": {
+      "identifier": "4RBidXU9Aa",
+      "status": "queued",
+      "expectTime": 0,
+      "tool": "voiceover-generator",
+      "credits": 12
+    },
+    "timing": {
+      "identifier": "4RBidXU9Aa",
+      "durationSeconds": 7,
+      "status": "ready",
+      "alignmentEndSeconds": 5.48,
+      "words": [
+        {
+          "text": "Poison",
+          "startSeconds": 0,
+          "endSeconds": 0.48
+        },
+        {
+          "text": "in",
+          "startSeconds": 0.533,
+          "endSeconds": 0.64
+        },
+        {
+          "text": "your",
+          "startSeconds": 0.656,
+          "endSeconds": 0.72
+        },
+        {
+          "text": "path?",
+          "startSeconds": 0.816,
+          "endSeconds": 1.36
+        },
+        {
+          "text": "Nudge",
+          "startSeconds": 1.64,
+          "endSeconds": 2.08
+        },
+        {
+          "text": "it",
+          "startSeconds": 2.107,
+          "endSeconds": 2.16
+        },
+        {
+          "text": "aside.",
+          "startSeconds": 2.267,
+          "endSeconds": 2.88
+        },
+        {
+          "text": "Make",
+          "startSeconds": 2.992,
+          "endSeconds": 3.44
+        },
+        {
+          "text": "a",
+          "startSeconds": 3.48,
+          "endSeconds": 3.52
+        },
+        {
+          "text": "clean",
+          "startSeconds": 3.587,
+          "endSeconds": 3.92
+        },
+        {
+          "text": "meal.",
+          "startSeconds": 4.016,
+          "endSeconds": 5.48
+        }
+      ],
+      "phrases": [
+        {
+          "text": "Poison in your path?",
+          "startSeconds": 0,
+          "endSeconds": 1.36,
+          "wordOffset": 0,
+          "wordCount": 4
+        },
+        {
+          "text": "Nudge it aside.",
+          "startSeconds": 1.64,
+          "endSeconds": 2.88,
+          "wordOffset": 4,
+          "wordCount": 3
+        },
+        {
+          "text": "Make a clean meal.",
+          "startSeconds": 2.992,
+          "endSeconds": 5.48,
+          "wordOffset": 7,
+          "wordCount": 4
+        }
+      ],
+      "totalWords": 11,
+      "offset": 0,
+      "hasMore": false,
+      "nextOffset": null,
+      "instruction": "Timings are seconds in the source audio. Segments sharing a provider cell share its full interval; no intra-cell timing is inferred. Fetch remaining pages before planning; phrase groups are page-local. Use durationSeconds for the full clip, not alignmentEndSeconds. When replying to the user, use names, titles, webUrl, and plain descriptions — do not quote internal identifiers (UUIDs, folder references, session or request ids) unless they explicitly ask."
+    }
+  },
+  {
+    "id": "05-danger",
+    "at": 34.25,
+    "text": "But the water is alive with hungry rivals. Protect Mother before they reach her heart.",
+    "creation": {
+      "identifier": "cpHMQkf0eP",
+      "status": "queued",
+      "expectTime": 0,
+      "tool": "voiceover-generator",
+      "credits": 18
+    },
+    "timing": {
+      "identifier": "cpHMQkf0eP",
+      "durationSeconds": 7,
+      "status": "ready",
+      "alignmentEndSeconds": 6.28,
+      "words": [
+        {
+          "text": "But",
+          "startSeconds": 0,
+          "endSeconds": 0.16
+        },
+        {
+          "text": "the",
+          "startSeconds": 0.18,
+          "endSeconds": 0.24
+        },
+        {
+          "text": "water",
+          "startSeconds": 0.32,
+          "endSeconds": 0.72
+        },
+        {
+          "text": "is",
+          "startSeconds": 0.8,
+          "endSeconds": 0.96
+        },
+        {
+          "text": "alive",
+          "startSeconds": 1.04,
+          "endSeconds": 1.44
+        },
+        {
+          "text": "with",
+          "startSeconds": 1.488,
+          "endSeconds": 1.68
+        },
+        {
+          "text": "hungry",
+          "startSeconds": 1.737,
+          "endSeconds": 2.08
+        },
+        {
+          "text": "rivals.",
+          "startSeconds": 2.171,
+          "endSeconds": 2.88
+        },
+        {
+          "text": "Protect",
+          "startSeconds": 3.03,
+          "endSeconds": 4.08
+        },
+        {
+          "text": "Mother",
+          "startSeconds": 4.137,
+          "endSeconds": 4.48
+        },
+        {
+          "text": "before",
+          "startSeconds": 4.537,
+          "endSeconds": 4.88
+        },
+        {
+          "text": "they",
+          "startSeconds": 4.912,
+          "endSeconds": 5.04
+        },
+        {
+          "text": "reach",
+          "startSeconds": 5.093,
+          "endSeconds": 5.36
+        },
+        {
+          "text": "her",
+          "startSeconds": 5.38,
+          "endSeconds": 5.44
+        },
+        {
+          "text": "heart.",
+          "startSeconds": 5.507,
+          "endSeconds": 6.28
+        }
+      ],
+      "phrases": [
+        {
+          "text": "But the water is alive with hungry rivals.",
+          "startSeconds": 0,
+          "endSeconds": 2.88,
+          "wordOffset": 0,
+          "wordCount": 8
+        },
+        {
+          "text": "Protect Mother before they reach her heart.",
+          "startSeconds": 3.03,
+          "endSeconds": 6.28,
+          "wordOffset": 8,
+          "wordCount": 7
+        }
+      ],
+      "totalWords": 15,
+      "offset": 0,
+      "hasMore": false,
+      "nextOffset": null,
+      "instruction": "Timings are seconds in the source audio. Segments sharing a provider cell share its full interval; no intra-cell timing is inferred. Fetch remaining pages before planning; phrase groups are page-local. Use durationSeconds for the full clip, not alignmentEndSeconds. When replying to the user, use names, titles, webUrl, and plain descriptions — do not quote internal identifiers (UUIDs, folder references, session or request ids) unless they explicitly ask."
+    }
+  },
+  {
+    "id": "06-defend",
+    "at": 42,
+    "text": "Catch the hunter. Rescue a fragile life.",
+    "creation": {
+      "identifier": "CqyFJ2QEEy",
+      "status": "queued",
+      "expectTime": 0,
+      "tool": "voiceover-generator",
+      "credits": 8
+    },
+    "timing": {
+      "identifier": "CqyFJ2QEEy",
+      "durationSeconds": 7,
+      "status": "ready",
+      "alignmentEndSeconds": 3.64,
+      "words": [
+        {
+          "text": "Catch",
+          "startSeconds": 0,
+          "endSeconds": 0.4
+        },
+        {
+          "text": "the",
+          "startSeconds": 0.42,
+          "endSeconds": 0.48
+        },
+        {
+          "text": "hunter.",
+          "startSeconds": 0.56,
+          "endSeconds": 1.12
+        },
+        {
+          "text": "Rescue",
+          "startSeconds": 1.303,
+          "endSeconds": 2.4
+        },
+        {
+          "text": "a",
+          "startSeconds": 2.44,
+          "endSeconds": 2.48
+        },
+        {
+          "text": "fragile",
+          "startSeconds": 2.55,
+          "endSeconds": 3.04
+        },
+        {
+          "text": "life.",
+          "startSeconds": 3.152,
+          "endSeconds": 3.64
+        }
+      ],
+      "phrases": [
+        {
+          "text": "Catch the hunter.",
+          "startSeconds": 0,
+          "endSeconds": 1.12,
+          "wordOffset": 0,
+          "wordCount": 3
+        },
+        {
+          "text": "Rescue a fragile life.",
+          "startSeconds": 1.303,
+          "endSeconds": 3.64,
+          "wordOffset": 3,
+          "wordCount": 4
+        }
+      ],
+      "totalWords": 7,
+      "offset": 0,
+      "hasMore": false,
+      "nextOffset": null,
+      "instruction": "Timings are seconds in the source audio. Segments sharing a provider cell share its full interval; no intra-cell timing is inferred. Fetch remaining pages before planning; phrase groups are page-local. Use durationSeconds for the full clip, not alignmentEndSeconds. When replying to the user, use names, titles, webUrl, and plain descriptions — do not quote internal identifiers (UUIDs, folder references, session or request ids) unless they explicitly ask."
+    }
+  },
+  {
+    "id": "07-evolve",
+    "at": 48.35,
+    "text": "Spend what you gather to evolve. New abilities. New anatomy. Your colony, transformed.",
+    "creation": {
+      "identifier": "0eqDFUHTfW",
+      "status": "queued",
+      "expectTime": 0,
+      "tool": "voiceover-generator",
+      "credits": 18
+    },
+    "timing": {
+      "identifier": "0eqDFUHTfW",
+      "durationSeconds": 10,
+      "status": "ready",
+      "alignmentEndSeconds": 8.92,
+      "words": [
+        {
+          "text": "Spend",
+          "startSeconds": 0,
+          "endSeconds": 0.32
+        },
+        {
+          "text": "what",
+          "startSeconds": 0.368,
+          "endSeconds": 0.56
+        },
+        {
+          "text": "you",
+          "startSeconds": 0.58,
+          "endSeconds": 0.64
+        },
+        {
+          "text": "gather",
+          "startSeconds": 0.709,
+          "endSeconds": 1.12
+        },
+        {
+          "text": "to",
+          "startSeconds": 1.227,
+          "endSeconds": 1.44
+        },
+        {
+          "text": "evolve.",
+          "startSeconds": 1.531,
+          "endSeconds": 2.16
+        },
+        {
+          "text": "New",
+          "startSeconds": 2.5,
+          "endSeconds": 3.52
+        },
+        {
+          "text": "abilities.",
+          "startSeconds": 3.608,
+          "endSeconds": 4.401
+        },
+        {
+          "text": "New",
+          "startSeconds": 4.58,
+          "endSeconds": 5.12
+        },
+        {
+          "text": "anatomy.",
+          "startSeconds": 5.19,
+          "endSeconds": 5.76
+        },
+        {
+          "text": "Your",
+          "startSeconds": 6.048,
+          "endSeconds": 7.2
+        },
+        {
+          "text": "colony,",
+          "startSeconds": 7.269,
+          "endSeconds": 7.76
+        },
+        {
+          "text": "transformed.",
+          "startSeconds": 7.853,
+          "endSeconds": 8.92
+        }
+      ],
+      "phrases": [
+        {
+          "text": "Spend what you gather to evolve.",
+          "startSeconds": 0,
+          "endSeconds": 2.16,
+          "wordOffset": 0,
+          "wordCount": 6
+        },
+        {
+          "text": "New abilities.",
+          "startSeconds": 2.5,
+          "endSeconds": 4.401,
+          "wordOffset": 6,
+          "wordCount": 2
+        },
+        {
+          "text": "New anatomy.",
+          "startSeconds": 4.58,
+          "endSeconds": 5.76,
+          "wordOffset": 8,
+          "wordCount": 2
+        },
+        {
+          "text": "Your colony, transformed.",
+          "startSeconds": 6.048,
+          "endSeconds": 8.92,
+          "wordOffset": 10,
+          "wordCount": 3
+        }
+      ],
+      "totalWords": 13,
+      "offset": 0,
+      "hasMore": false,
+      "nextOffset": null,
+      "instruction": "Timings are seconds in the source audio. Segments sharing a provider cell share its full interval; no intra-cell timing is inferred. Fetch remaining pages before planning; phrase groups are page-local. Use durationSeconds for the full clip, not alignmentEndSeconds. When replying to the user, use names, titles, webUrl, and plain descriptions — do not quote internal identifiers (UUIDs, folder references, session or request ids) unless they explicitly ask."
+    }
+  },
+  {
+    "id": "08-worlds",
+    "at": 56.3,
+    "text": "Cross three living waters. Changing encounters. Different colors. A new journey every time.",
+    "creation": {
+      "identifier": "SyTJcE8Ub8",
+      "status": "queued",
+      "expectTime": 0,
+      "tool": "voiceover-generator",
+      "credits": 20
+    },
+    "timing": {
+      "identifier": "SyTJcE8Ub8",
+      "durationSeconds": 10,
+      "status": "ready",
+      "alignmentEndSeconds": 8.96,
+      "words": [
+        {
+          "text": "Cross",
+          "startSeconds": 0,
+          "endSeconds": 0.24
+        },
+        {
+          "text": "three",
+          "startSeconds": 0.28,
+          "endSeconds": 0.48
+        },
+        {
+          "text": "living",
+          "startSeconds": 0.537,
+          "endSeconds": 0.88
+        },
+        {
+          "text": "waters.",
+          "startSeconds": 0.971,
+          "endSeconds": 2.24
+        },
+        {
+          "text": "Changing",
+          "startSeconds": 2.32,
+          "endSeconds": 2.96
+        },
+        {
+          "text": "encounters.",
+          "startSeconds": 3.033,
+          "endSeconds": 3.92
+        },
+        {
+          "text": "Different",
+          "startSeconds": 4.016,
+          "endSeconds": 4.88
+        },
+        {
+          "text": "colors.",
+          "startSeconds": 4.96,
+          "endSeconds": 6
+        },
+        {
+          "text": "A",
+          "startSeconds": 6.28,
+          "endSeconds": 6.56
+        },
+        {
+          "text": "new",
+          "startSeconds": 6.62,
+          "endSeconds": 6.8
+        },
+        {
+          "text": "journey",
+          "startSeconds": 6.85,
+          "endSeconds": 7.2
+        },
+        {
+          "text": "every",
+          "startSeconds": 7.267,
+          "endSeconds": 7.6
+        },
+        {
+          "text": "time.",
+          "startSeconds": 7.696,
+          "endSeconds": 8.96
+        }
+      ],
+      "phrases": [
+        {
+          "text": "Cross three living waters.",
+          "startSeconds": 0,
+          "endSeconds": 2.24,
+          "wordOffset": 0,
+          "wordCount": 4
+        },
+        {
+          "text": "Changing encounters.",
+          "startSeconds": 2.32,
+          "endSeconds": 3.92,
+          "wordOffset": 4,
+          "wordCount": 2
+        },
+        {
+          "text": "Different colors.",
+          "startSeconds": 4.016,
+          "endSeconds": 6,
+          "wordOffset": 6,
+          "wordCount": 2
+        },
+        {
+          "text": "A new journey every time.",
+          "startSeconds": 6.28,
+          "endSeconds": 8.96,
+          "wordOffset": 8,
+          "wordCount": 5
+        }
+      ],
+      "totalWords": 13,
+      "offset": 0,
+      "hasMore": false,
+      "nextOffset": null,
+      "instruction": "Timings are seconds in the source audio. Segments sharing a provider cell share its full interval; no intra-cell timing is inferred. Fetch remaining pages before planning; phrase groups are page-local. Use durationSeconds for the full clip, not alignmentEndSeconds. When replying to the user, use names, titles, webUrl, and plain descriptions — do not quote internal identifiers (UUIDs, folder references, session or request ids) unless they explicitly ask."
+    }
+  },
+  {
+    "id": "09-discovery",
+    "at": 68.1,
+    "text": "Discover rare creatures... and bring the lives you save home.",
+    "creation": {
+      "identifier": "gO07W54SXO",
+      "status": "queued",
+      "expectTime": 0,
+      "tool": "voiceover-generator",
+      "credits": 14
+    },
+    "timing": {
+      "identifier": "gO07W54SXO",
+      "durationSeconds": 7,
+      "status": "ready",
+      "alignmentEndSeconds": 4.8,
+      "words": [
+        {
+          "text": "Discover",
+          "startSeconds": 0,
+          "endSeconds": 0.48
+        },
+        {
+          "text": "rare",
+          "startSeconds": 0.544,
+          "endSeconds": 0.8
+        },
+        {
+          "text": "creatures...",
+          "startSeconds": 0.872,
+          "endSeconds": 3.04
+        },
+        {
+          "text": "and",
+          "startSeconds": 3.06,
+          "endSeconds": 3.12
+        },
+        {
+          "text": "bring",
+          "startSeconds": 3.16,
+          "endSeconds": 3.36
+        },
+        {
+          "text": "the",
+          "startSeconds": 3.4,
+          "endSeconds": 3.52
+        },
+        {
+          "text": "lives",
+          "startSeconds": 3.587,
+          "endSeconds": 3.92
+        },
+        {
+          "text": "you",
+          "startSeconds": 3.94,
+          "endSeconds": 4
+        },
+        {
+          "text": "save",
+          "startSeconds": 4.08,
+          "endSeconds": 4.4
+        },
+        {
+          "text": "home.",
+          "startSeconds": 4.464,
+          "endSeconds": 4.8
+        }
+      ],
+      "phrases": [
+        {
+          "text": "Discover rare creatures...",
+          "startSeconds": 0,
+          "endSeconds": 3.04,
+          "wordOffset": 0,
+          "wordCount": 3
+        },
+        {
+          "text": "and bring the lives you save home.",
+          "startSeconds": 3.06,
+          "endSeconds": 4.8,
+          "wordOffset": 3,
+          "wordCount": 7
+        }
+      ],
+      "totalWords": 10,
+      "offset": 0,
+      "hasMore": false,
+      "nextOffset": null,
+      "instruction": "Timings are seconds in the source audio. Segments sharing a provider cell share its full interval; no intra-cell timing is inferred. Fetch remaining pages before planning; phrase groups are page-local. Use durationSeconds for the full clip, not alignmentEndSeconds. When replying to the user, use names, titles, webUrl, and plain descriptions — do not quote internal identifiers (UUIDs, folder references, session or request ids) unless they explicitly ask."
+    }
+  },
+  {
+    "id": "10-boss",
+    "at": 74.3,
+    "text": "Then face the giants. Learn their rhythm. Find your moment.",
+    "creation": {
+      "identifier": "3zmAI4vREY",
+      "status": "queued",
+      "expectTime": 0,
+      "tool": "voiceover-generator",
+      "credits": 12
+    },
+    "timing": {
+      "identifier": "3zmAI4vREY",
+      "durationSeconds": 8,
+      "status": "ready",
+      "alignmentEndSeconds": 6.32,
+      "words": [
+        {
+          "text": "Then",
+          "startSeconds": 0,
+          "endSeconds": 0.32
+        },
+        {
+          "text": "face",
+          "startSeconds": 0.432,
+          "endSeconds": 0.88
+        },
+        {
+          "text": "the",
+          "startSeconds": 0.9,
+          "endSeconds": 0.96
+        },
+        {
+          "text": "giants.",
+          "startSeconds": 1.04,
+          "endSeconds": 1.6
+        },
+        {
+          "text": "Learn",
+          "startSeconds": 1.733,
+          "endSeconds": 2.4
+        },
+        {
+          "text": "their",
+          "startSeconds": 2.427,
+          "endSeconds": 2.56
+        },
+        {
+          "text": "rhythm.",
+          "startSeconds": 2.617,
+          "endSeconds": 3.12
+        },
+        {
+          "text": "Find",
+          "startSeconds": 3.248,
+          "endSeconds": 3.76
+        },
+        {
+          "text": "your",
+          "startSeconds": 3.824,
+          "endSeconds": 4.08
+        },
+        {
+          "text": "moment.",
+          "startSeconds": 4.171,
+          "endSeconds": 6.32
+        }
+      ],
+      "phrases": [
+        {
+          "text": "Then face the giants.",
+          "startSeconds": 0,
+          "endSeconds": 1.6,
+          "wordOffset": 0,
+          "wordCount": 4
+        },
+        {
+          "text": "Learn their rhythm.",
+          "startSeconds": 1.733,
+          "endSeconds": 3.12,
+          "wordOffset": 4,
+          "wordCount": 3
+        },
+        {
+          "text": "Find your moment.",
+          "startSeconds": 3.248,
+          "endSeconds": 6.32,
+          "wordOffset": 7,
+          "wordCount": 3
+        }
+      ],
+      "totalWords": 10,
+      "offset": 0,
+      "hasMore": false,
+      "nextOffset": null,
+      "instruction": "Timings are seconds in the source audio. Segments sharing a provider cell share its full interval; no intra-cell timing is inferred. Fetch remaining pages before planning; phrase groups are page-local. Use durationSeconds for the full clip, not alignmentEndSeconds. When replying to the user, use names, titles, webUrl, and plain descriptions — do not quote internal identifiers (UUIDs, folder references, session or request ids) unless they explicitly ask."
+    }
+  },
+  {
+    "id": "11-outro",
+    "at": 83.4,
+    "text": "Microverse. Feed. Protect. Evolve.",
+    "creation": {
+      "identifier": "p81Bkdjehw",
+      "status": "queued",
+      "expectTime": 0,
+      "tool": "voiceover-generator",
+      "credits": 8
+    },
+    "timing": {
+      "identifier": "p81Bkdjehw",
+      "durationSeconds": 8,
+      "status": "ready",
+      "alignmentEndSeconds": 5.8,
+      "words": [
+        {
+          "text": "Microverse.",
+          "startSeconds": 0,
+          "endSeconds": 1.6
+        },
+        {
+          "text": "Feed.",
+          "startSeconds": 1.744,
+          "endSeconds": 2.4
+        },
+        {
+          "text": "Protect.",
+          "startSeconds": 2.6,
+          "endSeconds": 4.08
+        },
+        {
+          "text": "Evolve.",
+          "startSeconds": 4.507,
+          "endSeconds": 5.8
+        }
+      ],
+      "phrases": [
+        {
+          "text": "Microverse.",
+          "startSeconds": 0,
+          "endSeconds": 1.6,
+          "wordOffset": 0,
+          "wordCount": 1
+        },
+        {
+          "text": "Feed.",
+          "startSeconds": 1.744,
+          "endSeconds": 2.4,
+          "wordOffset": 1,
+          "wordCount": 1
+        },
+        {
+          "text": "Protect.",
+          "startSeconds": 2.6,
+          "endSeconds": 4.08,
+          "wordOffset": 2,
+          "wordCount": 1
+        },
+        {
+          "text": "Evolve.",
+          "startSeconds": 4.507,
+          "endSeconds": 5.8,
+          "wordOffset": 3,
+          "wordCount": 1
+        }
+      ],
+      "totalWords": 4,
+      "offset": 0,
+      "hasMore": false,
+      "nextOffset": null,
+      "instruction": "Timings are seconds in the source audio. Segments sharing a provider cell share its full interval; no intra-cell timing is inferred. Fetch remaining pages before planning; phrase groups are page-local. Use durationSeconds for the full clip, not alignmentEndSeconds. When replying to the user, use names, titles, webUrl, and plain descriptions — do not quote internal identifiers (UUIDs, folder references, session or request ids) unless they explicitly ask."
+    }
+  }
+]
