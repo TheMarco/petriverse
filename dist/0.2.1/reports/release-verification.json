@@ -1,0 +1,54 @@
+{
+  "version": "0.2.1",
+  "verified_at": "2026-10-07T23:39:20.339294+00:00",
+  "engine": "Godot 4.7.2",
+  "archives": {
+    "macos": {
+      "file": "Petriverse-0.2.1-macos-universal.zip",
+      "bytes": 176320972,
+      "sha256": "8dab1c033a9bfd305fdc5befaee4299f485b1bf3b3d6b49075826402d1d6f0fd",
+      "game_pack_sha256": "fc3a3839699ce2b013cb6a4b7b97398b0c14faf2d613a8a33d9c18b4169b0689",
+      "archive_validated": true,
+      "executable_permissions_preserved": null
+    },
+    "windows": {
+      "file": "Petriverse-0.2.1-windows-x86_64.zip",
+      "bytes": 152372715,
+      "sha256": "a2fce210da685a1147f50866957f03040b445ae0f5b1f05cda0b6175d1af9dea",
+      "game_pack_sha256": "fc3a3839699ce2b013cb6a4b7b97398b0c14faf2d613a8a33d9c18b4169b0689",
+      "archive_validated": true,
+      "executable_permissions_preserved": null
+    },
+    "linux": {
+      "file": "Petriverse-0.2.1-linux-x86_64.tar.gz",
+      "bytes": 142621099,
+      "sha256": "adc307ed306d7e55cced057e49cc6b67114791c473e3e48eb2cf06cb2bcfe50c",
+      "game_pack_sha256": "fc3a3839699ce2b013cb6a4b7b97398b0c14faf2d613a8a33d9c18b4169b0689",
+      "archive_validated": true,
+      "executable_permissions_preserved": true
+    }
+  },
+  "identical_game_packs": true,
+  "mac_signing": "Developer ID Application: Marco van Hylckama Vlieg (3ML6V62AF5)",
+  "mac_notarization": {
+    "message": "Processing complete",
+    "id": "40952b7b-6556-4711-b8e0-f0a7b2dcc366",
+    "status": "Accepted"
+  },
+  "mac_staple_and_gatekeeper": "Passed on app extracted from final archive",
+  "native_smoke": {
+    "checks": 54,
+    "engine": "4.7.2-stable (official)",
+    "failures": [],
+    "platform": "macOS",
+    "source": ""
+  },
+  "native_platforms_tested": [
+    "macOS"
+  ],
+  "target_platforms_not_run": [
+    "Windows",
+    "Linux"
+  ],
+  "source_note": "All three platforms exported once from an unchanged source tree; no pack synchronization was needed."
+}

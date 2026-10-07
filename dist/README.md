@@ -1,20 +1,24 @@
-# Petriverse 0.2.0
+# Petriverse 0.2.1
 
-- **Mac, Apple Silicon + Intel:** [Petriverse-0.2.0-macos-universal.zip](Petriverse-0.2.0-macos-universal.zip). Developer ID signed, Apple notarized, with the ticket stapled. Requires macOS 13+ on Apple Silicon or macOS 11+ on Intel.
-- **Windows x86-64:** [Petriverse-0.2.0-windows-x86_64.zip](Petriverse-0.2.0-windows-x86_64.zip). Extract everything and run `Petriverse.exe`; keep `Petriverse.pck` beside it. Not Authenticode signed.
-- **Linux x86-64:** [Petriverse-0.2.0-linux-x86_64.tar.gz](Petriverse-0.2.0-linux-x86_64.tar.gz). Extract and run `./Petriverse.x86_64`; keep `Petriverse.pck` beside it. Executable permissions are preserved.
+- **Mac, Apple Silicon + Intel:** [Petriverse-0.2.1-macos-universal.zip](Petriverse-0.2.1-macos-universal.zip). Developer ID signed, Apple notarized, with the ticket stapled. Requires macOS 13+ on Apple Silicon or macOS 11+ on Intel.
+- **Windows x86-64:** [Petriverse-0.2.1-windows-x86_64.zip](Petriverse-0.2.1-windows-x86_64.zip). Extract everything and run `Petriverse.exe`; keep `Petriverse.pck` beside it. Not Authenticode signed.
+- **Linux x86-64:** [Petriverse-0.2.1-linux-x86_64.tar.gz](Petriverse-0.2.1-linux-x86_64.tar.gz). Extract and run `./Petriverse.x86_64`; keep `Petriverse.pck` beside it. Executable permissions are preserved.
 
 All packages include the art, three supplied music tracks, sound effects and license notices. They work offline without Godot or API keys. Existing Microverse saves remain in their original application-data location and carry over under the Petriverse name.
 
+## New in 0.2.1
+
+A redesigned interface. During an encounter the screen shows only what you act on: mother health, saved food, your traits, the goal, and the next step. The field journal, settings, and Save and return home live in a new pause menu (Space), and the journey map appears in briefings and the pause menu. Dialogs, buttons, upgrade cards and settings share one style, with shortcut keys printed on the buttons; Settings now include the input mode. Discovery messages no longer run off the bottom of the screen, and the evolution close-up keeps the trait's name readable. Game rules are unchanged.
+
 ## Included in this release
 
-The living Petriverse title screen, independent cell drift, reactive water and sparkling particles, continuous-membrane amoebas with timed cell rescue, bacteriophages that infect bacteria and release stolen food, colony evolution, rare creatures, three biomes and their guardians, thirty-encounter journeys, and the home pond. The current interface typography and collision-aware creature labels are included.
+The living Petriverse title screen, independent cell drift, reactive water and sparkling particles, continuous-membrane amoebas with timed cell rescue, bacteriophages that infect bacteria and release stolen food, colony evolution, rare creatures, three biomes and their guardians, thirty-encounter journeys, and the home pond. The redesigned interface, Inter typography (SIL OFL) and collision-aware creature labels are included.
 
 ## Verification
 
 All three platforms contain the same game pack. That pack passed 54 native smoke checks on macOS, covering menu startup, release identity, logo, fonts, creatures, all three supplied scores, board data, a real food capture, recovery, fluid rendering and pause. The final extracted Mac archive passed signature, stapled-ticket and Gatekeeper verification. Archive contents, game-pack hashes and Linux executable permissions were checked. Windows and Linux have not been run on their target operating systems.
 
-See [release verification](0.2.0/reports/release-verification.json), [native pack report](0.2.0/reports/pack-native.json), and [checksums](SHA256SUMS.txt). Previous 0.1.0 and 0.1.1 archives are retained.
+See [release verification](0.2.1/reports/release-verification.json), [native pack report](0.2.1/reports/pack-native.json), and [checksums](SHA256SUMS.txt). Previous 0.1.0, 0.1.1 and 0.2.0 archives are retained.
 
 ## Trailer
 
