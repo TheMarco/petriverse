@@ -1,0 +1,71 @@
+{
+	"duration": 12.0,
+	"events": [
+		{
+			"sound": "connect",
+			"time": 5.0
+		},
+		{
+			"sound": "connect",
+			"time": 6.0
+		},
+		{
+			"sound": "connect",
+			"time": 7.0
+		},
+		{
+			"capture": {
+				"armor_hits": 0,
+				"bodies": 1,
+				"boss_layers": 0,
+				"cells_rescued": 1,
+				"filtered": 0,
+				"food": 0,
+				"food_bonuses": {},
+				"ids": [
+					36
+				],
+				"kills": 1,
+				"mastery": [],
+				"nodes": [
+					7,
+					8,
+					15
+				],
+				"points": 0,
+				"poison": 0,
+				"polygon": "[(575.0952, 366.575), (652.0453, 184.481), (498.3566, 265.4652)]",
+				"positions": [
+					"(575.1657, 272.1738)"
+				],
+				"prey_forms": [
+					""
+				],
+				"prey_kinds": [
+					"amoeba"
+				],
+				"purified": 0,
+				"raw_food": 0,
+				"recovery": 3.0,
+				"rescued": 0,
+				"restored_node": -1,
+				"salvage": 0,
+				"threats": 1,
+				"valid": true,
+				"wardens": 0
+			},
+			"sound": "close",
+			"time": 8.46666666666667
+		},
+		{
+			"sound": "absorb",
+			"time": 9.16666666666667
+		}
+	],
+	"failures": [],
+	"frames": 360,
+	"integrity": 5,
+	"nourishment": 0,
+	"shot": "amoeba",
+	"source": "Native Godot simulation, camera and title overlays only; staged isolated encounters"
+}
