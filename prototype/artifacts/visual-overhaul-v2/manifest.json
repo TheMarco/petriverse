@@ -1,0 +1,58 @@
+[
+  {
+    "detail": "Organic sediment, fine algae and refractive pond fragments",
+    "group": "Worlds & habitats",
+    "id": "world-0-bloom",
+    "image": "world-0-bloom.webp",
+    "label": "Stillwater · Blooming banks"
+  },
+  {
+    "detail": "Etched silica diatoms in cool slate-blue water",
+    "group": "Worlds & habitats",
+    "id": "world-1-bloom",
+    "image": "world-1-bloom.webp",
+    "label": "Glassgarden · Sunlit reeds"
+  },
+  {
+    "detail": "Delicate suspended membranes and deep blue plankton",
+    "group": "Worlds & habitats",
+    "id": "world-2-bloom",
+    "image": "world-2-bloom.webp",
+    "label": "Blue Deep · Luminous current"
+  },
+  {
+    "detail": "The unmodified Mother and her cells",
+    "group": "Colony families",
+    "id": "colony-starting",
+    "image": "colony-starting.webp",
+    "label": "Starting colony"
+  },
+  {
+    "detail": "Living buds, fine feeding brushes, sensory hairs and nursery chambers",
+    "group": "Colony families",
+    "id": "colony-nimble",
+    "image": "colony-nimble.webp",
+    "label": "Mature Nimble colony"
+  },
+  {
+    "detail": "Broad folded membranes, digestive sacs, storage chambers and a porous veil",
+    "group": "Colony families",
+    "id": "colony-feast",
+    "image": "colony-feast.webp",
+    "label": "Mature Feast colony"
+  },
+  {
+    "detail": "Ribbed membranes, folded feeding organs and trailing tissue",
+    "group": "Colony families",
+    "id": "colony-hunter",
+    "image": "colony-hunter.webp",
+    "label": "Mature Hunter colony"
+  },
+  {
+    "detail": "A broad primary shape with secondary buds, ribs and digestive organs",
+    "group": "Colony families",
+    "id": "colony-hybrid",
+    "image": "colony-hybrid.webp",
+    "label": "Mixed colony"
+  }
+]
