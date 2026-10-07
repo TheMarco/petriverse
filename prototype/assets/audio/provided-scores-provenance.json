@@ -1,0 +1,53 @@
+{
+  "source": "User-provided MP3 files, supplied 2026-10-07. No new audio generated.",
+  "menu_track": "stillwater",
+  "harmonic_overlays": false,
+  "tracks": [
+    {
+      "world": "stillwater",
+      "source": "track1.mp3",
+      "source_sha256": "01c20a36c0da1f4b1ef71792b5d25b151f06e596dbddf22dcc59a7546ea8e806",
+      "original": "artifacts/audio-source/provided-scores/track1.mp3",
+      "asset": "assets/audio/petriverse-stillwater.ogg",
+      "duration_seconds": 189.200544,
+      "source_lufs": -17.49,
+      "gain_db": -5.510000000000002,
+      "estimated_true_peak_dbfs": -9.240000000000002,
+      "target_lufs": -23.0,
+      "processing": "Linear gain only; 44.1 kHz stereo Ogg Vorbis quality 6. Five-second loop crossfade in the game."
+    },
+    {
+      "world": "glassgarden",
+      "source": "track2.mp3",
+      "source_sha256": "4ce8bd49172ad85e8fe4e23b7736b8a28382d66780c45291c1964cdcd225fe84",
+      "original": "artifacts/audio-source/provided-scores/track2.mp3",
+      "asset": "assets/audio/petriverse-glassgarden.ogg",
+      "duration_seconds": 139.200726,
+      "source_lufs": -17.85,
+      "gain_db": -5.149999999999999,
+      "estimated_true_peak_dbfs": -11.18,
+      "target_lufs": -23.0,
+      "processing": "Linear gain only; 44.1 kHz stereo Ogg Vorbis quality 6. Five-second loop crossfade in the game."
+    },
+    {
+      "world": "blue-deep",
+      "source": "track3.mp3",
+      "source_sha256": "02e4ba25ff78ed0d665f6b0706226c84fae0e8f8f55ecbd3a0d3e43bb505dccc",
+      "original": "artifacts/audio-source/provided-scores/track3.mp3",
+      "asset": "assets/audio/petriverse-blue-deep.ogg",
+      "duration_seconds": 182.800544,
+      "source_lufs": -17.4,
+      "gain_db": -5.600000000000001,
+      "estimated_true_peak_dbfs": -11.770000000000001,
+      "target_lufs": -23.0,
+      "processing": "Linear gain only; 44.1 kHz stereo Ogg Vorbis quality 6. Five-second loop crossfade in the game."
+    }
+  ],
+  "validation": {
+    "focused_audio_checks": 83,
+    "native_mixer_checks": 14,
+    "native_failures": [],
+    "mixed_peak_dbfs": -11.5900901228713,
+    "dropped_mixer_frames": 0
+  }
+}

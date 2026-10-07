@@ -1,0 +1,15 @@
+{
+  "provider": "OpenAI built-in imagegen",
+  "assets": [
+    {
+      "path": "stillwater-v1.png",
+      "source": "exec-e194e1aa-fa96-4944-93ae-8ab75a9fb61b.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: full-bleed 1536x1024 microscopic pond-water background texture for the STILLWATER biome of a meditative game. Generate an authentic phase-contrast wet-mount micrograph seen from directly above, with very many tiny irregular suspended organic flecks, soft translucent round algal cells, sparse wispy gently curved algae filaments and tiny clusters of subdued olive chloroplast granules. Real photographic microscope optics: uneven refractive rims, slight chromatic fringe, translucent wet membranes, natural depth-of-field with most matter slightly below focus. Each organism should be SMALL, mostly under 3 percent of image width; a few fine filaments may extend 8 percent. Uneven natural distribution, more organic detail toward edges and relatively restful but still textured central water. Cool neutral grey-green transmitted-light water with low contrast, medium brightness suitable for later dark blue grading in the game. Rich realistic optical detail, no giant hero organism, no sharp angular silica needles (those belong to a different biome), no fantastical glow, no cartoon, no illustration, no stars, no scenery, no text, no frame, no microscope circular border. It should look like an actual photograph of a quiet drop of pond water, not a composition of icons."
+    },
+    {
+      "path": "blue-deep-v1.png",
+      "source": "exec-af84a2cd-0c09-4028-9f74-e3a97421925c.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: full-bleed 1536x1024 microscopic-water background texture for BLUE DEEP, the deepest biome of a meditative microscopy game. An authentic photographic phase-contrast wet-mount micrograph of sparse suspended plankton and marine snow in cool neutral gray-violet transmitted water. Realistic microscopic matter: many tiny translucent irregular gelatinous flocs, delicate pale branching organic threads, sparse porous round radiolarian shells and hollow delicate membrane ghosts, minute detritus specks of varied size. Different optical depths, most matter softened below the focal plane, occasional sharply resolved microscopic silica lattice with refractive rim. Keep all organisms tiny, mostly under 3 percent width, and avoid any large featured subject. More small detail toward outer edges, quiet subtly textured center, organically uneven distribution, slight natural chromatic aberration, photographic refraction and optical interference. Medium-bright gray-violet source plate suitable for dark navy color grading in a game; low contrast, no black space. This is a genuine-looking scientific microscope image, NOT an underwater landscape and NOT outer space. No stars, bubbles, planets, giant creatures, jellyfish silhouettes, illustration, magical glow, text, borders or vignette. It must be distinctly more open and ethereal than green algae-rich pond water or dense needle-shaped diatoms."
+    }
+  ]
+}

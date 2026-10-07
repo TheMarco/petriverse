@@ -1,0 +1,311 @@
+{
+  "provider": "ElevenLabs",
+  "documentation": [
+    "https://elevenlabs.io/docs/api-reference/music/compose",
+    "https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert"
+  ],
+  "mastering": "44.1kHz Vorbis, gentle bandwidth shaping, -23 LUFS music/effects, -29 LUFS pond. Short effects have lead-in silence removed. Runtime mixer adds headroom and crossfades music.",
+  "assets": [
+    {
+      "provider": "ElevenLabs",
+      "name": "connect",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "One single tiny rounded water droplet with a warm delicate glass resonance, a soft musical A4 note. Immediate gentle pluck at time zero, short clean decay into silence. Intimate, tactile, tranquil, almost ASMR. Not a cartoon pop or a computer beep. No background ambience or music. No voices, no speech, no harsh transients, no distortion. Original isolated sound design for a soothing microscopic pond-life game.",
+        "duration_seconds": 0.65,
+        "loop": false,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": false,
+      "request_id": null,
+      "credit_cost": "6",
+      "sha256": "b3d0fed144a4582620548743bdba74eee54a03a760fb139362e824d53cd436ce"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "close",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "One delicate organic membrane closing: a rounded liquid tuck softly blooming into a luminous consonant A major suspended glass chord. Immediate tactile onset, smooth airy resonance, quiet satisfying resolution, soft short tail. No beat or background music. No voices, no speech, no harsh transients, no distortion. Original isolated sound design for a soothing microscopic pond-life game.",
+        "duration_seconds": 1.5,
+        "loop": false,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": false,
+      "request_id": null,
+      "credit_cost": "15",
+      "sha256": "97490efd0f296d44708b379ca43d8014c6a2b34be73703e29895fd3543c35349"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "absorb",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "A tiny translucent cell draws liquid inward, slowly dissolves and absorbs another cell: very soft swirling viscous water, fine wet granular fizz and a few microscopic bubbles, ending in a warm pearlescent exhale. Beautiful, delicate and nourishing, not disgusting. Quiet close-up texture, no big splash, suction horror or bass impact. No music. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 2.5,
+        "loop": false,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": false,
+      "request_id": null,
+      "credit_cost": "25",
+      "sha256": "58091ff6b2722545b3fa3d5e28a1cbae1b3e607e16c7dae0234663bb3bdc9508"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "injury",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "One fragile living membrane gently tears under water, a muted rounded low droplet followed by a short descending glass sigh and fine bubbles escaping. Tender, melancholy, immediately noticeable but never alarming. Quiet isolated game feedback, no crunch or explosion. No music. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 1.8,
+        "loop": false,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": false,
+      "request_id": null,
+      "credit_cost": "18",
+      "sha256": "376a70a9ef0a70c4645f65846ba716b719531e30d16be52f4ddf2d01e6f83f97"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "fracture",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "A tiny opalescent microscopic shell flexes and fractures, a very soft fine crystalline tick inside thick water, followed by a delicate shimmering sandy exhale. Immediate rounded onset, gentle and satisfying, no shattering glass crash. No music. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 1.0,
+        "loop": false,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": false,
+      "request_id": null,
+      "credit_cost": "10",
+      "sha256": "b9bfa36017ac00c20fa0594548ad277f2750158796bd33c3a915b618b3bdde95"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "evolve",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "One serene ascending blossom of soft glass harmonics in A major pentatonic, like an underwater flower opening, with a tiny breath of liquid bubbles. A tender three-note musical reward, warm luminous airy tail, unhurried, soothing and intimate. No beat, fanfare or background track. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 4.0,
+        "loop": false,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": false,
+      "request_id": null,
+      "credit_cost": "40",
+      "sha256": "2194a2ce1e0725ad3c9c21dde1f84a580232ed16f4f870c708e05f73145ac11a"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "warning",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "One very quiet low rounded resonant water bell, soft A3 fundamental and airy glass overtones, slowly blooming then fading. Calm attention cue for a fragile organism, not an alarm. No ticking, no sharp ping, no music bed. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 1.6,
+        "loop": false,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": false,
+      "request_id": null,
+      "credit_cost": "16",
+      "sha256": "ab83cac39a732870aeeb5c361391a440a07ac408967820ff343066e98e8e5280"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "victory",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "A gentle luminous resolution of three slowly blooming soft glass chords in A major, warm airy harmonics, an intimate underwater garden opening into light. Peaceful accomplishment, soothing and emotional, no celebratory fanfare, percussion or rhythmic beat. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 6.0,
+        "loop": false,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": false,
+      "request_id": null,
+      "credit_cost": "60",
+      "sha256": "ef1aa529d023a5e4ed76693b3977930d9901eb68f071bfd2668bad7bb60f75cf"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "loss",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "A tender falling pair of softly bowed glass notes over a fading low warm water resonance, a fragile life returning to the pond. Bittersweet, accepting and peaceful, not ominous or dramatic. Quiet tail into silence, no percussion. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 4.0,
+        "loop": false,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": false,
+      "request_id": null,
+      "credit_cost": "40",
+      "sha256": "ac03164c8be2d659df2f43a63014bc9c11b25a92bf35cfa05ab599a1eacb7656"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "pond",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "Seamless almost-silent underwater micro-ambience. A soft warm current with scattered extremely tiny distant liquid bubbles and a faint silky aqueous rustle. Sparse, spacious, calm, close and delicate, no large ocean waves, birds, wind, splashes, heartbeat, melody or music. Consistent level, no beginning or ending. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 24.0,
+        "loop": true,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": true,
+      "request_id": null,
+      "credit_cost": "240",
+      "sha256": "573567750eee8f1abb1b83f02abbeb5c1905b8179a24ab477375d59f18c77304"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "stillwater",
+      "endpoint": "music",
+      "request": {
+        "prompt": "Original instrumental ambient meditation score for a beautiful microscopic pond ecosystem. Deeply soothing, spacious, intimate and quietly wondrous. A major pentatonic tonal center with gentle suspended harmonies, warm soft analog pads breathing very slowly, sparse felt-like glass mallet notes with beautifully rounded attacks, delicate distant bowed glass harmonics, subtle liquid granular texture. Lots of silence between melodic gestures. A floating sense of 48 BPM without any drums or explicit rhythm. Slow graceful harmonic evolution, restrained dynamic range, no tension build, no dramatic climax. Never saccharine, never a stock spa melody. Wide natural space, soft upper frequencies, clear warm low midrange, no heavy sub bass. A continuous living soundscape from first second to last, end in the same A suspended harmonic bed for a smooth long crossfade to the opening. No fade to silence, no finale. No percussion, ostinato, arpeggiator, vocals, voices, choir, singing or speech.",
+        "music_length_ms": 120000,
+        "force_instrumental": true,
+        "model_id": "music_v2"
+      },
+      "loop": true,
+      "request_id": null,
+      "credit_cost": null,
+      "sha256": "752eec66db08d1ecc1c3784dab5944d87d2990029767cc5ad2e185a4a8f89600"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "deepwater",
+      "endpoint": "music",
+      "request": {
+        "prompt": "Original instrumental ambient meditation music for discovering a majestic two-hearted microscopic organism in a dark blue pond. Peaceful concentration and compassionate wonder, never battle music. A major pentatonic, warm slowly breathing low pads, airy bowed glass, very sparse soft rounded glass mallet notes, a few deep velvety water resonances, wide dreamy natural reverberation. The sensation of 48 BPM, no drums or explicit beat. Slightly deeper and more enveloping than a tranquil garden, still very soothing, gentle and safe. Gradual harmonic movement with suspended chords, no dramatic swells or tension risers, no harsh sounds, no ominous dissonance. Restrained even volume. Continuous atmosphere from beginning to end, finish in the same A suspended harmonic bed to crossfade seamlessly to the opening. No fade to silence or final cadence. No percussion, ostinato, arpeggiators, vocals, voices, singing, choir or speech.",
+        "music_length_ms": 90000,
+        "force_instrumental": true,
+        "model_id": "music_v2"
+      },
+      "loop": true,
+      "request_id": null,
+      "credit_cost": null,
+      "sha256": "44a78f66dcb8420d12fab52cc176bcdaea77426263bee60276a3c2f27ea2da9e"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "glassgarden",
+      "endpoint": "music",
+      "request": {
+        "prompt": "Original instrumental ambient score for a microscopic garden of etched glass diatoms. Meditative, intimate, curious, spacious. A major pentatonic with sustained A and E overtones, sparse tiny felted celesta gestures, resonant glass bowls, soft brushed crystal harmonics and warm velvety pads. More translucent and crystalline than a pond score but never shrill or tinkling. No drum beat, no rhythmic ostinato, no ticking, no arpeggiator, no dramatic rise or finale. Extremely gentle dynamic range with long breathing spaces. Sensation of 48 BPM without explicit pulse. Rounded attacks and softened treble. A continuous living atmosphere from first to last second, ending on the same suspended A harmony to allow a five-second crossfade. No fade to silence. Absolutely no voices, singing, choir, speech, percussion or heavy bass.",
+        "music_length_ms": 120000,
+        "force_instrumental": true,
+        "model_id": "music_v2"
+      },
+      "loop": true,
+      "request_id": null,
+      "credit_cost": null,
+      "sha256": "28afffc91497cd2774e86507ee66e6b70d1ef1515e93296c8e2fb848774c506c"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "current-layer",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "Seamless soft watery texture for a living microscopic current. A warm airy liquid rustle with tiny silk-like bubbles, breathing slowly in irregular waves. Very sparse and delicate, calm anticipation without alarm or ticking. No distinct melody, beat, impact or large splash. Even level, no beginning or ending. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 24.0,
+        "loop": true,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": true,
+      "request_id": null,
+      "credit_cost": "240",
+      "sha256": "f98bdd684d9c45e305941905e5e19fe0d899b7df6a4959c16b8a856c8c2b055c"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "tension-layer",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "Seamless extremely gentle low bowed-glass resonance on A2 and E3, floating in thick quiet water. Slow breathing and fine silky aqueous grain. Peaceful alert concentration, tender and protective, never frightening. No beat, ticking, riser, crescendo or sub-bass. Stable suspended harmony, no melody or ending. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 24.0,
+        "loop": true,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": true,
+      "request_id": null,
+      "credit_cost": "240",
+      "sha256": "059e4ed58e86eef56784b2cd6bebe067b5f923b9a5db2c7f98051a8a19b45a27"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "mastery",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "One small beautiful musical blossom: three rounded liquid-glass notes A5 E6 B6 spread gently over two seconds, overlapping warm shimmering overtones and a soft pearly water exhale. Restrained, intimate, satisfying discovery. Smooth quiet decay, no fanfare, percussion or background track. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 3.8,
+        "loop": false,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": false,
+      "request_id": null,
+      "credit_cost": "38",
+      "sha256": "05dbef342cbda7a49db1fec6408152eb12126670963fd8e13ef42f516e6d8687"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "nimble-layer",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "Seamless sparse rounded liquid-glass micro-plucks on A5 E6 B5, with long quiet spaces and delicate floating tails. Intimate, light, curious, meditative. Irregular natural timing, no repeated rhythmic pattern, beat, ticking or sharp treble. Stable suspended harmony, no beginning or ending. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 24.0,
+        "loop": true,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": true,
+      "request_id": null,
+      "credit_cost": "240",
+      "sha256": "fd81eb8c0f98752af2efbb8b57dd3abc3e2f1e1b28fef43579730441063d123a"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "feast-layer",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "Seamless warm bowed-glass resonance on A3 E4, broad velvety overtones breathing in very slow gentle swells. Spacious, nourishing, meditative, rich but transparent. No melodic sequence, beat, pulsing bass, ticking or dramatic rise. Soft upper frequencies, no beginning or ending. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 24.0,
+        "loop": true,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": true,
+      "request_id": null,
+      "credit_cost": "240",
+      "sha256": "56335885b7be936c75ce080224127f01fb4feadc813f97525763cc4b6c4303e0"
+    },
+    {
+      "provider": "ElevenLabs",
+      "name": "hunter-layer",
+      "endpoint": "sound-generation",
+      "request": {
+        "text": "Seamless soft protective harmonics on A4 E5 B4, slowly overlapping bell-glass tones and a fine airy watery halo. Tender, watchful, reassuring, meditative. No alarm, tension rise, melody, beat, ticking, bass impact, choir or voices. Restrained treble, continuous quiet texture, no beginning or ending. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+        "duration_seconds": 24.0,
+        "loop": true,
+        "prompt_influence": 0.65,
+        "model_id": "eleven_text_to_sound_v2"
+      },
+      "loop": true,
+      "request_id": null,
+      "credit_cost": "240",
+      "sha256": "57605c4c46e0d5a66d17aa2c1422e446ef8c16ccce930791909c0a690a921bc4"
+    }
+  ]
+}

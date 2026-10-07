@@ -1,0 +1,19 @@
+{
+  "generator": "Built-in image_gen",
+  "reference": "drifter.png",
+  "transparent_background": true,
+  "prompts": [
+    {
+      "name": "bellwether",
+      "prompt": "Use case: stylized-concept. Asset type: single isolated transparent RGBA game organism sprite for MICROVERSE, a premium meditative microscopy game. Reference image is material/style reference ONLY: match its astonishing intricate translucent wet cytoplasm, crisp phase-contrast silvery edges, microgranules, fibrous organelles, organic photoreal microscopy quality. Create a DIFFERENT species. Centered entire organism with ample empty transparent margin, square canvas, orthographic top view, one main luminous nucleus exactly at image center (50%,50%) for gameplay registration. No environment, floor, shadow, text, glow cloud, frame, watermark, or other organisms. Genuine transparent background. Subject: Bellwether predator. A delicate radial bell-shaped rotifer seen from above, scalloped circular clear membrane, many gracefully curved short feeding filaments arranged in a crown, amber-peach central nucleus, radial threads and small opalescent digestive vacuoles. Broad rounded upper bell with tiny contracted forked tail below. Distinct from the reference's long oval. Keep nucleus perfectly centered. Elegant glass and gold, not cartoon or jellyfish fantasy."
+    },
+    {
+      "name": "glass-regent",
+      "prompt": "Use case: stylized-concept. Asset type: single isolated transparent RGBA game organism sprite for MICROVERSE, a premium meditative microscopy game. Reference image is material/style reference ONLY: match its astonishing intricate translucent wet cytoplasm, crisp phase-contrast silvery edges, microgranules, fibrous organelles, organic photoreal microscopy quality. Create a DIFFERENT species. Centered entire organism with ample empty transparent margin, square canvas, orthographic top view, one main luminous nucleus exactly at image center (50%,50%) for gameplay registration. No environment, floor, shadow, text, glow cloud, frame, watermark, or other organisms. Genuine transparent background. Subject: Glass Regent predator. A spectacular angular six-sided silica diatom shield, elongated vertically, sharp hexagonal pointed crown and tapered lower tip, layered transparent faceted armor with engraved fine concentric ribs, iridescent pale champagne and blue silica. A deep moss-gold round nucleus exactly at center, intricate symmetrically paired olive digestive chambers. Several short thin rigid glass spines at corners, absolutely no furry cilia. Exquisitely microscopic and wet, a much bolder angular silhouette than the reference."
+    },
+    {
+      "name": "pearl-spore",
+      "prompt": "Use case: stylized-concept. Asset type: single isolated transparent RGBA game organism sprite for MICROVERSE, a premium meditative microscopy game. Reference image is material/style reference ONLY: match its astonishing intricate translucent wet cytoplasm, crisp phase-contrast silvery edges, microgranules, fibrous organelles, organic photoreal microscopy quality. Create a DIFFERENT species. Centered entire organism with ample empty transparent margin, square canvas, orthographic top view, one main luminous nucleus exactly at image center (50%,50%) for gameplay registration. No environment, floor, shadow, text, glow cloud, frame, watermark, or other organisms. Genuine transparent background. Subject: tiny rescue Pearl Spore, a young friendly colony. An almost round opalescent seed in two delicate translucent membrane layers, three tiny budding lobes asymmetrically along its edge, only a few wispy silk-like filaments. Cool silver pearl nucleus exactly centered with pale mint rim and tiny warm organelles inside. Friendly, fragile, biologically believable, restrained clear blue pearl material rather than brilliant glowing orb. Distinct from green algae and violet toxic spikes."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "prompt": "Use case: stylized-concept. Production transparent game sprite for MICROVERSE. The provided image is ONLY a reference for exceptional photographic microscopic material quality; create radically different anatomy. ONE individual heart-lobe of THE CONJOINED, a majestic sprawling colonial amoeba. A completely IRREGULAR BRANCHING silhouette: a soft central glassy cell with 5 broad meandering pseudopods of very different lengths, two pseudopods splitting into delicate rounded branches, like a transparent living estuary. Soft wide translucent flowing arms, not spines, not star symmetry, not rigid tentacles. Exactly ONE amber nucleus at the EXACT CENTER of the square canvas, x50%,y50%. Deep muted violet-blue fibrous cytoplasm that continues into every arm, tiny pearl-clear vacuoles and sparse golden nutrient particles, fine vascular channels, three delicate nested flowing membrane folds, glass-thin opalescent edges. Natural organic asymmetry, small ripples, subtle wet refraction, beautiful convincing microscope optics. NO oval or circular disk silhouette, NO continuous cilia fringe, NO plates or honeycomb skeleton. It must look utterly different from a Drifter and a shelled diatom, while matching their material quality. Top-down orthographic, expansive branching body fills 80% of a square with safe margins around all arms. This is ONE half of a two-hearted colony; the game joins two such lobes through living tissue. Draw exactly ONE central golden nucleus and no secondary bright nuclei. Genuinely transparent alpha background with no backdrop, cast shadow, floor, scene, text, label or watermark. Calm and wondrous, not a horror creature, cartoon, neuron diagram or flat vector.",
+  "mode": "built-in imagegen edit/reference",
+  "references": [
+    "prototype/assets/organisms/drifter.png"
+  ],
+  "transparent_background": true,
+  "asset": "prototype/assets/organisms/conjoined-lobe-v2.png"
+}

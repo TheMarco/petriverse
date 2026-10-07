@@ -1,0 +1,194 @@
+[
+  {
+    "key": "lantern_grazer",
+    "kind": "grazer",
+    "name": "Lantern grazer",
+    "brief": "A squat champagne-gold translucent bell-shaped rotifer, broad trumpet crown pointing right, fine whorled feeding cilia, tapering two-pronged soft tail at left. A hollow corrugated glass bell with amber digestive granules and one small warm golden nucleus exactly at canvas center. Strong silhouette distinct from circular cells, leaf-shapes or spiky viruses.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. A squat champagne-gold translucent bell-shaped rotifer, broad trumpet crown pointing right, fine whorled feeding cilia, tapering two-pronged soft tail at left. A hollow corrugated glass bell with amber digestive granules and one small warm golden nucleus exactly at canvas center. Strong silhouette distinct from circular cells, leaf-shapes or spiky viruses.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-e59c5af1-beb2-4f76-9388-84659529dc54.png",
+    "nucleus_uv": [
+      0.491,
+      0.487
+    ],
+    "unlock_stage": 1,
+    "detail": "Pale-gold food thief. Capture its center to recover all food still in its stomach before it swims away.",
+    "generator": "built-in image_gen",
+    "file": "lantern_grazer.png"
+  },
+  {
+    "key": "fern_desmid",
+    "kind": "food",
+    "name": "Fern desmid",
+    "brief": "A delicate green desmid formed of two mirror lobes like deeply lobed fern fans, joined at a central narrow waist. Fresh lime and olive chloroplasts with tiny honey-gold pyrenoids, frosted refractive fringes. Entire organism horizontal and broad, central pale gold capture nucleus precisely at image center.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. A delicate green desmid formed of two mirror lobes like deeply lobed fern fans, joined at a central narrow waist. Fresh lime and olive chloroplasts with tiny honey-gold pyrenoids, frosted refractive fringes. Entire organism horizontal and broad, central pale gold capture nucleus precisely at image center.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-67b684f6-36f2-40d4-bc23-6ca0d2c04b04.png",
+    "nucleus_uv": [
+      0.49,
+      0.485
+    ],
+    "unlock_stage": 1,
+    "detail": "Green food. Enclose its bright center for one nourishment. Its shape changes; the feeding rule stays the same.",
+    "generator": "built-in image_gen",
+    "file": "fern_desmid.png"
+  },
+  {
+    "key": "spiral_alga",
+    "kind": "food",
+    "name": "Spiral alga",
+    "brief": "One short fat curved translucent capsule of green algae, a graceful open C shape with densely coiled chartreuse chloroplast ribbons inside a clear membrane. A small round pale gold capture nucleus precisely at image center, connected organically to the capsule tissue. It is one compact food organism with a clearly readable lime green silhouette.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. One short fat curved translucent capsule of green algae, a graceful open C shape with densely coiled chartreuse chloroplast ribbons inside a clear membrane. A small round pale gold capture nucleus precisely at image center, connected organically to the capsule tissue. It is one compact food organism with a clearly readable lime green silhouette.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-1a097e52-05f2-44ba-ac76-4559cf3b2e83.png",
+    "nucleus_uv": [
+      0.489,
+      0.484
+    ],
+    "unlock_stage": 4,
+    "detail": "Green food. Enclose its bright center for one nourishment. Its shape changes; the feeding rule stays the same.",
+    "generator": "built-in image_gen",
+    "file": "spiral_alga.png"
+  },
+  {
+    "key": "crown_cyst",
+    "kind": "cyst",
+    "name": "Crown cyst",
+    "brief": "A toxic magenta-violet dormant microorganism shaped like an angular squat hexagonal crown, with eight short crooked thorns, dense dusty plum cytoplasm, jewel-like indigo vacuoles and one magenta gold nucleus exactly at canvas center. Porous armored organic membrane, delicate luminous lilac fringe. Clearly thorny poison silhouette.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. A toxic magenta-violet dormant microorganism shaped like an angular squat hexagonal crown, with eight short crooked thorns, dense dusty plum cytoplasm, jewel-like indigo vacuoles and one magenta gold nucleus exactly at canvas center. Porous armored organic membrane, delicate luminous lilac fringe. Clearly thorny poison silhouette.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-b56c108b-c7a9-4db0-aa8e-5b4c0bc0a466.png",
+    "nucleus_uv": [
+      0.49,
+      0.49
+    ],
+    "unlock_stage": 2,
+    "detail": "Purple poison. A mixed meal costs one health. In purification missions, capture cysts alone to clear them safely.",
+    "generator": "built-in image_gen",
+    "file": "crown_cyst.png"
+  },
+  {
+    "key": "bramble_cyst",
+    "kind": "cyst",
+    "name": "Bramble cyst",
+    "brief": "A toxic mauve-purple cyst formed of four compact overlapping lobes like an irregular burr, fine branched spines curving from the outer rim, dense purple granular cytoplasm and small luminous magenta nucleus exactly at canvas center. Strong jagged silhouette, transparent interstices, subtle violet refractive light.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. A toxic mauve-purple cyst formed of four compact overlapping lobes like an irregular burr, fine branched spines curving from the outer rim, dense purple granular cytoplasm and small luminous magenta nucleus exactly at canvas center. Strong jagged silhouette, transparent interstices, subtle violet refractive light.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-a5488af8-abf6-4fd2-a0c2-94db39deb124.png",
+    "nucleus_uv": [
+      0.492,
+      0.481
+    ],
+    "unlock_stage": 5,
+    "detail": "Purple poison. A mixed meal costs one health. In purification missions, capture cysts alone to clear them safely.",
+    "generator": "built-in image_gen",
+    "file": "bramble_cyst.png"
+  },
+  {
+    "key": "snow_spore",
+    "kind": "spore",
+    "name": "Snow spore",
+    "brief": "One rescue spore shaped like a delicate pearl-white six-petaled snow rosette, milky translucent rounded sacs surrounding one pale ivory glowing nucleus exactly at image center. Tiny beadlike vacuoles, fine soft cilia, silver-blue membrane edges. Compact benign white silhouette, no green purple or orange body.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. One rescue spore shaped like a delicate pearl-white six-petaled snow rosette, milky translucent rounded sacs surrounding one pale ivory glowing nucleus exactly at image center. Tiny beadlike vacuoles, fine soft cilia, silver-blue membrane edges. Compact benign white silhouette, no green purple or orange body.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-c5222ad5-87d2-4c19-bb39-bc0c4e7b02e9.png",
+    "nucleus_uv": [
+      0.491,
+      0.486
+    ],
+    "unlock_stage": 1,
+    "detail": "Pearl-white rescue spore. Enclose its center before it fades away. Counts toward your rescue goal.",
+    "generator": "built-in image_gen",
+    "file": "snow_spore.png"
+  },
+  {
+    "key": "sail_spore",
+    "kind": "spore",
+    "name": "Sail spore",
+    "brief": "One pearl-white rescue spore with three asymmetrical delicate rounded translucent sails surrounding a tiny ivory nucleus precisely at image center. Pearlescent milky jelly sacs, one taller teardrop sail and two smaller rounded buds, silvery hairline membrane, cyan refraction. Looks like a microscopic floating seed, compact benign pale-white shape.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. One pearl-white rescue spore with three asymmetrical delicate rounded translucent sails surrounding a tiny ivory nucleus precisely at image center. Pearlescent milky jelly sacs, one taller teardrop sail and two smaller rounded buds, silvery hairline membrane, cyan refraction. Looks like a microscopic floating seed, compact benign pale-white shape.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-2308485a-614e-41d6-8b25-45364b54b139.png",
+    "nucleus_uv": [
+      0.5,
+      0.629
+    ],
+    "unlock_stage": 6,
+    "detail": "Pearl-white rescue spore. Enclose its center before it fades away. Counts toward your rescue goal.",
+    "generator": "built-in image_gen",
+    "file": "sail_spore.png"
+  },
+  {
+    "key": "needle_hunter",
+    "kind": "drifter",
+    "name": "Needle hunter",
+    "brief": "A predatory amber microscopic ciliate, long slim asymmetric spear-shaped body horizontal, tapered dagger tail to left and hooked feeding snout to right, clear glass skin with tawny amber intestinal folds, sparse long cilia. One glowing orange gold nucleus precisely at image center. Slim unmistakably hunter silhouette, no green or purple.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. A predatory amber microscopic ciliate, long slim asymmetric spear-shaped body horizontal, tapered dagger tail to left and hooked feeding snout to right, clear glass skin with tawny amber intestinal folds, sparse long cilia. One glowing orange gold nucleus precisely at image center. Slim unmistakably hunter silhouette, no green or purple.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-cc07468f-d9ca-4a57-908c-976df7fa5a12.png",
+    "nucleus_uv": [
+      0.515,
+      0.483
+    ],
+    "unlock_stage": 2,
+    "detail": "Amber hunter. Enclose its gold center before it reaches the mother. One capture absorbs it.",
+    "generator": "built-in image_gen",
+    "file": "needle_hunter.png"
+  },
+  {
+    "key": "ribbon_hunter",
+    "kind": "drifter",
+    "name": "Ribbon hunter",
+    "brief": "A predatory amber ciliate shaped like a compact curved ribbon or curled comma, flattened translucent bronze body, flared ruffled undulating membrane, fine rows of beating cilia, granular orange organelles. One glowing orange gold nucleus precisely at image center. Organic asymmetric curved silhouette, very different from spear hunter, no face.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. A predatory amber ciliate shaped like a compact curved ribbon or curled comma, flattened translucent bronze body, flared ruffled undulating membrane, fine rows of beating cilia, granular orange organelles. One glowing orange gold nucleus precisely at image center. Organic asymmetric curved silhouette, very different from spear hunter, no face.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-2cc7d0df-6188-4f14-9e8d-2a336376deb7.png",
+    "nucleus_uv": [
+      0.49,
+      0.489
+    ],
+    "unlock_stage": 6,
+    "detail": "Amber hunter. Enclose its gold center before it reaches the mother. One capture absorbs it.",
+    "generator": "built-in image_gen",
+    "file": "ribbon_hunter.png"
+  },
+  {
+    "key": "comb_grazer",
+    "kind": "grazer",
+    "name": "Comb grazer",
+    "brief": "One champagne-gold grazing microorganism shaped like a broad asymmetrical crescent comb, rounded transparent digestive body with 8 long parallel ribbed ciliary comb teeth spreading out on the right, a short flexible curled tail on left. Internal pale amber vacuoles and one warm pale-gold nucleus exactly at image center. Feathery translucent delicate silhouette.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. One champagne-gold grazing microorganism shaped like a broad asymmetrical crescent comb, rounded transparent digestive body with 8 long parallel ribbed ciliary comb teeth spreading out on the right, a short flexible curled tail on left. Internal pale amber vacuoles and one warm pale-gold nucleus exactly at image center. Feathery translucent delicate silhouette.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-a94b6799-25d3-44fc-b3c7-3c60ca7f7dba.png",
+    "nucleus_uv": [
+      0.49,
+      0.492
+    ],
+    "unlock_stage": 5,
+    "detail": "Pale-gold food thief. Capture its center to recover all food still in its stomach before it swims away.",
+    "generator": "built-in image_gen",
+    "file": "comb_grazer.png"
+  },
+  {
+    "key": "lace_parasite",
+    "kind": "parasite",
+    "name": "Lace parasite",
+    "brief": "One coral-pink translucent parasite shaped like a small asymmetrical lace anemone, tiny oval rose-colored central body with one luminous pink-gold nucleus precisely at image center, five long fine curling sticky pseudopods each branching once, delicate perforated pink membranes between two arms. Distinct grasping pink silhouette, limbs fully within frame.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. One coral-pink translucent parasite shaped like a small asymmetrical lace anemone, tiny oval rose-colored central body with one luminous pink-gold nucleus precisely at image center, five long fine curling sticky pseudopods each branching once, delicate perforated pink membranes between two arms. Distinct grasping pink silhouette, limbs fully within frame.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-a9e6eeac-f63c-4172-8f72-2075a012d52e.png",
+    "nucleus_uv": [
+      0.49,
+      0.498
+    ],
+    "unlock_stage": 5,
+    "detail": "Pink cell parasite. Follow its tether and capture the body to free the blocked blue cell.",
+    "generator": "built-in image_gen",
+    "file": "lace_parasite.png"
+  },
+  {
+    "key": "hourglass_divider",
+    "kind": "divider",
+    "name": "Hourglass divider",
+    "brief": "One indigo-blue dividing bacterium, thick horizontal hourglass-shaped transparent tube with two broad rounded lobes and visibly pinched middle, articulated ribbed silvery blue membrane, sapphire grainy cytoplasm and one golden nucleus precisely centered in its connecting waist at image center. Flexible blue ribbed rod silhouette with delicate short flagella at each outer end, blue not green.",
+    "prompt": "Use case: stylized-concept. Asset type: production transparent sprite for MICROVERSE, a premium meditative microscope pond-life game. One isolated organism only, scientifically inspired cinematic phase-contrast microphotography, top-down flattened focal plane, extraordinary fine wet translucent membrane detail, internal organelles, tiny cilia, delicate refractive white/cyan edges and subtle chromatic aberration. Crisp enough to read at 70 pixels, real organic specimen not cartoon, not shiny toy, no face, no eyes, no text or labels or frame or cast shadow. Square 1024 image with true transparent alpha background, all appendages fully in frame, organism centered with 12% clear margin. Exactly one distinct small luminous central capture nucleus centered precisely at image UV (0.5,0.5). Do not use black backing or background pond water. One indigo-blue dividing bacterium, thick horizontal hourglass-shaped transparent tube with two broad rounded lobes and visibly pinched middle, articulated ribbed silvery blue membrane, sapphire grainy cytoplasm and one golden nucleus precisely centered in its connecting waist at image center. Flexible blue ribbed rod silhouette with delicate short flagella at each outer end, blue not green.",
+    "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-cd188df0-b017-49a7-9a70-1142fa9728b7.png",
+    "nucleus_uv": [
+      0.49,
+      0.49
+    ],
+    "unlock_stage": 8,
+    "detail": "Blue divider. Capture its central gold nucleus before it splits at twenty seconds, or catch its two young.",
+    "generator": "built-in image_gen",
+    "file": "hourglass_divider.png"
+  }
+]

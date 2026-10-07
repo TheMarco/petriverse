@@ -1,0 +1,10 @@
+{
+  "assets": [
+    {
+      "path": "glassgarden-v1.png",
+      "provider": "OpenAI built-in imagegen",
+      "source": "exec-10e09c53-64b3-4f41-803f-d5bf4c39392b.png",
+      "prompt": "Authentic phase-contrast wet-mount micrograph, GLASSGARDEN. Many tiny etched transparent silica diatoms, needle shells, short rectangular chains, sparse fibers and dust. Varied focus, natural refractive rims and subdued amber-olive chloroplasts. Small organisms, restful central area, detail toward edges. Cool neutral grey-green transmitted water for dark teal grading. Full-bleed 1536x1024, no text, hero organism, frame, glow, or illustration."
+    }
+  ]
+}

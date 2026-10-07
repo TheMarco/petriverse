@@ -1,0 +1,17 @@
+{
+  "provider": "Built-in image_gen",
+  "assets": [
+    {
+      "name": "glowdrift",
+      "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-cbd8e959-426a-4917-8360-cfbc9239972b.png",
+      "prompt": "Use case: stylized-concept. Asset type: transparent game creature sprite, one rare protective microorganism for MICROVERSE. Primary request: Glowdrift, a peaceful luminous plankton unlike a round cell or a flower. Top-down microscopic view of an open, loose spiral colony of translucent bead-like connected chambers, curled into an airy comma, with five extremely fine trailing mucous filaments. A single larger opalescent pearl-white nucleus EXACTLY at center of the square canvas (50%,50%). Spiral chambers gently diminish outward. Material is fragile moist cellular glass, richly detailed granular cytoplasm, intricate membrane texture, soft cool cyan internal bioluminescence, a few tiny warm gold vacuoles, subtle optical refraction. Photoreal phase-contrast microscopy with exquisite biological detail, not a flat drawing, starfield, neon icon, cartoon, 3D plastic toy, tentacled monster or conventional jellyfish. Complete organism centered with at least 8% transparent margins. Bright but restrained readable silhouette on a dark blue background. TRUE transparent alpha background; no scenery or background glow cloud, no frame, no text, no labels, no watermark. Shape should remain recognizable at 90 pixels.",
+      "transparent_background": true
+    },
+    {
+      "name": "glass_harp",
+      "source": "/Users/marcovhv/.codex/generated_images/01a10dbf-9407-73d1-93e0-a67901f20cf6/exec-3c3deb93-1d16-4272-a5ab-a5ff51a49efb.png",
+      "prompt": "Use case: stylized-concept. Asset type: one transparent organism sprite for MICROVERSE, a beautiful photoreal microscopic pond game. Primary request: Glass Harp, a rare living filter-feeding plankton with an unmistakable elongated crescent silhouette, a curved translucent silica shell, exceptionally fine parallel harp-like internal ribs and two thin feathery filtering fans. Only ONE organism, top-down microscope view, centered, complete body with generous transparent margins. One small pearl-white capture nucleus EXACTLY at the center of the square canvas (50% x, 50% y), with delicate granular translucent cytoplasm around it. Long crescent tapers toward upper-right and lower-left; asymmetrical but balanced. Materials: intricate real microscopy detail, moist glass membrane, silver-blue opalescent refraction, restrained pale gold internal granules, faint iridescent rim fringes, subtle imperfections. It must look biologically alive, not a logo, gem, cartoon, mechanical instrument, sea shell or conventional jellyfish. Actual transparent alpha background, no black/white rectangle, no glow cloud outside its membrane, no scenery, no text or labels, no borders, no watermark. Sharp detailed tissue suitable for a dark blue game, with readable pale silhouette when shown at 90 pixels.",
+      "transparent_background": true
+    }
+  ]
+}

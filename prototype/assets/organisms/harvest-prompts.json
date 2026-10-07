@@ -1,0 +1,13 @@
+{
+  "mode": "built-in image_gen",
+  "intent": "generate using a style reference",
+  "reference": "/Users/marcovhv/projects/GIT/microverse/prototype/assets/organisms/drifter.png",
+  "prompts": {
+    "food": "Use case: stylized-concept\nAsset type: top-down microscopic game sprite, genuinely transparent PNG\nInput images: Image 1 is a material, detail and illumination reference only. Create a new organism, not a recolor.\nSubject: ONE edible freshwater desmid, a plump three-lobed rounded triangular glass cell with tiny scalloped edges and three jade green chloroplast pockets surrounding ONE warm ivory nucleus exactly at image center. Readable very different silhouette from the reference oval. Fine lace-like cellulose membrane, wet translucent granular cytoplasm, tiny vesicles and luminous rim refraction. Beautiful believable pond-water microscopy with cinematic depth, matching the supplied reference's extraordinary surface detail.\nComposition: entire organism isolated centered on a square canvas, spans 80% width, approximately round triangular proportions; single nucleus centered at (50%,50%) for game targeting. No other objects.\nLighting: soft cool transmitted light, pale chartreuse chloroplasts and pearly mint edges, gentle gold center. Delicate, nourishing, alive.\nConstraints: preserve alpha transparency outside organism. No background, shadow, floor, glow cloud, text, watermark, cartoon face, icons, diagram labels, UI.",
+    "cyst": "Use case: stylized-concept\nAsset type: top-down microscopic game sprite, genuinely transparent PNG\nInput images: Image 1 is a material, detail and illumination reference only. Create a new organism, not a recolor.\nSubject: ONE toxic freshwater resting cyst, a compact dark plum spherical microbe surrounded by an irregular crown of eight short jagged translucent crystalline thorns. Inky violet interior with small bruised magenta vesicles, ONE bright rose-ivory nucleus exactly at image center. Strong spiky silhouette recognizable at 45 pixels, visibly unlike an edible rounded desmid. Extraordinary photographic wet glass membrane and cytoplasm detail matching reference quality. Natural organic imperfection, not geometric jewelry.\nComposition: entire organism isolated centered on square canvas, thorn crown spans 80% width; nucleus exactly (50%,50%) for gameplay targeting. Single organism only.\nLighting: cool transmitted microscopy rim light, restrained pink-purple refraction at spines, dark rich interior. Beautiful and quietly dangerous pond life.\nConstraints: genuine alpha transparency outside organism. No background, shadow, floor, glow cloud, text, watermark, cartoon face, skull symbols, UI, diagram."
+  },
+  "assets": {
+    "food": "desmid.png",
+    "cyst": "toxic-cyst.png"
+  }
+}
