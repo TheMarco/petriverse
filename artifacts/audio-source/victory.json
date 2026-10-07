@@ -1,0 +1,16 @@
+{
+  "provider": "ElevenLabs",
+  "name": "victory",
+  "endpoint": "sound-generation",
+  "request": {
+    "text": "A gentle luminous resolution of three slowly blooming soft glass chords in A major, warm airy harmonics, an intimate underwater garden opening into light. Peaceful accomplishment, soothing and emotional, no celebratory fanfare, percussion or rhythmic beat. No voices, harsh transients or distortion. Quiet microscopic pond-game sound design.",
+    "duration_seconds": 6.0,
+    "loop": false,
+    "prompt_influence": 0.65,
+    "model_id": "eleven_text_to_sound_v2"
+  },
+  "loop": false,
+  "request_id": null,
+  "credit_cost": "60",
+  "sha256": "ef1aa529d023a5e4ed76693b3977930d9901eb68f071bfd2668bad7bb60f75cf"
+}

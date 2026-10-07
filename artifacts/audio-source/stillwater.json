@@ -1,0 +1,15 @@
+{
+  "provider": "ElevenLabs",
+  "name": "stillwater",
+  "endpoint": "music",
+  "request": {
+    "prompt": "Original instrumental ambient meditation score for a beautiful microscopic pond ecosystem. Deeply soothing, spacious, intimate and quietly wondrous. A major pentatonic tonal center with gentle suspended harmonies, warm soft analog pads breathing very slowly, sparse felt-like glass mallet notes with beautifully rounded attacks, delicate distant bowed glass harmonics, subtle liquid granular texture. Lots of silence between melodic gestures. A floating sense of 48 BPM without any drums or explicit rhythm. Slow graceful harmonic evolution, restrained dynamic range, no tension build, no dramatic climax. Never saccharine, never a stock spa melody. Wide natural space, soft upper frequencies, clear warm low midrange, no heavy sub bass. A continuous living soundscape from first second to last, end in the same A suspended harmonic bed for a smooth long crossfade to the opening. No fade to silence, no finale. No percussion, ostinato, arpeggiator, vocals, voices, choir, singing or speech.",
+    "music_length_ms": 120000,
+    "force_instrumental": true,
+    "model_id": "music_v2"
+  },
+  "loop": true,
+  "request_id": null,
+  "credit_cost": null,
+  "sha256": "752eec66db08d1ecc1c3784dab5944d87d2990029767cc5ad2e185a4a8f89600"
+}

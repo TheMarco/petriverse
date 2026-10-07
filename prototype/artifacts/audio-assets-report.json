@@ -1,0 +1,114 @@
+{
+  "sample_rate": 44100,
+  "channels": 2,
+  "assets": [
+    {
+      "asset": "absorb",
+      "seconds": 2.406,
+      "peak_dbfs": -5.93,
+      "rms_dbfs": -29.96,
+      "first_audible_ms": 2.09,
+      "clipped_samples": 0,
+      "bytes": 74119
+    },
+    {
+      "asset": "close",
+      "seconds": 1.47,
+      "peak_dbfs": -4.02,
+      "rms_dbfs": -30.28,
+      "first_audible_ms": 0.45,
+      "clipped_samples": 0,
+      "bytes": 29747
+    },
+    {
+      "asset": "connect",
+      "seconds": 0.65,
+      "peak_dbfs": -8.18,
+      "rms_dbfs": -27.36,
+      "first_audible_ms": 0.84,
+      "clipped_samples": 0,
+      "bytes": 13256
+    },
+    {
+      "asset": "deepwater",
+      "seconds": 90.044,
+      "peak_dbfs": -10.95,
+      "rms_dbfs": -25.31,
+      "first_audible_ms": 232.9,
+      "clipped_samples": 0,
+      "bytes": 659100
+    },
+    {
+      "asset": "evolve",
+      "seconds": 3.773,
+      "peak_dbfs": -11.07,
+      "rms_dbfs": -26.26,
+      "first_audible_ms": 5.92,
+      "clipped_samples": 0,
+      "bytes": 31185
+    },
+    {
+      "asset": "fracture",
+      "seconds": 0.998,
+      "peak_dbfs": -4.52,
+      "rms_dbfs": -30.38,
+      "first_audible_ms": 1.13,
+      "clipped_samples": 0,
+      "bytes": 31496
+    },
+    {
+      "asset": "injury",
+      "seconds": 1.752,
+      "peak_dbfs": -5.43,
+      "rms_dbfs": -28.24,
+      "first_audible_ms": 4.9,
+      "clipped_samples": 0,
+      "bytes": 27106
+    },
+    {
+      "asset": "loss",
+      "seconds": 3.942,
+      "peak_dbfs": -3.99,
+      "rms_dbfs": -27.75,
+      "first_audible_ms": 0.93,
+      "clipped_samples": 0,
+      "bytes": 72142
+    },
+    {
+      "asset": "pond",
+      "seconds": 24.001,
+      "peak_dbfs": -4.92,
+      "rms_dbfs": -33.07,
+      "first_audible_ms": 0.02,
+      "clipped_samples": 0,
+      "bytes": 138821
+    },
+    {
+      "asset": "stillwater",
+      "seconds": 120.033,
+      "peak_dbfs": -8.61,
+      "rms_dbfs": -24.82,
+      "first_audible_ms": 396.35,
+      "clipped_samples": 0,
+      "bytes": 1085458
+    },
+    {
+      "asset": "victory",
+      "seconds": 5.989,
+      "peak_dbfs": -3.87,
+      "rms_dbfs": -28.6,
+      "first_audible_ms": 0.82,
+      "clipped_samples": 0,
+      "bytes": 62622
+    },
+    {
+      "asset": "warning",
+      "seconds": 1.592,
+      "peak_dbfs": -12.23,
+      "rms_dbfs": -25.99,
+      "first_audible_ms": 0.34,
+      "clipped_samples": 0,
+      "bytes": 18928
+    }
+  ]
+}
