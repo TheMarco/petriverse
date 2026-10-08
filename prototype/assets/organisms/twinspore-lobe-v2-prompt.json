@@ -1,0 +1,9 @@
+{
+  "prompt": "Use case: stylized-concept. Production transparent game sprite for MICROVERSE. The reference Drifter defines ONLY microscopic realism, delicate wet optics and detail quality; do not copy its oval silhouette. Create ONE individual slender lobe of a TWINSPORE pair. One long CURVED COMMA-SHAPED bacterium, like a delicate crescent or a curved bean, with a thin flattened translucent copper-rose membrane. Its silhouette is strongly bent and tapered at both tips, asymmetrical and sinuous, width roughly three times its height. A SINGLE small rich golden nucleus is exactly at the center of the square image x50%,y50%, inside the thick middle of the curved body. Each thin end trails a few extraordinarily fine long flagella that curl like floating silk; NO uniform fringe of hairs, NO oval disk, NO spherical body, NO armor. Intricate darker rust-red and smoky rose cytoplasm with fine branching fibers and several small transparent vacuoles, wet pearl-white double edges and restrained amber refraction, very limited color saturation. Top-down orthographic, long direction horizontal, an elegant living crescent occupying about 80% of the square width and 42% height including curled filaments, generous transparent margins. Game will connect two of these bodies with a thin living tether, but draw only ONE with exactly ONE nucleus. Authentic high-end microscopic photo appearance, captivating natural imperfection and depth, physically translucent, intricate detail at large resolution yet distinctive at 75px. Genuine transparent alpha background. No text, border, scene, shadow, floor, face, legs, fish fins, fantasy monster, cartoon or flat graphic.",
+  "mode": "built-in imagegen edit/reference",
+  "references": [
+    "prototype/assets/organisms/drifter.png"
+  ],
+  "transparent_background": true,
+  "asset": "prototype/assets/organisms/twinspore-lobe-v2.png"
+}
