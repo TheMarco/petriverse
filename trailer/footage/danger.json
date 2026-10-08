@@ -1,0 +1,15 @@
+{
+	"duration": 7.0,
+	"events": [
+		{
+			"sound": "injury",
+			"time": 3.0
+		}
+	],
+	"failures": [],
+	"frames": 210,
+	"integrity": 4,
+	"nourishment": 0,
+	"shot": "danger",
+	"source": "Native Godot simulation, camera and title overlays only; staged isolated encounters"
+}
