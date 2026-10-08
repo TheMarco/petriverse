@@ -1,0 +1,210 @@
+{
+  "duration": 90,
+  "sample_rate": 48000,
+  "voice": {
+    "provider": "ElevenLabs via Magnific",
+    "model": "eleven_v3",
+    "voice": "Willa Ashford",
+    "catalog_voice_id": 918,
+    "generation_credits": 168
+  },
+  "narration": [
+    {
+      "id": "01-hook",
+      "start": 0.85,
+      "end": 6.29,
+      "source_trim": [
+        0.03,
+        5.47
+      ],
+      "text": "In a single drop of water... a whole world is fighting to survive."
+    },
+    {
+      "id": "02-intro",
+      "start": 8.15,
+      "end": 14.24,
+      "source_trim": [
+        0.0,
+        6.09
+      ],
+      "text": "This is Microverse. Guide a living colony through a changing microscopic world."
+    },
+    {
+      "id": "03-play",
+      "start": 14.35,
+      "end": 23.57,
+      "source_trim": [
+        0.03,
+        9.25
+      ],
+      "text": "Drag through three or more blue cells. Close the loop around green food, then release. Your cells merge, absorb, and return."
+    },
+    {
+      "id": "04-nudge",
+      "start": 26.35,
+      "end": 31.07,
+      "source_trim": [
+        0.01,
+        4.73
+      ],
+      "text": "Poison in your path? Nudge it aside. Make a clean meal."
+    },
+    {
+      "id": "05-danger",
+      "start": 34.25,
+      "end": 40.27,
+      "source_trim": [
+        0.01,
+        6.03
+      ],
+      "text": "But the water is alive with hungry rivals. Protect Mother before they reach her heart."
+    },
+    {
+      "id": "06-defend",
+      "start": 42,
+      "end": 45.88,
+      "source_trim": [
+        0.03,
+        3.91
+      ],
+      "text": "Catch the hunter. Rescue a fragile life."
+    },
+    {
+      "id": "07-evolve",
+      "start": 47.15,
+      "end": 56.19,
+      "source_trim": [
+        0.0,
+        9.04
+      ],
+      "text": "Spend what you gather to evolve. New abilities. New anatomy. Your colony, transformed."
+    },
+    {
+      "id": "08-worlds",
+      "start": 56.65,
+      "end": 65.06,
+      "source_trim": [
+        0.0,
+        8.41
+      ],
+      "text": "Cross three living waters. Changing encounters. Different colors. A new journey every time."
+    },
+    {
+      "id": "09-discovery",
+      "start": 68.1,
+      "end": 73.16,
+      "source_trim": [
+        0.03,
+        5.09
+      ],
+      "text": "Discover rare creatures... and bring the lives you save home."
+    },
+    {
+      "id": "10-boss",
+      "start": 74.3,
+      "end": 79.28,
+      "source_trim": [
+        0.03,
+        5.01
+      ],
+      "text": "Then face the giants. Learn their rhythm. Find your moment."
+    },
+    {
+      "id": "11-outro",
+      "start": 83.4,
+      "end": 89.49,
+      "source_trim": [
+        0.0,
+        6.09
+      ],
+      "text": "Microverse. Feed. Protect. Evolve."
+    }
+  ],
+  "events": [
+    {
+      "at": 15.5,
+      "sound": "connect"
+    },
+    {
+      "at": 16.7,
+      "sound": "connect"
+    },
+    {
+      "at": 17.9,
+      "sound": "connect"
+    },
+    {
+      "at": 20.267,
+      "sound": "close"
+    },
+    {
+      "at": 20.967,
+      "sound": "absorb"
+    },
+    {
+      "at": 27.9,
+      "sound": "close"
+    },
+    {
+      "at": 29.7,
+      "sound": "connect"
+    },
+    {
+      "at": 30.333,
+      "sound": "connect"
+    },
+    {
+      "at": 30.9,
+      "sound": "connect"
+    },
+    {
+      "at": 31.767,
+      "sound": "close"
+    },
+    {
+      "at": 32.467,
+      "sound": "absorb"
+    },
+    {
+      "at": 37.0,
+      "sound": "injury"
+    },
+    {
+      "at": 42.167,
+      "sound": "connect"
+    },
+    {
+      "at": 42.667,
+      "sound": "connect"
+    },
+    {
+      "at": 43.167,
+      "sound": "connect"
+    },
+    {
+      "at": 43.867,
+      "sound": "close"
+    },
+    {
+      "at": 44.567,
+      "sound": "absorb"
+    },
+    {
+      "at": 48.8,
+      "sound": "evolve"
+    },
+    {
+      "at": 52.6,
+      "sound": "evolve"
+    }
+  ],
+  "music": [
+    "stillwater",
+    "glassgarden",
+    "deepwater",
+    "hunter-layer",
+    "tension-layer",
+    "current-layer",
+    "pond"
+  ]
+}
