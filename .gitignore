@@ -12,3 +12,6 @@ dist/*
 
 # Uncompressed preview captures (mp4 copies are tracked)
 *.avi
+
+# Python bytecode
+__pycache__/
