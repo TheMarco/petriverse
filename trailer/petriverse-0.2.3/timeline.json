@@ -1,0 +1,110 @@
+[
+  {
+    "shot": "hook",
+    "start": 0.0,
+    "duration": 5,
+    "file": "footage/hook.mp4"
+  },
+  {
+    "shot": "reveal",
+    "start": 5.0,
+    "duration": 4,
+    "file": "footage/reveal.mp4"
+  },
+  {
+    "shot": "loop",
+    "start": 9.0,
+    "duration": 7,
+    "file": "footage/loop.mp4"
+  },
+  {
+    "shot": "fluid",
+    "start": 16.0,
+    "duration": 3,
+    "file": "footage/fluid.mp4"
+  },
+  {
+    "shot": "amoeba",
+    "start": 19.0,
+    "duration": 10,
+    "file": "footage/amoeba.mp4"
+  },
+  {
+    "shot": "phages",
+    "start": 29.0,
+    "duration": 12,
+    "file": "footage/phages.mp4"
+  },
+  {
+    "shot": "mother_growth",
+    "start": 41.0,
+    "duration": 6,
+    "file": "footage/mother_growth.mp4"
+  },
+  {
+    "shot": "film",
+    "start": 47.0,
+    "duration": 6,
+    "file": "footage/film.mp4"
+  },
+  {
+    "shot": "route_choice",
+    "start": 53.0,
+    "duration": 4,
+    "file": "footage/route_choice.mp4"
+  },
+  {
+    "shot": "world_a",
+    "start": 57.0,
+    "duration": 3,
+    "file": "footage/world_a.mp4"
+  },
+  {
+    "shot": "world_b",
+    "start": 60.0,
+    "duration": 3,
+    "file": "footage/world_b.mp4"
+  },
+  {
+    "shot": "world_c",
+    "start": 63.0,
+    "duration": 3,
+    "file": "footage/world_c.mp4"
+  },
+  {
+    "shot": "final_wave",
+    "start": 66.0,
+    "duration": 5,
+    "file": "footage/final_wave.mp4"
+  },
+  {
+    "shot": "boss_a",
+    "start": 71.0,
+    "duration": 3,
+    "file": "footage/boss_a.mp4"
+  },
+  {
+    "shot": "boss_b",
+    "start": 74.0,
+    "duration": 3,
+    "file": "footage/boss_b.mp4"
+  },
+  {
+    "shot": "boss_c",
+    "start": 77.0,
+    "duration": 3,
+    "file": "footage/boss_c.mp4"
+  },
+  {
+    "shot": "home",
+    "start": 80.0,
+    "duration": 4,
+    "file": "footage/home.mp4"
+  },
+  {
+    "shot": "end",
+    "start": 84.0,
+    "duration": 6,
+    "file": "footage/end.mp4"
+  }
+]

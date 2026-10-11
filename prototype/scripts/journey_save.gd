@@ -10,9 +10,9 @@ const BOSS_FIELDS := ["variant", "hit_cycle", "attack_count", "gate_ids", "open_
 const HABITAT_FIELDS := ["habitat_choice", "habitat_confirmed", "habitat_applied", "habitat_history"]
 const AMOEBA_FIELDS := ["phase","target_node","captive_node","site_nodes","destination","reach_point","ingest_axis","reach_age","digestion_age","rest_age","arm_extension","victim_home","search_after"]
 const LIVING_FIELDS := ["destination","target_id","target_node","site_nodes","latched","action_clock","stored_food","daughter","sector","spawning"]
-const RUN_FIELDS := ["rescued_specimens", "mastery_awards", "lesson_step", "lesson_nodes", "stage_index", "state", "score", "integrity", "kills", "elapsed", "stage_elapsed", "biomass", "total_food", "total_rescued", "completed_dishes", "colony_id", "retries", "run_seed", "next_enemy_id", "boss_defeated", "mutations", "offered_mutations", "seen_species", "discovery_serial", "last_discovery", "best_capture", "loops_drawn", "capture_serial", "last_capture", "contact_time", "last_contacts", "residuals"]
+const RUN_FIELDS := ["rescued_specimens", "mastery_awards", "lesson_step", "lesson_nodes", "stage_index", "state", "score", "integrity", "max_integrity", "growth_roles", "guardian_spent", "guardian_recovery", "guardian_resting", "guardian_block_serial", "last_repair_encounter", "kills", "elapsed", "stage_elapsed", "biomass", "total_food", "total_rescued", "completed_dishes", "colony_id", "retries", "run_seed", "next_enemy_id", "boss_defeated", "mutations", "offered_mutations", "seen_species", "discovery_serial", "last_discovery", "best_capture", "loops_drawn", "capture_serial", "last_capture", "contact_time", "last_contacts", "residuals"]
 const ENEMY_FIELDS := ["cradle_open_age", "story", "gate_ids", "shield_remaining", "cradle", "visitor", "bloom_releases", "hunt_target", "hunt_time", "forage_remaining", "foraging_done", "fed_remaining", "carried_food", "bloom_id", "id", "nucleus", "speed", "heading", "health", "age", "kind", "form", "stunned", "slowed", "hit_flash", "shield_flash", "pair_angle", "pair_span", "lure_vector", "lure_elapsed"]
-const HARVEST_FIELDS := ["visitor_at", "visitor_spawned", "nourishment", "poison_taken", "next_bloom", "next_threat", "blooms", "rotation", "loss_reason", "loss_title", "rescued", "purified", "defended", "visited", "clean_food", "threats_spawned", "spores_spawned", "next_spore", "tide", "boss_hits", "last_time"]
+const HARVEST_FIELDS := ["visitor_at", "visitor_spawned", "nourishment", "poison_taken", "next_bloom", "next_threat", "blooms", "rotation", "loss_reason", "loss_title", "rescued", "purified", "defended", "hunters_captured", "final_surge_enabled", "final_surge_started", "final_surge_start_time", "final_surge_rapid", "final_surge_needed", "final_surge_captured", "final_surge_ids", "visited", "clean_food", "threats_spawned", "spores_spawned", "next_spore", "tide", "boss_hits", "last_time"]
 
 static func fields(object: RefCounted, names: Array) -> Dictionary:
 	var result := {}
@@ -93,6 +93,13 @@ static func restore(run: RefCounted, data: Dictionary) -> bool:
 	run.mastery_awards.clear()
 	run.rescued_specimens.clear()
 	apply(run, data.run, RUN_FIELDS)
+	if not data.run.has("growth_roles"):
+		# Older journeys resume with a useful default, without inserting a new
+		# choice into an encounter the player has already begun.
+		if run.stage_index >= 2:
+			run.growth_roles[1] = "guard"
+		if run.stage_index >= 8:
+			run.growth_roles[5] = "guard"
 	run.habitat_history = {}
 	apply(run,data.run,HABITAT_FIELDS)
 	if not data.run.has("habitat_choice"):
@@ -140,6 +147,19 @@ static func restore(run: RefCounted, data: Dictionary) -> bool:
 		var ecology = run.harvest.ecology
 		ecology.rhythm_origin = ecology.next_wave-ecology.pace.warning-ecology.wave*ecology.pace.cycle
 	apply(run.mother_damage, data.mother, ["lost", "bites", "serial"])
+	if not data.run.has("max_integrity"):
+		# Older snapshots had five cores at every stage. Preserve their health
+		# proportion while moving wounds onto the organelles now visible.
+		run.integrity = clampi(ceili(float(run.integrity)*float(run.max_integrity)/5.0),0,run.max_integrity)
+		run.mother_damage.set_capacity(run.max_integrity)
+		run.mother_damage.reset_from_integrity(run.integrity)
+	else:
+		var current_capacity: int = run.MotherAppearance.capacity_for_stage(run.stage_index)
+		if current_capacity != run.max_integrity:
+			run.integrity = clampi(run.integrity + maxi(0,current_capacity-run.max_integrity),0,current_capacity)
+			run.max_integrity = current_capacity
+		run.mother_damage.set_capacity(run.max_integrity)
+		run.mother_damage.prepare_integrity(run.integrity)
 	for i in 24:
 		apply(run.cells[i], data.cells[i], ["remaining", "duration", "captor", "lost"])
 	run.phages.restore(data.get("phages",{}))

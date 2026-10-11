@@ -15,6 +15,22 @@ var notice_time := 0.0
 var gates_spawned := false
 const FEEDING_TIME := 6.0
 
+static func hunter_speed(run: RefCounted) -> float:
+	# A grown colony attracts hunters that close the distance sooner. The first
+	# biome keeps its teaching pace; later hunters still take many seconds to
+	# cross the dish, leaving time to respond to the arrival warning.
+	if run.stage_index < 4 or run.mutations.size() < 4:
+		return 5.4
+	var speed := minf(9.0, 5.4 + 0.7 * float(run.mutations.size() - 3) + 0.15 * float(run.stage_index - 4))
+	# A stocked, evolved colony leaves a stronger food trail in the Blue Deep.
+	# Spending reserves between encounters weakens this late predator response.
+	if run.encounter_total() == 30 and run.stage_index >= 8 and run.mutations.size() >= 5:
+		speed += 2.4 * clampf((float(run.biomass) - 12.0) / 18.0, 0.0, 1.0)
+	return speed
+
+static func early_hunters(run: RefCounted) -> bool:
+	return run.stage_index >= 4 and run.mutations.size() >= 5
+
 func pocket(run: RefCounted, area: int, outer: bool = false) -> Vector2:
 	var s := posmod(area,8)
 	var n := (s+1)%8
@@ -299,14 +315,14 @@ func queue_wave(run: RefCounted) -> void:
 	pending.append({"at":arrives,"kind":"bloom","area":area})
 	pending.append({"at":arrives,"kind":family,"area":area})
 	if (run.stage_index >= 2 or wave>0) and run.Habitats.hunter_arrives(run,wave) and not (run.harvest.spec.get("phage_lesson",false) and wave==0):
-		var hunter := {"at":arrives+4.0,"kind":"hunter","area":(area+3)%8}
+		var hunter := {"at":arrives if early_hunters(run) else arrives+4.0,"kind":"hunter","area":(area+3)%8}
 		if run.harvest.spec.has("hunter"):
 			hunter.species = run.harvest.spec.hunter
 		pending.append(hunter)
 		if int(pace.extra_every)>0 and wave%int(pace.extra_every)==0 and run.habitat_choice!="refuge":
 			# A staggered second front leaves time for a deliberate first capture.
 			# The sheltered route keeps its advertised single, alternate waves.
-			pending.append({"at":arrives+10.0,"kind":"hunter","area":(area+6)%8,"species":"drifter"})
+			pending.append({"at":arrives+6.0 if early_hunters(run) else arrives+10.0,"kind":"hunter","area":(area+6)%8,"species":"drifter"})
 	if mode == "rescue":
 		pending.append({"at":arrives,"kind":"spore","area":area})
 	wave += 1
@@ -353,8 +369,10 @@ func spawn_event(run: RefCounted, event: Dictionary) -> void:
 			kind = event.get("species",kind)
 			var point: Vector2 = arrival_site(run,event).position
 			var outward: Vector2 = (point-run.board.center).normalized()
-			run.spawn_enemy({"angle":rad_to_deg(outward.angle()),"radius":310.0,"position":point,"speed":5.4,"kind":kind})
+			run.spawn_enemy({"angle":rad_to_deg(outward.angle()),"radius":310.0,"position":point,"speed":hunter_speed(run)+(2.0 if event.get("rapid_surge",false) else 0.0),"kind":kind})
 			run.harvest.threats_spawned += 1
+			if event.get("final_surge",false):
+				run.harvest.final_surge_ids.append(run.next_enemy_id)
 		_:
 			if run.enemies.filter(func(e): return e.kind == event.kind).size()>=(1 if event.kind=="amoeba" and run.stage_index<8 else 2):
 				return

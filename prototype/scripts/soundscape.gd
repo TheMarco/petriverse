@@ -18,6 +18,7 @@ const VOICE_LIMIT := 10
 var music_volume := 0.65
 var effects_volume := 0.70
 var muted := false
+var narration_active := false
 var enabled := true
 var preferences_path := "user://preferences.cfg"
 var streams: Dictionary = {}
@@ -40,6 +41,7 @@ var recent: Dictionary = {}
 var last_capture := 0
 var last_phage_burst := ""
 var last_integrity := 5
+var last_guard_block := 0
 var last_path: Array = []
 var last_state := "active"
 var last_warning := -20.0
@@ -141,7 +143,7 @@ func update_music(delta: float, paused: bool) -> void:
 	pause_gain = move_toward(pause_gain, 0.45 if paused else 1.0, delta * 0.7)
 	duck = maxf(0.0, duck - delta)
 	var global_gain := 0.0 if muted or not enabled else 1.0
-	var base_gain := music_volume * pause_gain * boot_fade * global_gain * (0.78 if duck > 0.0 else 1.0)
+	var base_gain := (0.35 if narration_active else 1.0) * music_volume * pause_gain * boot_fade * global_gain * (0.78 if duck > 0.0 else 1.0)
 	var active := music[active_music]
 	if not crossfading and streams.has(desired_track):
 		if desired_track != current_track:
@@ -214,8 +216,8 @@ func play_effect(name: String, gain: float = 1.0, pitch: float = 1.0) -> void:
 	if name in ["close", "injury", "evolve", "victory", "loss"]:
 		duck = 1.1
 
-func schedule(name: String, delay: float, gain: float = 1.0) -> void:
-	pending.append({"name": name, "remaining": delay, "gain": gain})
+func schedule(name: String, delay: float, gain: float = 1.0, pitch: float = 1.0) -> void:
+	pending.append({"name": name, "remaining": delay, "gain": gain, "pitch": pitch})
 
 func reset_run() -> void:
 	last_phage_burst = ""
@@ -226,6 +228,7 @@ func reset_run() -> void:
 	recent.clear()
 	last_capture = 0
 	last_integrity = 5
+	last_guard_block = 0
 	last_path.clear()
 	last_state = "active"
 	last_warning = -20.0
@@ -252,7 +255,7 @@ func sync(run: RefCounted, delta: float) -> void:
 	for cue in pending:
 		cue.remaining -= delta
 		if cue.remaining <= 0.0:
-			play_effect(cue.name, cue.gain)
+			play_effect(cue.name, cue.gain, cue.get("pitch", 1.0))
 	pending = pending.filter(func(cue): return cue.remaining > 0.0)
 	if not run.phages.bursts.is_empty():
 		var burst: Dictionary = run.phages.bursts[-1]
@@ -266,6 +269,14 @@ func sync(run: RefCounted, delta: float) -> void:
 		play_effect("close", 0.65)
 		if not run.last_capture.get("positions", []).is_empty():
 			schedule("absorb", 0.55, 0.75)
+		if run.journey and not run.last_capture.get("capture_grade","").is_empty():
+			var grand: bool = run.last_capture.capture_grade == "Living constellation"
+			schedule("connect",0.16,0.45,1.26)
+			schedule("connect",0.31,0.50,1.50)
+			schedule("connect",0.48,0.56,2.00)
+			if grand:
+				schedule("connect",0.65,0.52,2.52)
+			schedule("absorb",0.96,0.50,1.15)
 		if run.last_capture.get("rescued",0)>0 and run.last_capture.get("mastery",[]).is_empty() and clock-last_mastery>=8.0:
 			schedule("mastery",0.9,0.32)
 			last_mastery = clock
@@ -280,6 +291,9 @@ func sync(run: RefCounted, delta: float) -> void:
 		last_path = path.duplicate()
 	if run.integrity < last_integrity:
 		play_effect("injury", 0.82)
+	if run.journey and run.guardian_block_serial != last_guard_block:
+		play_effect("fracture",0.55,1.35)
+		last_guard_block = run.guardian_block_serial
 	last_integrity = run.integrity
 	if run.journey and run.mastery_awards.size()!=last_mastery_count:
 		if run.mastery_awards.size()>last_mastery_count and clock-last_mastery>=8.0:

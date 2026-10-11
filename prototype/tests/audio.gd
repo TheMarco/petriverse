@@ -129,6 +129,10 @@ func exercise() -> void:
 	journey.enemies.clear()
 	sound.sync(journey,12.0)
 	expect(danger==0.0 and sound.layer_gains["tension-layer"]==0.0,"Old fixed-key tension music stays silent over the supplied scores")
+	journey.capture_serial += 1
+	journey.last_capture = {"capture_grade":"Grand sweep","positions":[journey.board.center]}
+	sound.sync(journey,0.1)
+	expect(sound.pending.filter(func(c): return c.name=="connect").size()==3,"A grand sweep schedules its three rising capture notes")
 	sound.enabled = true
 	sound.muted = true
 	sound.sync(journey,0.1)

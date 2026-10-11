@@ -2,8 +2,8 @@
 """Bounded offline editor for the 90-second Petriverse game trailer.
 
 Reads native capture clips plus per-shot JSON reports from
-``<root>/trailer/petriverse/footage/`` and encodes the final trailer to
-``<root>/trailer/Petriverse-trailer-0.2.0.mp4`` (1920x1080 H264 yuv420p,
+``<root>/trailer/petriverse-0.2.3/footage/`` and encodes the final trailer to
+``<root>/trailer/Petriverse-trailer-0.2.3.mp4`` (1920x1080 H264 yuv420p,
 30fps, AAC stereo 192kbps, +faststart, exactly 90s).
 
 Conventions follow tools/edit_trailer.py (numpy premix helpers, two-pass
@@ -32,15 +32,16 @@ except ImportError:
 RATE = 48000
 SECONDS = 90
 N = RATE * SECONDS
-TARGET_NAME = "Petriverse-trailer-0.2.0.mp4"
+TARGET_NAME = "Petriverse-trailer-0.2.3.mp4"
 
 # Exact cut timeline in seconds (total 90). Never retimed: straight cuts
 # (or an optional short fade that preserves every boundary and the total).
 SHOTS = [
-    ("hook", 5), ("reveal", 4), ("loop", 10), ("fluid", 6),
-    ("amoeba", 12), ("phages", 12), ("evolve", 7),
+    ("hook", 5), ("reveal", 4), ("loop", 7), ("fluid", 3),
+    ("amoeba", 10), ("phages", 12), ("mother_growth", 6),
+    ("film", 6), ("route_choice", 4),
     ("world_a", 3), ("world_b", 3), ("world_c", 3),
-    ("rare_a", 3), ("rare_b", 3),
+    ("final_wave", 5),
     ("boss_a", 3), ("boss_b", 3), ("boss_c", 3),
     ("home", 4), ("end", 6),
 ]
@@ -48,9 +49,9 @@ SHOTS = [
 # (track, timeline_start, timeline_end, fade_in, fade_out). Each source
 # starts at its own beginning.
 MUSIC_CUES = [
-    ("petriverse-stillwater", 0, 37, 2.0, 5.0),
-    ("petriverse-glassgarden", 32, 66, 5.0, 6.0),
-    ("petriverse-blue-deep", 60, 90, 6.0, 2.0),
+    ("petriverse-stillwater", 0, 35, 2.0, 5.0),
+    ("petriverse-glassgarden", 30, 68, 5.0, 6.0),
+    ("petriverse-blue-deep", 62, 90, 6.0, 2.0),
 ]
 MUSIC_GAINS = {
     "petriverse-stillwater": 0.80,
@@ -335,7 +336,7 @@ def dry_run(root, transition):
     timeline = build_timeline()
     print(f"timeline: {len(timeline)} shots, "
           f"{sum(s['duration'] for s in timeline)}s total")
-    footage_dir = root / "trailer/petriverse/footage"
+    footage_dir = root / "trailer/petriverse-0.2.3/footage"
     game_audio = root / "prototype/assets/audio"
     missing = []
     for shot in timeline:
@@ -370,7 +371,7 @@ def dry_run(root, transition):
 def edit(root, transition):
     ffmpeg = which_tool("ffmpeg")
     ffprobe = which_tool("ffprobe")
-    petra = root / "trailer/petriverse"
+    petra = root / "trailer/petriverse-0.2.3"
     footage_dir = petra / "footage"
     game_audio = root / "prototype/assets/audio"
     out_path = root / "trailer" / TARGET_NAME
@@ -442,7 +443,7 @@ def edit(root, transition):
          "-pix_fmt", "yuv420p", "-r", "30",
          "-c:a", "aac", "-b:a", "192k", "-ac", "2", "-ar", "48000",
          "-t", str(SECONDS), "-movflags", "+faststart",
-         "-metadata", "title=PETRIVERSE — 90-second game trailer",
+         "-metadata", "title=PETRIVERSE 0.2.3 — 90-second game trailer",
          str(out_path)], check=True)
 
     probe_data, errors = validate(ffprobe, out_path)
@@ -458,7 +459,7 @@ def edit(root, transition):
          "-ss", "6.5", "-i", str(out_path), "-frames:v", "1", str(poster)])
     report = {"edit": [s["shot"] for s in timeline], "transition": transition,
               "output": f"trailer/{TARGET_NAME}",
-              "poster": f"trailer/petriverse/{poster.name}" if still.returncode == 0 else None,
+              "poster": f"trailer/petriverse-0.2.3/{poster.name}" if still.returncode == 0 else None,
               "mixer": mixer, "events_mixed": len(event_log),
               "validation_errors": errors}
     (petra / "report.json").write_text(json.dumps(report, indent=2) + "\n")

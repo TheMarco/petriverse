@@ -1,4 +1,5 @@
 extends "res://tests/harvest_feasibility.gd"
+const LoopStrain = preload("res://scripts/loop_strain.gd")
 ## Complete connected journeys using stale observations and the same actual
 ## swept-pointer gestures as the harvest feasibility test. No future positions.
 func free_local_routes(run: RefCounted, center: Vector2) -> Array:
@@ -21,6 +22,8 @@ func free_local_routes(run: RefCounted, center: Vector2) -> Array:
 func accepts_meal(run: RefCounted, profile: Dictionary, meal: Dictionary) -> bool:
 	if meal.poison==0:
 		return true
+	if profile.get("careful",false):
+		return false
 	# A Feast player may deliberately exchange one health for a substantial
 	# meal, using the same visible consequence preview as a human.
 	return profile.get("build","")=="elastic" and meal.poison==1 and meal.food>=4 and run.integrity>=3
@@ -29,13 +32,18 @@ func choose_journey(run: RefCounted, profile: Dictionary, pointer: Vector2) -> D
 	var harvest = run.harvest
 	var spec: Dictionary = harvest.spec
 	var food_needed: bool = harvest.nourishment < int(spec.food)
+	var need_hunters: bool = not food_needed and harvest.hunter_quota()>harvest.hunters_captured
 	var desired := "food"
 	if not food_needed:
 		desired = {"rescue": "spore", "purify": "cyst", "defend": "drifter", "boss": "boss", "sectors": "food"}.get(spec.mode,"food")
+		if need_hunters:
+			desired = "drifter"
 	if spec.mode == "boss" and not food_needed and run.boss()!=null and not run.boss().can_take_pulse():
 		desired = "warden"
 	var urgent: Array = run.enemies.filter(func(e): return e.kind in ["drifter","shellback","twinspore","divider"] and not e.is_boss() and e.nucleus.distance_to(run.board.center)<155.0)
-	var focuses: Array = run.enemies.filter(func(e): return e.kind == desired or (desired == "boss" and e.is_boss()) or (desired == "drifter" and e.kind in ["shellback","twinspore","grazer","parasite","divider","bell_bud"]))
+	var focuses: Array = run.enemies.filter(func(e): return e.kind == desired or (desired == "boss" and e.is_boss()) or (desired == "drifter" and e.kind in (["shellback","twinspore","divider"] if need_hunters else ["shellback","twinspore","grazer","parasite","divider","bell_bud"])))
+	if harvest.final_surge_started:
+		focuses = run.enemies.filter(func(e): return harvest.final_surge_ids.has(e.id))
 	var blocked: Array = run.enemies.filter(func(e): return e.kind == "parasite" and e.latched)
 	# Follow the same visible rescue countdown and instruction as the HUD.
 	if spec.mode=="rescue" and harvest.rescued<int(spec.target):
@@ -110,7 +118,7 @@ func choose_journey(run: RefCounted, profile: Dictionary, pointer: Vector2) -> D
 		if not accepts_meal(run,profile,result):
 			continue
 		var defense_value := 16.0 if min_threat_distance < 165.0 else 5.0
-		var value: float = result.food * (5.0 if food_needed else 0.6) + (result.threats + armor) * defense_value + result.rescued * (18.0 if desired == "spore" else 5.0) + result.purified * (14.0 if desired == "cyst" else 2.0) + result.boss_layers * 45.0 + result.get("wardens",0) * (28.0 if not food_needed else 1.0) - route.size() * 0.6 - result.poison*15.0
+		var value: float = result.food * (5.0 if food_needed else 0.6) + (result.threats + armor) * defense_value + result.rescued * (18.0 if desired == "spore" else 5.0) + result.purified * (14.0 if desired == "cyst" else 2.0) + result.boss_layers * 45.0 + result.get("wardens",0) * (28.0 if not food_needed else 1.0) - route.size() * 0.6 - LoopStrain.penalty(route,run.board.anchors)*3.0 - result.poison*15.0
 		if value > merit:
 			merit = value
 			best = {"path":route.duplicate(),"food":result.food}
@@ -128,13 +136,16 @@ func measure_stage(run: RefCounted, profile: Dictionary, seed_value: int) -> Dic
 	var segment_from := pointer
 	var index := 0
 	var aim := Vector2.ZERO
-	var stats := {"profile":profile.name,"seed":seed_value,"captures":0,"empty":0,"abandoned_poison":0,"spoiled":0,"missed_input":0,"plans":0,"search_misses":0,"poison":0,"contacts":0,"max_rate":0.0}
+	var stats := {"profile":profile.name,"seed":seed_value,"captures":0,"empty":0,"abandoned_poison":0,"spoiled":0,"missed_input":0,"plans":0,"search_misses":0,"poison":0,"contacts":0,"max_rate":0.0,"strained_captures":0,"strain_seconds":0.0,"capture_grades":{},"capture_bonus_score":0}
 	stats.route_sizes = {}
 	var gesture_start := 0.0
 	var expected_food := 0
 	var next_fumble := false
 	var last_contact: float = run.contact_time
-	while run.state == Run.ACTIVE and clock < float(run.harvest.spec.duration)+1.0:
+	var initial_health: int = run.integrity
+	var initial_guard_blocks: int = run.guardian_block_serial
+	var initial_score: int = run.score
+	while run.state == Run.ACTIVE and clock < run.harvest.deadline()+1.0:
 		var dt := 1.0 / 60.0
 		clock += dt
 		run.step(dt)
@@ -205,6 +216,11 @@ func measure_stage(run: RefCounted, profile: Dictionary, seed_value: int) -> Dic
 			var result: Dictionary = run.release()
 			if result.valid:
 				stats.captures += 1
+				stats.strain_seconds += float(result.get("strain",0.0))
+				stats.strained_captures += int(float(result.get("strain",0.0))>=0.5)
+				if not result.get("capture_grade","").is_empty():
+					stats.capture_grades[result.capture_grade] = int(stats.capture_grades.get(result.capture_grade,0))+1
+					stats.capture_bonus_score += int(result.capture_bonus)
 				var size: int = result.nodes.size()
 				stats.route_sizes[str(size)] = int(stats.route_sizes.get(str(size),0))+1
 				if result.food == 0 and result.threats == 0 and result.rescued==0 and result.purified==0 and result.boss_layers==0 and result.get("wardens",0)==0 and result.armor_hits==0:
@@ -218,6 +234,11 @@ func measure_stage(run: RefCounted, profile: Dictionary, seed_value: int) -> Dic
 	stats.seconds = snappedf(clock,0.01)
 	stats.food = run.harvest.nourishment
 	stats.integrity = run.integrity
+	stats.health_change = run.integrity-initial_health
+	stats.guard_blocks = run.guardian_block_serial-initial_guard_blocks
+	stats.score_gained = run.score-initial_score
+	stats.loops_per_minute = snappedf(stats.captures/maxf(0.01,clock/60.0),0.01)
+	stats.mean_strain = snappedf(float(stats.strain_seconds)/maxf(1,stats.captures),0.01)
 	stats.poison = run.harvest.poison_taken
 	stats.objective = run.harvest.objective_count()
 	stats.stage = run.stage_index
@@ -235,6 +256,9 @@ func exercise() -> void:
 	var extended := false
 	var first_seed := 73
 	var think := 2.5
+	var growth_choice := ""
+	var careful := false
+	var report_tag := ""
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--seeds="): samples = int(arg.get_slice("=",1))
 		if arg.begins_with("--rate="): rate = float(arg.get_slice("=",1))
@@ -244,13 +268,22 @@ func exercise() -> void:
 		if arg=="--long": extended = true
 		if arg.begins_with("--seed="): first_seed = int(arg.get_slice("=",1))
 		if arg.begins_with("--think="): think = float(arg.get_slice("=",1))
+		if arg.begins_with("--growth="): growth_choice = arg.get_slice("=",1)
+		if arg == "--careful": careful = true
+		if arg.begins_with("--tag="): report_tag = arg.get_slice("=",1)
 	if not build.is_empty() and not Run.Mutations.BUILD_PATHS.has(build):
 		printerr("Unknown build: ",build)
+		quit(1)
+		return
+	if not growth_choice.is_empty() and growth_choice not in ["guard", "feeder"]:
+		printerr("Unknown growth role: ",growth_choice)
 		quit(1)
 		return
 	var profile := {"name":"deliberate" if think>=2.5 else "practiced", "rate":rate, "think":think, "review":0.45, "routes":8, "aim":6.0, "mistake_every":0}
 	profile.build = build
 	profile.habitat = habitat
+	profile.growth = growth_choice if not growth_choice.is_empty() else ("feeder" if build=="elastic" else "guard")
+	profile.careful = careful
 	profile.cyst_margin = 6.0 if build=="fission" else 12.0
 	var preferences: Array = ["grazer","filter","nursery","symbiosis","fission","lure","catalyst","frenzy","residual","enzyme","feast","elastic"]
 	if not build.is_empty():
@@ -276,6 +309,8 @@ func exercise() -> void:
 			run.restart()
 		var stage_reports: Array = []
 		while run.stage_index < 12:
+			if run.growth_slot()>=0:
+				run.choose_growth_role(profile.growth)
 			if run.Habitats.pending(run):
 				run.Habitats.choose(run,habitat)
 			run.begin_encounter()
@@ -288,17 +323,21 @@ func exercise() -> void:
 			for i in 600:
 				if run.evolution_ready(): break
 				run.step(1.0/60.0)
-			if run.integrity <= 3 and run.biomass >= run.repair_cost():
-				run.choose_journey_evolution("repair")
+			var advanced := false
+			if run.integrity <= 3 and run.integrity < run.max_integrity and run.biomass >= run.repair_cost() and not run.repair_waiting():
+				advanced = run.choose_journey_evolution("repair")
 			else:
 				var choice := "continue"
 				for option in preferences:
 					if run.offered_mutations.has(option) and run.biomass >= run.evolution_cost():
 						choice = option
 						break
-				run.choose_journey_evolution(choice)
+				advanced = run.choose_journey_evolution(choice)
+			expect(advanced,"Automated player advances after each settled encounter")
+			if not advanced:
+				break
 		wins += int(run.state==Run.SUCCESS)
-		reports.append({"seed":run.run_seed,"state":run.state,"last_stage":run.stage_index,"mutations":run.mutations.duplicate(),"stages":stage_reports})
+		reports.append({"seed":run.run_seed,"state":run.state,"last_stage":run.stage_index,"mutations":run.mutations.duplicate(),"growth_roles":run.growth_roles.duplicate(),"stages":stage_reports})
 		run.dispose()
 	var path := "res://artifacts/journey-living-ecosystem-feasibility-%s-%.1f%s.json" % ["all" if global_search else "local",rate,"" if build.is_empty() else "-"+build]
 	if habitat!="bloom":
@@ -309,9 +348,15 @@ func exercise() -> void:
 		path = path.trim_suffix(".json")+"-seed%d.json" % first_seed
 	if think!=2.5:
 		path = path.trim_suffix(".json")+"-think%.1f.json" % think
+	if not growth_choice.is_empty():
+		path = path.trim_suffix(".json")+"-growth-%s.json" % growth_choice
+	if careful:
+		path = path.trim_suffix(".json")+"-careful.json"
+	if not report_tag.is_empty():
+		path = path.trim_suffix(".json")+"-"+report_tag+".json"
 	var file := FileAccess.open(path,FileAccess.WRITE)
 	file.store_string(JSON.stringify({"profile":profile,"global_search":global_search,"wins":wins,"runs":samples,"journeys":reports,"limits":"Simulated route search is not a human playtest. No retries used. At most eight consequence reviews: four nearby free triangles plus four familiar routes; no future positions."},"  "))
 	if extended:
-		expect(wins==samples,"Every requested generated journey reaches its thirtieth encounter and wins")
+		expect(wins==samples,"Every requested focused journey reaches its final encounter and wins")
 	print("JOURNEY FEASIBILITY: %d/%d complete journeys; %d checks; %d failures" % [wins,samples,checks,failures.size()])
 	quit(0 if failures.is_empty() else 1)

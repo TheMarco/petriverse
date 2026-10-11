@@ -1,29 +1,23 @@
-# Petriverse 0.2.1
+# Petriverse 0.2.3
 
-- **Mac, Apple Silicon + Intel:** [Petriverse-0.2.1-macos-universal.zip](Petriverse-0.2.1-macos-universal.zip). Developer ID signed, Apple notarized, with the ticket stapled. Requires macOS 13+ on Apple Silicon or macOS 11+ on Intel.
-- **Windows x86-64:** [Petriverse-0.2.1-windows-x86_64.zip](Petriverse-0.2.1-windows-x86_64.zip). Extract everything and run `Petriverse.exe`; keep `Petriverse.pck` beside it. Not Authenticode signed.
-- **Linux x86-64:** [Petriverse-0.2.1-linux-x86_64.tar.gz](Petriverse-0.2.1-linux-x86_64.tar.gz). Extract and run `./Petriverse.x86_64`; keep `Petriverse.pck` beside it. Executable permissions are preserved.
+- **Mac, Apple Silicon + Intel:** [Petriverse-0.2.3-macos-universal.zip](Petriverse-0.2.3-macos-universal.zip). Developer ID signed, Apple notarized, and ticket stapled.
+- **Windows x86-64:** [Petriverse-0.2.3-windows-x86_64.zip](Petriverse-0.2.3-windows-x86_64.zip). Extract everything and run `Petriverse.exe`; keep `Petriverse.pck` beside it. Not Authenticode signed.
+- **Linux x86-64:** [Petriverse-0.2.3-linux-x86_64.zip](Petriverse-0.2.3-linux-x86_64.zip) or [tar.gz](Petriverse-0.2.3-linux-x86_64.tar.gz). Extract and run `./Petriverse.x86_64`; keep `Petriverse.pck` beside it. Executable permissions are preserved.
 
-All packages include the art, three supplied music tracks, sound effects and license notices. They work offline without Godot or API keys. Existing Microverse saves remain in their original application-data location and carry over under the Petriverse name.
+All three builds contain version **0.2.3** internally and the same game pack. Artwork, the three supplied music tracks, effects, creature-film narration, subtitles, and license notices are bundled. No Godot installation, network connection, or API key is needed to play. Existing Microverse saves remain compatible.
 
-## New in 0.2.1
+## New in 0.2.3
 
-A redesigned interface. During an encounter the screen shows only what you act on: mother health, saved food, your traits, the goal, and the next step. The field journal, settings, and Save and return home live in a new pause menu (Space), and the journey map appears in briefings and the pause menu. Dialogs, buttons, upgrade cards and settings share one style, with shortcut keys printed on the buttons; Settings now include the input mode. Discovery messages no longer run off the bottom of the screen, and the evolution close-up keeps the trait's name readable. Game rules are unchanged.
+New journeys use a focused fifteen-encounter path through three biomes. Mother visibly grows from three to seven organelles and takes on a different body with a first major mutation. Route choices and organelle roles add longer-term decisions. First sightings offer a nonblocking **Watch film** choice; **Later** saves the film in the Field Journal, where it can be replayed. Round outcomes appear in the dish before the next decision.
 
-## Included in this release
-
-The living Petriverse title screen, independent cell drift, reactive water and sparkling particles, continuous-membrane amoebas with timed cell rescue, bacteriophages that infect bacteria and release stolen food, colony evolution, rare creatures, three biomes and their guardians, thirty-encounter journeys, and the home pond. The redesigned interface, Inter typography (SIL OFL) and collision-aware creature labels are included.
+Existing thirty-encounter saves keep their route. In late Blue Deep visits, a warned hunter wave follows the ordinary goal, swift clears draw more hunters, Guard organelles rest longer, and repair requires a deeper wound. Long membrane links strain the colony, while varied clean feeding can reward careful play. These changes increase scripted pressure; human difficulty and enjoyment still need playtesting.
 
 ## Verification
 
-All three platforms contain the same game pack. That pack passed 54 native smoke checks on macOS, covering menu startup, release identity, logo, fonts, creatures, all three supplied scores, board data, a real food capture, recovery, fluid rendering and pause. The final extracted Mac archive passed signature, stapled-ticket and Gatekeeper verification. Archive contents, game-pack hashes and Linux executable permissions were checked. Windows and Linux have not been run on their target operating systems.
+The identical exported game pack passed **109 native Mac smoke checks** with Godot 4.7.2. These cover startup, version, current journey length, all 44 film voiceovers, Mother stage textures, art, music, real capture, cell recovery, fluid rendering, and pause. The Mac archive and extracted app signature passed validation. Windows and Linux archives passed integrity checks; Windows version metadata and Linux executable permissions were inspected. Windows and Linux have not been run on their target operating systems. The Mac app has an accepted Apple notarization ticket stapled to it.
 
-See [release verification](0.2.1/reports/release-verification.json), [native pack report](0.2.1/reports/pack-native.json), and [checksums](SHA256SUMS.txt). Previous 0.1.0, 0.1.1 and 0.2.0 archives are retained.
-
-## Trailer
-
-[Watch the new 90-second trailer](../trailer/Petriverse-trailer-0.2.0.mp4). It uses native gameplay footage and the three supplied scores, with captions explaining the major mechanics.
+See [native pack report](0.2.3/reports/pack-native.json), [release checksums](SHA256SUMS.txt), and the [new game trailer](../trailer/Petriverse-trailer-0.2.3.mp4). Previous archives and the 0.2.0 trailer are retained.
 
 ## Rebuilding
 
-Use Godot 4.7.2 with `--headless --path prototype --export-release` and preset `macOS`, `Windows`, or `Linux`. Mac signing uses the configured Developer ID identity. Submit the signed archive with the existing `AC_PASSWORD` Keychain profile, staple the accepted ticket, then package and verify the extracted final app. Keep source files unchanged between platform exports; compare game-pack hashes before signing the final Mac package. Credentials are never stored in this project.
+Use Godot 4.7.2 with `--headless --path prototype --export-release` and preset `macOS`, `Windows`, or `Linux`. The Mac export uses the configured Developer ID identity from Keychain. Keep source files unchanged between platform exports and compare game-pack hashes. Credentials are never stored in this project.

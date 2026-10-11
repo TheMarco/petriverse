@@ -1,0 +1,96 @@
+{
+	"checks": 28,
+	"failures": [],
+	"films": {
+		"bacterium": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"chalice_grazer": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"comb_grazer": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"crown_rotifer": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"grazer": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"lantern_grazer": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		}
+	}
+}

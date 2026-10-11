@@ -2,6 +2,9 @@ extends SceneTree
 const Run = preload("res://scripts/run_controller.gd")
 const Save = preload("res://scripts/journey_save.gd")
 const Profile = preload("res://scripts/journey_profile.gd")
+const LoopStrain = preload("res://scripts/loop_strain.gd")
+const Route = preload("res://scripts/journey_route.gd")
+const Expedition = preload("res://scripts/expedition_creatures.gd")
 var checks := 0
 var failures: Array[String] = []
 func _initialize() -> void:
@@ -59,6 +62,7 @@ func exercise() -> void:
 	expect(run.stage_index == 1 and run.state == Run.BRIEF and run.mutations.has(chosen) and run.biomass == 3, "Next encounter preserves the mutation and unspent food")
 	for index in 12:
 		fixture_stage(run, index)
+		expect(run.max_integrity == run.MotherAppearance.capacity_for_stage(index) and run.mother_damage.capacity == run.max_integrity, "The Mother grows health organelles through all five ages (%d)" % index)
 		expect(run.board.validate_board().is_empty(), "Legal layout in encounter %d" % index)
 		expect(run.stage_elapsed == 0 and run.harvest.nourishment == 0, "Encounter clock and food objective reset in %d" % index)
 		run.harvest.nourishment = int(run.harvest.spec.food)
@@ -83,7 +87,7 @@ func exercise() -> void:
 	var preview: Dictionary = run.harvest_preview()
 	var result: Dictionary = run.release()
 	expect(preview.poison == 1 and preview.food == 5 and result.poison == preview.poison and result.food == preview.food, "Filter + Catalyst composition agrees with preview")
-	expect(is_equal_approx(result.recovery, 4.2), "Filtering has its stated recovery tradeoff")
+	expect(is_equal_approx(result.recovery, 4.2+LoopStrain.penalty([0,8,9],run.board.anchors)), "Filtering and long-link strain both contribute to recovery")
 	settle(run)
 	fixture_stage(run, 4)
 	run.mutations.clear()
@@ -127,19 +131,19 @@ func exercise() -> void:
 	fixture_stage(run, 0)
 	run.mutations.clear()
 	run.add_mutation("nursery")
-	run.integrity = 3
-	run.mother_damage.prepare_integrity(3)
+	run.integrity = 2
+	run.mother_damage.prepare_integrity(2)
 	run.harvest.clean_food = 10
 	meal(run, ["food", "food"])
 	select(run)
 	run.release()
-	expect(run.integrity == 4 and run.mother_damage.lost.count(true) == 1, "Nursery regrows a logical and visible organelle")
+	expect(run.integrity == 3 and run.mother_damage.lost.count(true) == 0, "Nursery regrows a logical and visible organelle")
 	fixture_stage(run, 0)
 	run.state = Run.EVOLVE
 	run.biomass = 8
-	run.integrity = 2
-	run.mother_damage.prepare_integrity(2)
-	expect(run.choose_journey_evolution("repair") and run.integrity == 4 and run.biomass == 2 and run.mother_damage.lost.count(true) == 1, "Repair spends stores and restores real cores before travel")
+	run.integrity = 1
+	run.mother_damage.prepare_integrity(1)
+	expect(run.choose_journey_evolution("repair") and run.integrity == 3 and run.biomass == 2 and run.mother_damage.lost.count(true) == 0, "Repair spends stores and restores real cores before travel")
 	# Exact resume, including an in-flight absorption and node drift.
 	run.begin_encounter()
 	run.step(2.0)
@@ -159,6 +163,141 @@ func exercise() -> void:
 	expect(Save.write(run, "/tmp/microverse-journey-test.cfg") == OK and not Save.read("/tmp/microverse-journey-test.cfg").is_empty(), "Disk save round trip")
 	var disk_data := Save.read("/tmp/microverse-journey-test.cfg")
 	expect(Save.restore(resumed, disk_data.snapshot) and resumed.board.anchors == run.board.anchors and resumed.harvest.nourishment == run.harvest.nourishment, "Serialized disk data restores real simulation types and values")
+	var legacy_snapshot: Dictionary = snapshot.duplicate(true)
+	legacy_snapshot.run.erase("max_integrity")
+	legacy_snapshot.run.integrity = 5
+	legacy_snapshot.mother.lost = [false,false,false,false,false]
+	var migrated := Run.new(true,11,true,true)
+	expect(Save.restore(migrated,legacy_snapshot) and migrated.max_integrity==3 and migrated.integrity==3 and migrated.mother_damage.lost.count(true)==0, "An older five-core save resumes with the new visible capacity")
+	migrated.dispose()
+	var strained := Run.new(true,31,true,true)
+	var short_path := [0,1,2]
+	var wide_path := [0,8,9]
+	var short_delay: float = LoopStrain.penalty(short_path,strained.board.anchors)
+	var wide_delay: float = LoopStrain.penalty(wide_path,strained.board.anchors)
+	expect(wide_delay > short_delay and wide_delay > 0.0,"A wide membrane carries a larger recovery cost than nearby links")
+	strained.begin_encounter()
+	select(strained,wide_path)
+	var stretched_capture: Dictionary = strained.release()
+	expect(stretched_capture.valid and is_equal_approx(stretched_capture.strain,wide_delay) and is_equal_approx(strained.cells[0].remaining,stretched_capture.recovery),"The visible long-link cost is paid by actual cells on release")
+	strained.dispose()
+	var thirty: Array = Route.make(32)
+	for i in 15:
+		thirty.insert(4,thirty[3].duplicate(true))
+	var guarding := Run.new(true,32,true,true)
+	guarding.route_plan = thirty.duplicate(true)
+	guarding.route_position = 2
+	guarding.long_journey = true
+	guarding.expedition_roster = Expedition.plan(guarding.run_seed,guarding.route_plan,[])
+	guarding.stage_index = 2
+	guarding.start_stage()
+	expect(guarding.growth_slot()==1 and guarding.choose_growth_role("guard") and guarding.growth_active("guard")==1,"The fourth organelle offers a functional guard choice")
+	guarding.begin_encounter()
+	guarding.enemies = [Run.Drifter.new(701,guarding.board.center+Vector2(40,0),0.0)]
+	guarding.resolve_contacts()
+	expect(guarding.integrity==4 and guarding.guardian_spent==1 and guarding.mother_damage.lost.count(true)==0,"The guard visibly preserves a health core on the first hunter contact")
+	guarding.enemies = [Run.Drifter.new(702,guarding.board.center+Vector2(40,0),0.0)]
+	guarding.resolve_contacts()
+	expect(guarding.integrity==3 and guarding.mother_damage.lost.count(true)==1,"A spent guard leaves the next hunter dangerous")
+	var guard_snapshot: Dictionary = Save.capture(guarding)
+	var guard_resume := Run.new(true,33,true,true)
+	expect(Save.restore(guard_resume,guard_snapshot) and guard_resume.growth_roles.get(1)=="guard" and guard_resume.guardian_spent==1 and guard_resume.guardian_recovery==1,"Save and resume preserve the growth choice and Guard recovery")
+	guard_resume.dispose()
+	guarding.heal(1)
+	guarding.route_position = 19
+	guarding.stage_index = 3
+	guarding.start_stage()
+	expect(guarding.guardian_spent==1 and guarding.guardian_recovery==0 and guarding.guardian_resting==1,"A Guard that blocked a hunter rests through the following encounter")
+	var resting_snapshot: Dictionary = Save.capture(guarding)
+	var resting_resume := Run.new(true,128,true,true)
+	expect(Save.restore(resting_resume,resting_snapshot) and resting_resume.guardian_resting==1,"The second Guard recovery round survives save and resume")
+	resting_resume.dispose()
+	guarding.begin_encounter()
+	guarding.enemies = [Run.Drifter.new(704,guarding.board.center+Vector2(40,0),0.0)]
+	guarding.resolve_contacts()
+	expect(guarding.integrity==3 and guarding.guardian_recovery==0,"The recovering Guard cannot block another hunter")
+	guarding.heal(1)
+	guarding.route_position = 20
+	guarding.stage_index = 4
+	guarding.start_stage()
+	expect(guarding.guardian_spent==1 and guarding.guardian_resting==0,"A blocked Guard rests for a second encounter on the original route")
+	guarding.route_position = 21
+	guarding.stage_index = 4
+	guarding.start_stage()
+	expect(guarding.guardian_spent==0,"A Guard is ready after two complete recovery encounters")
+	guarding.dispose()
+	var repair_probe := Run.new(true,125,true,true)
+	repair_probe.route_plan = thirty.duplicate(true)
+	repair_probe.route_position = 2
+	repair_probe.long_journey = true
+	repair_probe.expedition_roster = Expedition.plan(repair_probe.run_seed,repair_probe.route_plan,[])
+	repair_probe.stage_index = 2
+	repair_probe.start_stage()
+	repair_probe.state = Run.EVOLVE
+	repair_probe.integrity = 1
+	repair_probe.mother_damage.prepare_integrity(1)
+	repair_probe.biomass = 8
+	expect(repair_probe.choose_journey_evolution("repair") and repair_probe.repair_waiting(),"A repair in the thirty-encounter route must rest through the next encounter")
+	var repair_snapshot: Dictionary = Save.capture(repair_probe)
+	var repair_resume := Run.new(true,126,true,true)
+	expect(Save.restore(repair_resume,repair_snapshot) and repair_resume.repair_waiting(),"Repair recovery survives save and resume")
+	repair_resume.state = Run.EVOLVE
+	repair_resume.integrity = 2
+	repair_resume.mother_damage.prepare_integrity(2)
+	repair_resume.biomass = 8
+	expect(not repair_resume.choose_journey_evolution("repair") and repair_resume.choose_journey_evolution("continue") and not repair_resume.repair_waiting(),"A second repair needs one complete intervening encounter")
+	repair_resume.dispose()
+	repair_probe.dispose()
+	var late_position := -1
+	for i in thirty.size():
+		if int(thirty[i].stage)>=8:
+			late_position = i
+			break
+	var repair_late := Run.new(true,127,true,true)
+	repair_late.route_plan = thirty.duplicate(true)
+	repair_late.route_position = late_position
+	repair_late.long_journey = true
+	repair_late.expedition_roster = Expedition.plan(repair_late.run_seed,repair_late.route_plan,[])
+	repair_late.stage_index = int(thirty[late_position].stage)
+	repair_late.start_stage()
+	repair_late.state = Run.EVOLVE
+	repair_late.integrity = repair_late.max_integrity-1
+	repair_late.mother_damage.prepare_integrity(repair_late.integrity)
+	repair_late.biomass = 30
+	expect(repair_late.stage_index>=8 and repair_late.repair_needs_deeper_wound() and not repair_late.choose_journey_evolution("repair"),"One wounded core no longer triggers a full late-route repair")
+	repair_late.integrity -= 1
+	repair_late.mother_damage.prepare_integrity(repair_late.integrity)
+	expect(not repair_late.repair_needs_deeper_wound() and repair_late.choose_journey_evolution("repair"),"Two wounded cores still allow a late-route repair")
+	repair_late.dispose()
+	var feeding := Run.new(true,34,true,true)
+	feeding.stage_index = 2
+	feeding.start_stage()
+	expect(feeding.choose_growth_role("feeder") and feeding.growth_active("feeder")==1,"The fourth organelle also offers a feeding choice")
+	feeding.begin_encounter()
+	meal(feeding,["food","food","food","food","food"])
+	select(feeding,wide_path)
+	var graded: Dictionary = feeding.release()
+	expect(graded.valid and graded.food==6 and graded.capture_grade=="Grand sweep" and graded.capture_bonus==150 and feeding.score>=graded.points,"A clean wide meal gains feeder food, a named grade and bonus score")
+	feeding.mother_damage.record(703,feeding.board.center+feeding.mother_damage.core_offset(1),feeding.board.center)
+	feeding.integrity -= 1
+	meal(feeding,["food","food","food","food"])
+	var meal_ids: Array = feeding.enemies.map(func(body): return body.id)
+	expect(feeding.harvest.outcome(meal_ids,feeding,3).food==4,"Wounding the feeder organelle suspends its benefit")
+	feeding.heal(1)
+	expect(feeding.harvest.outcome(meal_ids,feeding,3).food==5,"Repair restores the feeder's benefit")
+	feeding.dispose()
+	var young := Run.new(true,19,true,true)
+	var unused_site: Vector2 = young.board.center + young.mother_damage.core_offset(1)
+	young.mother_damage.record(501,unused_site,young.board.center)
+	expect(young.mother_damage.active_indices().has(young.mother_damage.bites[0].core), "Damage cannot choose an organelle the young Mother has not grown")
+	young.dispose()
+	var elder := Run.new(true,23,true,true)
+	elder.stage_index = 10
+	elder.start_stage()
+	var seventh_site: Vector2 = elder.board.center + elder.mother_damage.core_offset(6)
+	elder.mother_damage.record(502,seventh_site,elder.board.center)
+	expect(elder.max_integrity==7 and elder.integrity==7 and elder.mother_damage.bites[0].core==6, "The seventh organelle is a real late-journey health target")
+	elder.dispose()
 	var saved_stage: int = run.stage_index
 	var saved_mutations: Array = run.mutations.duplicate()
 	run.state = Run.LOSS

@@ -7,11 +7,12 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "trailer/petriverse"
-FRAMES = Path("/tmp/petriverse-trailer-frames")
-SHOTS = [("hook",5),("reveal",4),("loop",10),("fluid",6),("amoeba",12),
-         ("phages",12),("evolve",7),("world_a",3),("world_b",3),("world_c",3),
-         ("rare_a",3),("rare_b",3),("boss_a",3),("boss_b",3),("boss_c",3),("home",4),("end",6)]
+OUT = ROOT / "trailer/petriverse-0.2.3"
+FRAMES = Path("/tmp/petriverse-0.2.3-trailer-frames")
+SHOTS = [("hook",5),("reveal",4),("loop",7),("fluid",3),("amoeba",10),
+         ("phages",12),("mother_growth",6),("film",6),("route_choice",4),
+         ("world_a",3),("world_b",3),("world_c",3),("final_wave",5),
+         ("boss_a",3),("boss_b",3),("boss_c",3),("home",4),("end",6)]
 
 def main():
     wanted = sys.argv[1:]

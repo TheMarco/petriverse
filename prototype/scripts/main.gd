@@ -2,6 +2,7 @@ extends Node2D
 
 const Run = preload("res://scripts/run_controller.gd")
 const Geometry = preload("res://scripts/loop_geometry.gd")
+const LoopStrain = preload("res://scripts/loop_strain.gd")
 const Hud = preload("res://scripts/hud.gd")
 const Microscope = preload("res://scripts/microscope.gd")
 const Soundscape = preload("res://scripts/soundscape.gd")
@@ -11,10 +12,12 @@ const JourneyProfile = preload("res://scripts/journey_profile.gd")
 const JourneySave = preload("res://scripts/journey_save.gd")
 const HomePond = preload("res://scripts/home_pond.gd")
 const EvolutionReveal = preload("res://scripts/evolution_reveal.gd")
+const CreatureCinema = preload("res://scripts/creature_cinema.gd")
 const UI = preload("res://scripts/ui_style.gd")
 const PEARL := Color("c7eee4")
 const CYAN := Color("86cbc5")
 const WARM := Color("edb184")
+const RESULT_REVEAL_SECONDS := 2.8
 
 var run = Run.new(true, 0, true, true)
 var journey_profile = JourneyProfile.new()
@@ -33,6 +36,8 @@ var show_home_on_start := true
 var hud: Node2D
 var microscope: Node2D
 var evolution_reveal: Node2D
+var creature_cinema: CanvasLayer
+var creature_intros_enabled := true
 var soundscape: Node
 var audio_enabled := true
 var settings_open := false
@@ -42,7 +47,9 @@ var save_records := true
 var results_saved := false
 var last_discovery := 0
 var last_mastery_count := 0
+var last_guard_notice_serial := 0
 var debug_mode := false
+var developer_tools := "--dev-tools" in OS.get_cmdline_user_args()
 var click_mode := false
 var reduced_motion := false
 var high_contrast := false
@@ -60,6 +67,11 @@ var visual_time := 0.0
 var toast := ""
 var toast_time := 0.0
 var reject_time := 0.0
+var result_reveal_state := ""
+var result_reveal_remaining := 0.0
+var big_capture_remaining := 0.0
+var big_capture_center := Vector2.ZERO
+var guard_flash_remaining := 0.0
 var font: Font = UI.font(UI.MEDIUM)
 
 func _ready() -> void:
@@ -92,6 +104,9 @@ func _ready() -> void:
 	if run.journey:
 		evolution_reveal = EvolutionReveal.new()
 		add_child(evolution_reveal)
+	if run.journey and creature_intros_enabled:
+		creature_cinema = CreatureCinema.new()
+		add_child(creature_cinema)
 	for error in run.board.validate_board():
 		push_error(error)
 
@@ -108,6 +123,15 @@ func _physics_process(delta: float) -> void:
 	run.step(delta)
 
 func _process(delta: float) -> void:
+	if creature_cinema!=null:
+		# Manual capture/test scenes drive their own clock; films are automatic in live play.
+		if is_processing() and is_physics_processing(): creature_cinema.poll(delta)
+		if creature_cinema.active:
+			soundscape.sync(run,delta)
+			return
+	advance_result_reveal(delta)
+	big_capture_remaining = maxf(0.0, big_capture_remaining - delta)
+	guard_flash_remaining = maxf(0.0, guard_flash_remaining - delta)
 	if run.state!=Run.ACTIVE:
 		run.nudge.cancel()
 	if run.state in [Run.ACTIVE, Run.HOME, Run.BRIEF] or (run.state in [Run.SUCCESS, Run.LOSS, Run.EVOLVE] and (not effects.is_empty() or run.mother_damage.active() or not run.amoebas.releases.is_empty() or not run.phages.bursts.is_empty())):
@@ -131,6 +155,12 @@ func _process(delta: float) -> void:
 			toast = award.title+" · "+award.detail+(" · +1 upgrade food" if award.food>0 else " · +150 points")
 			toast += " · Home: "+run.Mastery.KEEPSAKES[award.id]
 			toast_time = 5.0
+	if run.journey and run.guardian_block_serial != last_guard_notice_serial:
+		var blocks: int = run.guardian_block_serial - last_guard_notice_serial
+		last_guard_notice_serial = run.guardian_block_serial
+		guard_flash_remaining = 1.0
+		toast = "Guard organelle intercepted a hunter" if blocks == 1 else "Guard organelles intercepted %d hunters" % blocks
+		toast_time = 3.0
 	if run.journey and save_records and run.state != Run.HOME:
 		autosave_elapsed += delta
 		if saved_journey_serial != run.journey_serial or autosave_elapsed >= 8.0:
@@ -148,6 +178,25 @@ func _process(delta: float) -> void:
 		evolution_reveal.sync()
 	hud.refresh()
 	queue_redraw()
+
+func round_result_showing() -> bool:
+	return run.journey and run.state in [Run.EVOLVE, Run.LOSS, Run.SUCCESS] and (result_reveal_remaining > 0.0 or not run.clots.is_empty() or run.mother_damage.active())
+
+func advance_result_reveal(delta: float) -> void:
+	if not run.journey:
+		return
+	if run.state != result_reveal_state:
+		result_reveal_state = run.state
+		result_reveal_remaining = RESULT_REVEAL_SECONDS if run.state in [Run.EVOLVE, Run.LOSS, Run.SUCCESS] else 0.0
+	else:
+		result_reveal_remaining = maxf(0.0, result_reveal_remaining - delta)
+	if run.state == Run.EVOLVE and not round_result_showing() and run.evolution_ready() and not (journal_open or settings_open or help_open):
+		var can_evolve: bool = not run.offered_mutations.is_empty() and run.biomass >= run.evolution_cost()
+		var repair_resting: bool = run.integrity < run.max_integrity and not run.repair_needs_deeper_wound() and run.repair_waiting()
+		var can_repair: bool = run.integrity < run.max_integrity and run.biomass >= run.repair_cost() and not repair_resting and not run.repair_needs_deeper_wound()
+		if not can_evolve and not can_repair and not repair_resting and run.choose_journey_evolution("continue"):
+			result_reveal_state = run.state
+			save_journey()
 
 static func first_sentence(text: String) -> String:
 	var end := text.find(". ")
@@ -196,7 +245,9 @@ func toggle_sound_settings() -> void:
 func overlay_action() -> void:
 	if run.journey:
 		if run.state == Run.BRIEF:
-			if run.Habitats.pending(run):
+			if run.growth_slot() >= 0:
+				choose_growth_role("guard")
+			elif run.Habitats.pending(run):
 				choose_habitat("bloom")
 			else:
 				run.begin_encounter()
@@ -213,6 +264,8 @@ func overlay_action() -> void:
 		restart()
 
 func toggle_debug() -> void:
+	if not developer_tools:
+		return
 	debug_mode = not debug_mode
 
 func toggle_mode() -> void:
@@ -261,6 +314,8 @@ func save_preferences() -> void:
 	config.save(preferences_path)
 
 func choose_evolution(index: int) -> void:
+	if round_result_showing():
+		return
 	if index >= 0 and index < run.offered_mutations.size():
 		var id: String = run.offered_mutations[index]
 		if run.choose_mutation(id):
@@ -271,6 +326,7 @@ func choose_evolution(index: int) -> void:
 				save_journey()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if creature_cinema!=null and creature_cinema.active: return
 	if hud!=null and run.journey and hud.renaming():
 		if event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:
 			hud.cancel_rename()
@@ -418,7 +474,17 @@ func commit_selection() -> void:
 			var benefit: String = run.Mutations.food_bonus_text(result)
 			if not benefit.is_empty():
 				toast += " · includes " + benefit
-		toast_time = 2.0
+			if not result.get("capture_grade","").is_empty():
+				toast = "%s · +%d score · %s" % [result.capture_grade,result.capture_bonus,toast]
+				big_capture_remaining = 2.0
+				big_capture_center = Vector2.ZERO
+				if not result.positions.is_empty():
+					for point in result.positions:
+						big_capture_center += point / float(result.positions.size())
+				else:
+					for point in result.polygon:
+						big_capture_center += point / float(result.polygon.size())
+		toast_time = 3.0 if run.journey and not result.get("capture_grade","").is_empty() else 2.0
 		if run.journey and result.get("rescued",0)>0:
 			toast += " · settled in your home pond"
 			toast_time = 4.0
@@ -469,7 +535,9 @@ func draw_graph(legal: Array) -> void:
 	# than drawing a complete web that would obscure the organisms beneath it.
 	if run.selection.active and not run.selection.closed and legal.has(hovered):
 		var origin: Vector2 = run.board.anchors[run.selection.path[-1]]
-		bond(origin, run.board.anchors[hovered], Color(0.65, 0.86, 0.86, 0.65), 1.1, true)
+		var destination: Vector2 = run.board.anchors[hovered]
+		var tint: float = LoopStrain.edge_tint(origin,destination) if run.journey else 0.0
+		bond(origin, destination, Color(0.65, 0.86, 0.86, 0.65).lerp(Color(WARM,0.85),tint), 1.1+tint, true)
 
 func draw_selection() -> void:
 	if not run.selection.active:
@@ -480,10 +548,16 @@ func draw_selection() -> void:
 	if mother_blocked:
 		edge_color = WARM
 	for i in range(polygon.size() - 1):
-		bond(polygon[i], polygon[i + 1], Color(0.50, 0.81, 0.82, 0.13), 5.0)
-		bond(polygon[i], polygon[i + 1], edge_color, 1.4)
+		var tint: float = LoopStrain.edge_tint(polygon[i],polygon[i+1]) if run.journey else 0.0
+		var stroke: Color = edge_color.lerp(WARM,minf(1.0,tint*1.6)) if not mother_blocked else WARM
+		bond(polygon[i], polygon[i + 1], Color(stroke, 0.13), 5.0)
+		bond(polygon[i], polygon[i + 1], stroke, 1.4 + tint * 1.2)
+		if tint>0.15:
+			draw_circle((polygon[i]+polygon[i+1])*0.5,2.2+tint*2.0,Color(WARM,0.75),false,1.2,true)
 	if run.selection.can_close():
-		bond(polygon[-1], polygon[0], edge_color if run.selection.closed else edge_color.darkened(0.12), 1.4, not run.selection.closed)
+		var close_tint: float = LoopStrain.edge_tint(polygon[-1],polygon[0]) if run.journey else 0.0
+		var close_color: Color = edge_color.lerp(WARM,minf(1.0,close_tint*1.6))
+		bond(polygon[-1], polygon[0], close_color if run.selection.closed else close_color.darkened(0.12), 1.4 + close_tint * 1.2, not run.selection.closed)
 	elif mother_blocked and Geometry.simple_polygon(polygon):
 		bond(polygon[-1], polygon[0], Color(WARM, 0.65), 1.4, true)
 
@@ -522,10 +596,13 @@ func draw_mother() -> void:
 		var radius: float = run.board.mother_radius + Geometry.BOUNDARY_TOLERANCE
 		draw_circle(p, radius, Color(WARM, 0.08), true)
 		draw_circle(p, radius, Color(WARM, 0.8), false, 1.8, true)
-	# Numeric integrity markers accompany the five consumable golden organelles.
-	for i in 5:
-		var start := -PI / 2.0 + i * TAU / 5.0 + 0.30
-		draw_arc(p, 60, start, start + TAU / 5.0 - 0.60, 20, Color(0.72, 0.85, 0.82, 0.6) if i < run.integrity else Color(0.23, 0.33, 0.40, 0.6), 1.2, true)
+	# The rim tracks the number of organelles the Mother has grown so far.
+	for i in run.max_integrity:
+		var start: float = -PI / 2.0 + i * TAU / run.max_integrity + 0.30
+		draw_arc(p, 60, start, start + TAU / run.max_integrity - 0.60, 20, Color(0.72, 0.85, 0.82, 0.6) if i < run.integrity else Color(0.23, 0.33, 0.40, 0.6), 1.2, true)
+	if guard_flash_remaining > 0.0:
+		var glow: float = guard_flash_remaining
+		draw_arc(p, 68.0 + (1.0-glow)*14.0, 0.0, TAU, 64, Color(CYAN, glow*0.75), 2.0+glow*2.0, true)
 
 	for nucleus in run.critical_nuclei():
 		var angle := (nucleus - p).angle()
@@ -588,10 +665,17 @@ func reset_presentation() -> void:
 	results_saved = false
 	last_discovery = run.discovery_serial
 	toast_time = 0.0
+	result_reveal_state = run.state
+	result_reveal_remaining = 0.0
+	big_capture_remaining = 0.0
+	guard_flash_remaining = 0.0
 	visual_time = run.elapsed
 	last_mastery_count = run.mastery_awards.size()
+	last_guard_notice_serial = run.guardian_block_serial
 	soundscape.reset_run()
 	soundscape.last_mastery_count = last_mastery_count
+	soundscape.last_guard_block = run.guardian_block_serial
+	soundscape.last_integrity = run.integrity
 	# IDs restart with a new colony; discard old sprite and effect identities.
 	for body in microscope.enemies.values():
 		body.queue_free()
@@ -662,6 +746,11 @@ func travel_without_evolution() -> void:
 
 func choose_habitat(id: String) -> void:
 	if run.Habitats.choose(run,id):
+		save_journey()
+		hud.refresh()
+
+func choose_growth_role(role: String) -> void:
+	if run.choose_growth_role(role):
 		save_journey()
 		hud.refresh()
 

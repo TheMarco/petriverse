@@ -1,5 +1,7 @@
 extends SceneTree
 const Expedition = preload("res://scripts/expedition_creatures.gd")
+const Cinema = preload("res://scripts/creature_cinema.gd")
+const MotherAppearance = preload("res://scripts/mother_appearance.gd")
 ## Run against an exported PCK with isolated state, never a player's save files.
 var failures: Array[String] = []
 var checks := 0
@@ -43,17 +45,24 @@ func exercise() -> void:
 		expect(game.soundscape.streams.has(name),"Bundled audio: "+name)
 	for entry in Expedition.ENTRIES:
 		expect(ResourceLoader.exists("res://assets/organisms/"+entry.id+".png"),"Rare creature: "+entry.id)
+	var films: Dictionary = Cinema.entries()
+	expect(films.size()==44,"All 44 creature films are bundled")
+	for id in films:
+		expect(ResourceLoader.exists("res://assets/audio/introductions/"+id+".ogg"),"Creature film narration: "+id)
+	for stage in [1,2,4,8,10]:
+		expect(MotherAppearance.texture_for(stage,[])!=null,"Mother organelle stage: "+str(stage))
+		expect(MotherAppearance.texture_for(stage,["elastic"])!=null,"Elastic Mother organelle stage: "+str(stage))
 	for plate in game.microscope.Appearance.PLATES:
 		expect(ResourceLoader.exists(plate),"Biome plate: "+plate)
 	expect(ProjectSettings.get_setting("application/config/name")=="Petriverse","Release title is Petriverse")
-	expect(ProjectSettings.get_setting("application/config/version")=="0.2.1","Release version is 0.2.1")
+	expect(ProjectSettings.get_setting("application/config/version")=="0.2.3","Release version is 0.2.3")
 	for asset in ["branding/petriverse-title-v2.png","organisms/copper-bacterium.png","organisms/silver-phage.png","fonts/Inter-Variable.ttf"]:
 		expect(ResourceLoader.exists("res://assets/"+asset),"Current release asset: "+asset)
 	for score in ["petriverse-stillwater","petriverse-glassgarden","petriverse-blue-deep"]:
 		var music = load("res://assets/audio/"+score+".ogg")
 		expect(music!=null and music.get_length()>130.0,"User score packaged: "+score)
 	game.new_journey("wanderer")
-	expect(game.run.route_plan.size()==30,"New journey has thirty encounters")
+	expect(game.run.route_plan.size()==15,"New journey has fifteen encounters")
 	# Exercise one ordinary capture from the shipped data and compiled scripts.
 	game.run.long_journey = false
 	game.run.route_plan.clear()
@@ -80,7 +89,7 @@ func exercise() -> void:
 		RenderingServer.force_draw(false)
 		if frame==32 and DisplayServer.get_name()!="headless":
 			expect(root.get_texture().get_image().save_png("/tmp/microverse-release-smoke.png")==OK,"Native release screenshot saved")
-	expect(game.run.integrity==5,"Capture preserves Mother health")
+	expect(game.run.integrity==game.run.max_integrity,"Capture preserves Mother health")
 	expect(game.run.cells.all(func(c): return c.is_ready()),"Captured cells recover")
 	expect(game.run.fluid.clock>0.0,"Persistent fluid simulation runs from exported pack")
 	var water_map = game.microscope.field.material.get_shader_parameter("fluid_map")

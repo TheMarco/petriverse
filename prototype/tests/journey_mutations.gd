@@ -34,10 +34,10 @@ func exercise() -> void:
 		expect(attributed==result.food,"Base food plus visible upgrade bonuses accounts for the whole meal: "+id)
 		match id:
 			"fission":
-				expect(result.recovery == 2.0 and result.food==4,"Nimble's first upgrade rewards a clean small meal and returns its cells in two seconds")
+				expect(is_equal_approx(result.recovery-result.strain,2.0) and result.food==4,"Nimble's first upgrade rewards a clean small meal with two seconds of base recovery")
 				expect(run.Mutations.food_bonus_text(result)=="Rapid Fission +1","The first upgrade's real contribution is named in the capture feedback")
 			"elastic":
-				expect(path.size()==10 and result.recovery==3.6 and result.food==6,"Feast's first upgrade doubles desmid food in a wide capture with a recovery tradeoff")
+				expect(path.size()==10 and is_equal_approx(result.recovery-result.strain,3.6) and result.strain>0.0 and result.food==6,"Feast doubles food in a wide capture while long links add recovery")
 			"frenzy":
 				expect(run.is_ready(path[0]) and not run.clots[0].nodes.has(path[0]),"Frenzy frees the first node while the others fuse")
 			"lure":
@@ -52,7 +52,7 @@ func exercise() -> void:
 				run.step(0.4)
 				expect(extra.slowed > 0.0,"A hunter crossing a residual membrane actually slows")
 			"feast":
-				expect(result.food==6 and result.recovery==4.0,"Feast gains food at the cost of a slower wide loop")
+				expect(result.food==6 and is_equal_approx(result.recovery-result.strain,4.0),"Feast gains food at the cost of a slower wide loop")
 			"catalyst":
 				expect(result.food==3 and result.poison==1,"Unfiltered Catalyst preserves the risk as well as its food bonus")
 	# The first-choice feeding rewards must keep their spatial tradeoffs when

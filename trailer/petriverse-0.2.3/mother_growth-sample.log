@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 91.7 - Compatibility - Using Device: Apple - Apple M3 Max
+
+TRAILER mother_growth 0/180
+TRAILER mother_growth 60/180
+TRAILER mother_growth 120/180
+TRAILER COMPLETE mother_growth {"duration":6.0,"events":[{"sound":"evolve","time":1.0},{"sound":"evolve","time":2.2},{"sound":"evolve","time":3.4},{"sound":"evolve","time":4.6}],"failures":[],"frames":180,"integrity":9,"nourishment":0,"shot":"mother_growth","source":"Native Godot simulation, camera and title overlays only; staged isolated encounters"}

@@ -1,0 +1,8 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 91.7 - Compatibility - Using Device: Apple - Apple M3 Max
+
+TRAILER loop 0/210
+TRAILER loop 60/210
+TRAILER loop 120/210
+TRAILER loop 180/210
+TRAILER COMPLETE loop {"duration":7.0,"events":[{"sound":"connect","time":1.5},{"sound":"connect","time":2.5},{"sound":"connect","time":3.5},{"capture":{"armor_hits":0,"bodies":2,"boss_layers":0,"capture_bonus":0,"capture_grade":"","cells_rescued":0,"filtered":0,"food":2,"food_bonuses":{},"ids":[37,38],"kills":2,"mastery":[],"nodes":[0,8,9],"points":50,"poison":0,"polygon":"[(622.8132, 334.5349), (611.5925, 207.9301), (780.0695, 279.5676)]","positions":["(674.6594, 268.0211)","(659.0687, 267.0575)"],"prey_forms":["",""],"prey_kinds":["food","food"],"purified":0,"raw_food":2,"recovery":3.37856884087457,"rescued":0,"restored_node":-1,"salvage":0,"strain":0.378568840874566,"threats":0,"valid":true,"wardens":0},"sound":"close","time":4.9},{"sound":"absorb","time":5.6}],"failures":[],"frames":210,"integrity":5,"nourishment":2,"shot":"loop","source":"Native Godot simulation, camera and title overlays only; staged isolated encounters"}

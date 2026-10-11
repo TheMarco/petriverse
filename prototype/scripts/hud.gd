@@ -140,6 +140,7 @@ func refresh() -> void:
 	mode_button.text = "Input: clicks  ·  C" if game.click_mode else "Input: drag  ·  C"
 	motion_button.text = "Motion: low  ·  M" if game.reduced_motion else "Motion: full  ·  M"
 	debug_button.text = "Hide inspect  ·  D" if game.debug_mode else "Inspect dish  ·  D"
+	debug_button.visible = game.developer_tools and game.run.state == "paused" and not game.settings_open
 	center_button.visible = overlay_visible() and not game.settings_open and game.run.state != "evolve"
 	center_button.text = "Resume encounter" if game.run.state == "paused" else "Grow again  ·  R"
 	refresh_settings()
@@ -267,12 +268,12 @@ func _draw() -> void:
 	label_at(Plan.TITLES[run.stage_index] if run.full_run else "Enclosure study", Vector2(1080, 75), 13, MUTED)
 	draw_line(Vector2(36, 134), Vector2(204, 134), Color("294148"), 1.0)
 	label_at("MOTHER INTEGRITY", Vector2(36, 168), 12, MUTED)
-	for i in 5:
+	for i in run.max_integrity:
 		var box := Rect2(36 + i * 33, 184, 25, 8)
 		draw_rect(box, CYAN if i < run.integrity else Color("26393e"))
 		if i >= run.integrity:
 			draw_line(box.position, box.end, MUTED, 1.0)
-	label_at("%d / 5" % run.integrity, Vector2(36, 218), 14)
+	label_at("%d / %d" % [run.integrity,run.max_integrity], Vector2(36, 218), 14)
 	if not run.critical_nuclei().is_empty():
 		label_at("MOTHER UNDER THREAT", Vector2(36, 245), 12, Color("edb184"))
 	label_at("ABSORPTION SCORE", Vector2(36, 277), 12, MUTED)
@@ -377,12 +378,12 @@ func draw_harvest() -> void:
 	label_at("Feed in %d:%02d" % [int(harvest.DURATION) / 60, int(harvest.DURATION) % 60], Vector2(1080, 75), 13, MUTED)
 	draw_line(Vector2(36, 134), Vector2(204, 134), Color("294148"), 1.0)
 	label_at("MOTHER INTEGRITY", Vector2(36, 168), 12, MUTED)
-	for i in 5:
+	for i in run.max_integrity:
 		var box := Rect2(36 + i * 33, 184, 25, 8)
 		draw_rect(box, CYAN if i < run.integrity else Color("26393e"))
 		if i >= run.integrity:
 			draw_line(box.position, box.end, MUTED, 1.0)
-	label_at("%d / 5 organelles" % run.integrity, Vector2(36, 218), 14)
+	label_at("%d / %d organelles" % [run.integrity,run.max_integrity], Vector2(36, 218), 14)
 	if not run.critical_nuclei().is_empty():
 		label_at("MOTHER UNDER THREAT", Vector2(36, 245), 12, poison)
 	label_at("NOURISH THE MOTHER", Vector2(36, 277), 12, green)
@@ -449,6 +450,6 @@ func draw_harvest() -> void:
 		elif run.state == "loss":
 			subtitle = harvest.loss_reason
 		centered(subtitle, 410, 17, MUTED)
-		centered("Nourishment %d / %d   ·   Organelles %d / 5" % [harvest.nourishment, harvest.GOAL, run.integrity], 460, 14, green)
+		centered("Nourishment %d / %d   ·   Organelles %d / %d" % [harvest.nourishment, harvest.GOAL, run.integrity,run.max_integrity], 460, 14, green)
 		if run.state != "paused":
 			centered("Largest meal %d   ·   Cysts swallowed %d   ·   %.1fs" % [run.best_capture, harvest.poison_taken, run.elapsed], 490, 12, MUTED)

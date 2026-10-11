@@ -1,0 +1,10 @@
+{
+	"duration": 5.0,
+	"events": [],
+	"failures": [],
+	"frames": 150,
+	"integrity": 6,
+	"nourishment": 0,
+	"shot": "final_wave",
+	"source": "Native Godot simulation, camera and title overlays only; staged isolated encounters"
+}

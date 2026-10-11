@@ -1,0 +1,27 @@
+{
+	"duration": 6.0,
+	"events": [
+		{
+			"sound": "evolve",
+			"time": 1.0
+		},
+		{
+			"sound": "evolve",
+			"time": 2.2
+		},
+		{
+			"sound": "evolve",
+			"time": 3.4
+		},
+		{
+			"sound": "evolve",
+			"time": 4.6
+		}
+	],
+	"failures": [],
+	"frames": 180,
+	"integrity": 7,
+	"nourishment": 0,
+	"shot": "mother_growth",
+	"source": "Native Godot simulation, camera and title overlays only; staged isolated encounters"
+}

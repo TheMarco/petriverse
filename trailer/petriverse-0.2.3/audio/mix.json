@@ -1,0 +1,155 @@
+{
+  "duration": 90,
+  "sample_rate": 48000,
+  "mixer": "numpy",
+  "music": [
+    {
+      "track": "petriverse-stillwater",
+      "file": "prototype/assets/audio/petriverse-stillwater.ogg",
+      "timeline": [
+        0,
+        35
+      ],
+      "fade_in": 2.0,
+      "fade_out": 5.0,
+      "source_offset": 0,
+      "gain": 0.8
+    },
+    {
+      "track": "petriverse-glassgarden",
+      "file": "prototype/assets/audio/petriverse-glassgarden.ogg",
+      "timeline": [
+        30,
+        68
+      ],
+      "fade_in": 5.0,
+      "fade_out": 6.0,
+      "source_offset": 0,
+      "gain": 0.9
+    },
+    {
+      "track": "petriverse-blue-deep",
+      "file": "prototype/assets/audio/petriverse-blue-deep.ogg",
+      "timeline": [
+        62,
+        90
+      ],
+      "fade_in": 6.0,
+      "fade_out": 2.0,
+      "source_offset": 0,
+      "gain": 1.0
+    }
+  ],
+  "ambience": {
+    "track": "pond",
+    "file": "prototype/assets/audio/pond.ogg",
+    "gain": 0.12,
+    "loop": true
+  },
+  "events": [
+    {
+      "at": 10.5,
+      "sound": "connect",
+      "gain": 0.55,
+      "shot": "loop"
+    },
+    {
+      "at": 11.5,
+      "sound": "connect",
+      "gain": 0.55,
+      "shot": "loop"
+    },
+    {
+      "at": 12.5,
+      "sound": "connect",
+      "gain": 0.55,
+      "shot": "loop"
+    },
+    {
+      "at": 13.9,
+      "sound": "close",
+      "gain": 0.55,
+      "shot": "loop"
+    },
+    {
+      "at": 14.6,
+      "sound": "absorb",
+      "gain": 0.68,
+      "shot": "loop"
+    },
+    {
+      "at": 17.9,
+      "sound": "close",
+      "gain": 0.55,
+      "shot": "fluid"
+    },
+    {
+      "at": 23.0,
+      "sound": "connect",
+      "gain": 0.55,
+      "shot": "amoeba"
+    },
+    {
+      "at": 23.867,
+      "sound": "connect",
+      "gain": 0.55,
+      "shot": "amoeba"
+    },
+    {
+      "at": 24.7,
+      "sound": "connect",
+      "gain": 0.55,
+      "shot": "amoeba"
+    },
+    {
+      "at": 25.967,
+      "sound": "close",
+      "gain": 0.55,
+      "shot": "amoeba"
+    },
+    {
+      "at": 26.667,
+      "sound": "absorb",
+      "gain": 0.68,
+      "shot": "amoeba"
+    },
+    {
+      "at": 29.8,
+      "sound": "close",
+      "gain": 0.55,
+      "shot": "phages"
+    },
+    {
+      "at": 39.2,
+      "sound": "fracture",
+      "gain": 0.7,
+      "shot": "phages"
+    },
+    {
+      "at": 42.0,
+      "sound": "evolve",
+      "gain": 0.72,
+      "shot": "mother_growth"
+    },
+    {
+      "at": 43.2,
+      "sound": "evolve",
+      "gain": 0.72,
+      "shot": "mother_growth"
+    },
+    {
+      "at": 44.4,
+      "sound": "evolve",
+      "gain": 0.72,
+      "shot": "mother_growth"
+    },
+    {
+      "at": 45.6,
+      "sound": "evolve",
+      "gain": 0.72,
+      "shot": "mother_growth"
+    }
+  ],
+  "narration": null,
+  "subtitles": null
+}

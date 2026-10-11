@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 91.7 - Compatibility - Using Device: Apple - Apple M3 Max
+
+TRAILER amoeba 0/300
+TRAILER amoeba 60/300
+TRAILER amoeba 120/300
+TRAILER amoeba 180/300
+TRAILER amoeba 240/300
+TRAILER COMPLETE amoeba {"duration":10.0,"events":[{"sound":"connect","time":4.0},{"sound":"connect","time":4.86666666666667},{"sound":"connect","time":5.7},{"capture":{"armor_hits":0,"bodies":1,"boss_layers":0,"capture_bonus":0,"capture_grade":"","cells_rescued":1,"filtered":0,"food":0,"food_bonuses":{},"ids":[36],"kills":1,"mastery":[],"nodes":[7,8,15],"points":100,"poison":0,"polygon":"[(575.5399, 368.6044), (654.5437, 183.7796), (494.2841, 270.8974)]","positions":["(574.7892, 274.4271)"],"prey_forms":[""],"prey_kinds":["amoeba"],"purified":0,"raw_food":0,"recovery":3.52106439548069,"rescued":0,"restored_node":-1,"salvage":0,"strain":0.521064395480686,"threats":1,"valid":true,"wardens":0},"sound":"close","time":6.96666666666667},{"sound":"absorb","time":7.66666666666667}],"failures":[],"frames":300,"integrity":5,"nourishment":0,"shot":"amoeba","source":"Native Godot simulation, camera and title overlays only; staged isolated encounters"}

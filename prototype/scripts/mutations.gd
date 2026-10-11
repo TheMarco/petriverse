@@ -51,12 +51,13 @@ static func food_bonus_text(meal: Dictionary) -> String:
 	# Dot-assigned dictionary keys can be StringName values; compare their
 	# text so equal bonuses do not depend on intern allocation order.
 	traits.sort_custom(func(a,b): return bonuses[a]>bonuses[b] or (bonuses[a]==bonuses[b] and str(a)<str(b)))
-	var text := "%s +%d" % [definition(traits[0]).name,bonuses[traits[0]]]
+	var first_name: String = "Feeder organelle" if str(traits[0])=="feeder" else definition(traits[0]).name
+	var text := "%s +%d" % [first_name,bonuses[traits[0]]]
 	var other := 0
 	for id in traits.slice(1):
 		other += int(bonuses[id])
 	if other>0:
-		text += " · other upgrades +%d" % other
+		text += " · other bonuses +%d" % other
 	return text
 
 static func offers(selected: Array, rng: RandomNumberGenerator) -> Array:

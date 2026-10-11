@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 91.7 - Compatibility - Using Device: Apple - Apple M3 Max
+
+SCRIPT ERROR: Invalid access to property or key 'title' on a base object of type 'Dictionary'.
+          at: step (res://scripts/habitat_events.gd:50)
+          GDScript backtrace (most recent call first):
+              [0] step (res://scripts/habitat_events.gd:50)
+              [1] step (res://scripts/journey_harvest.gd:114)
+              [2] step (res://scripts/run_controller.gd:360)
+              [3] setup (res://tests/petriverse_trailer_capture.gd:290)
+              [4] render (res://tests/petriverse_trailer_capture.gd:477)
+TRAILER final_wave 0/150
+TRAILER final_wave 60/150
+TRAILER final_wave 120/150
+TRAILER COMPLETE final_wave {"duration":5.0,"events":[],"failures":[],"frames":150,"integrity":6,"nourishment":0,"shot":"final_wave","source":"Native Godot simulation, camera and title overlays only; staged isolated encounters"}

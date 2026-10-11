@@ -1,0 +1,642 @@
+{
+	"checks": 179,
+	"failures": [
+		"Theft and recapture: bacterium",
+		"Theft and recapture: grazer",
+		"Theft and recapture: lantern_grazer",
+		"Theft and recapture: comb_grazer",
+		"Theft and recapture: chalice_grazer",
+		"Theft and recapture: crown_rotifer"
+	],
+	"films": {
+		"amber_nautilus": {
+			"errors": [],
+			"milestones": {},
+			"scene": "shellback",
+			"totals": {
+				"armor_hits": 1,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"amoeba": {
+			"errors": [],
+			"milestones": {
+				"swallowed": true
+			},
+			"scene": "amoeba",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 1,
+				"food": 0,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"bacterium": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"bell_bud": {
+			"errors": [],
+			"milestones": {
+				"opened": true
+			},
+			"scene": "bellwether",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"bellwether": {
+			"errors": [],
+			"milestones": {
+				"opened": true
+			},
+			"scene": "bellwether",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 1,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"bramble_cyst": {
+			"errors": [],
+			"milestones": {
+				"nudged": true
+			},
+			"scene": "cyst",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"chalice_grazer": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"comb_grazer": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"comet_spore": {
+			"errors": [],
+			"milestones": {},
+			"scene": "spore",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 1
+			}
+		},
+		"conjoined": {
+			"errors": [],
+			"milestones": {},
+			"scene": "conjoined",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 1,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"crown_cyst": {
+			"errors": [],
+			"milestones": {
+				"nudged": true
+			},
+			"scene": "cyst",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"crown_rotifer": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"cyst": {
+			"errors": [],
+			"milestones": {
+				"nudged": true
+			},
+			"scene": "cyst",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"divider": {
+			"errors": [],
+			"milestones": {
+				"split": true
+			},
+			"scene": "divider",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 2,
+				"rescued": 0
+			}
+		},
+		"drifter": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "hunter",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"fern_desmid": {
+			"errors": [],
+			"milestones": {},
+			"scene": "food",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"food": {
+			"errors": [],
+			"milestones": {},
+			"scene": "food",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"glass_harp": {
+			"errors": [],
+			"milestones": {},
+			"scene": "glass_harp",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"glasswing_spore": {
+			"errors": [],
+			"milestones": {},
+			"scene": "spore",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 1
+			}
+		},
+		"glowdrift": {
+			"errors": [],
+			"milestones": {
+				"sheltered": true
+			},
+			"scene": "glowdrift",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"grazer": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"hourglass_divider": {
+			"errors": [],
+			"milestones": {
+				"split": true
+			},
+			"scene": "divider",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 2,
+				"rescued": 0
+			}
+		},
+		"lace_parasite": {
+			"errors": [],
+			"milestones": {
+				"latched": true
+			},
+			"scene": "parasite",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"lantern_grazer": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "grazer",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"moonlace": {
+			"errors": [],
+			"milestones": {
+				"bloomed": true
+			},
+			"scene": "moonlace",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"needle_hunter": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "hunter",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"parasite": {
+			"errors": [],
+			"milestones": {
+				"latched": true
+			},
+			"scene": "parasite",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"phage": {
+			"errors": [],
+			"milestones": {
+				"infected": true,
+				"ruptured": true
+			},
+			"scene": "phage",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"prism_hunter": {
+			"errors": [],
+			"milestones": {},
+			"scene": "shellback",
+			"totals": {
+				"armor_hits": 1,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"regent": {
+			"errors": [],
+			"milestones": {
+				"opened": true
+			},
+			"scene": "regent",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 1,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"ribbon_divider": {
+			"errors": [],
+			"milestones": {
+				"split": true
+			},
+			"scene": "divider",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 2,
+				"rescued": 0
+			}
+		},
+		"ribbon_hunter": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "hunter",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"sail_spore": {
+			"errors": [],
+			"milestones": {},
+			"scene": "spore",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 1
+			}
+		},
+		"shellback": {
+			"errors": [],
+			"milestones": {},
+			"scene": "shellback",
+			"totals": {
+				"armor_hits": 1,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"sieve_alga": {
+			"errors": [],
+			"milestones": {},
+			"scene": "food",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"snow_spore": {
+			"errors": [],
+			"milestones": {},
+			"scene": "spore",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 1
+			}
+		},
+		"spiral_alga": {
+			"errors": [],
+			"milestones": {},
+			"scene": "food",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"spore": {
+			"errors": [],
+			"milestones": {},
+			"scene": "spore",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 1
+			}
+		},
+		"sundial_alga": {
+			"errors": [],
+			"milestones": {},
+			"scene": "food",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"thistle_capsule": {
+			"errors": [],
+			"milestones": {
+				"nudged": true
+			},
+			"scene": "cyst",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		},
+		"trident_hunter": {
+			"errors": [],
+			"milestones": {
+				"ate": true
+			},
+			"scene": "hunter",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 1,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"twinspore": {
+			"errors": [],
+			"milestones": {},
+			"scene": "twinspore",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"veil_parasite": {
+			"errors": [],
+			"milestones": {
+				"latched": true
+			},
+			"scene": "parasite",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 1,
+				"rescued": 0
+			}
+		},
+		"warden": {
+			"errors": [],
+			"milestones": {
+				"opened": true
+			},
+			"scene": "warden",
+			"totals": {
+				"armor_hits": 0,
+				"boss_layers": 0,
+				"cells_rescued": 0,
+				"food": 0,
+				"kills": 0,
+				"rescued": 0
+			}
+		}
+	}
+}

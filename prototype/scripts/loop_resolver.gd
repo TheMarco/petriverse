@@ -2,6 +2,7 @@ extends RefCounted
 
 const Geometry = preload("res://scripts/loop_geometry.gd")
 const Mutations = preload("res://scripts/mutations.gd")
+const LoopStrain = preload("res://scripts/loop_strain.gd")
 
 static func enclosed(target: Dictionary, polygon: PackedVector2Array) -> bool:
 	if not target.get("eligible", true):
@@ -28,11 +29,14 @@ static func commit(path: Array, run: RefCounted) -> Dictionary:
 	var snapshot: Array = run.target_snapshot()
 	var polygon := Geometry.polygon_for(path, run.board.anchors)
 	var ids := targets(path, run.board, run.is_ready, snapshot, run.selection.max_vertices)
-	var recovery := Mutations.recovery(run.mutations, path.size(), run.board.tuning.recovery_seconds)
+	var strain: float = LoopStrain.penalty(path, run.board.anchors) if run.journey else 0.0
+	var recovery := Mutations.recovery(run.mutations, path.size(), run.board.tuning.recovery_seconds) + strain
 	for id in path:
 		run.cells[id].spend(recovery)
 	if run.harvest != null:
-		return run.harvest.commit(path, polygon, ids, recovery, run)
+		var harvest_result: Dictionary = run.harvest.commit(path, polygon, ids, recovery, run)
+		harvest_result["strain"] = strain
+		return harvest_result
 	var positions: Array = []
 	var prey_kinds: Array = []
 	var kills := 0

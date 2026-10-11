@@ -1,4 +1,8 @@
-# MICROVERSE trailer
+# Petriverse trailers
+
+The current [Petriverse 0.2.3 game trailer](Petriverse-trailer-0.2.3.mp4) is a new 90-second edit showing Mother's evolving anatomy, creature films, the focused route, late hunter waves, and updated gameplay. [Shot list, sources, and verification](petriverse-0.2.3/README.md). The [0.2.0 Petriverse trailer](Petriverse-trailer-0.2.0.mp4) and original Microverse trailer remain available.
+
+## Original Microverse trailer
 
 **Final film:** `Microverse-trailer-1080p.mp4` — 90 seconds, 1920×1080,
 30 fps, H.264 video, stereo 48 kHz AAC audio. English subtitles are embedded

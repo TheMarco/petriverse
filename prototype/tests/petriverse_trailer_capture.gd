@@ -5,8 +5,11 @@ const Main = preload("res://scripts/main.gd")
 const Drifter = preload("res://scripts/drifter.gd")
 const Expedition = preload("res://scripts/expedition_creatures.gd")
 const Geometry = preload("res://scripts/loop_geometry.gd")
+const FilmStage = preload("res://scripts/creature_film_stage.gd")
+const CreatureCinema = preload("res://scripts/creature_cinema.gd")
+const MotherAppearance = preload("res://scripts/mother_appearance.gd")
 const FPS := 30
-const LENGTHS := {"hook":5,"reveal":4,"loop":10,"fluid":6,"amoeba":12,"phages":12,"evolve":7,"world_a":3,"world_b":3,"world_c":3,"rare_a":3,"rare_b":3,"boss_a":3,"boss_b":3,"boss_c":3,"home":4,"end":6}
+const LENGTHS := {"hook":5,"reveal":4,"loop":7,"fluid":3,"amoeba":10,"phages":12,"mother_growth":6,"film":6,"route_choice":4,"world_a":3,"world_b":3,"world_c":3,"final_wave":5,"boss_a":3,"boss_b":3,"boss_c":3,"home":4,"end":6}
 var game
 var shot := "hook"
 var duration := 8.0
@@ -32,6 +35,9 @@ var rescued_node := -1
 var witnessed_swallow := false
 var witnessed_infection := false
 var witnessed_rupture := false
+var film_stage: Node2D
+var growth_cores := 3
+var surge_arrivals := 0
 
 class Titles extends Node2D:
 	var film
@@ -75,24 +81,28 @@ class Titles extends Node2D:
 				tracked("A SMALL LIFE. A WHOLE WORLD.",Vector2(960,858),24,4.0,Color(0.82,0.94,0.91,alpha))
 				line("A living strategy game in a drop of water.",Vector2(960,926),30,Color(0.83,0.89,0.89,alpha))
 			"loop":
-				if time<3.5: caption("HOW TO PLAY", "Drag through three or more blue cells.")
-				elif time<6.4: caption("CLOSE YOUR LOOP", "Enclose the green food.","Keep Mother outside.")
+				if time<2.8: caption("DRAW LIFE INTO A LOOP", "Connect the blue cells.")
+				elif time<5.5: caption("CLOSE YOUR LOOP", "Enclose the green food.","Keep Mother outside.")
 				else: caption("RELEASE TO ABSORB", "Feed Mother. Let your cells recover.")
 			"fluid": caption("EVERY MOVEMENT LEAVES A WAKE", "Nudge poison. Stir the living water.")
 			"amoeba":
-				if time<4.7: caption("SOMETHING IS HUNGRY", "An amoeba can swallow your cells.")
-				elif time<9.0: caption("15 SECONDS TO SAVE A LIFE", "Loop around its golden nucleus.")
-				else: caption("BRING YOUR CELL HOME", "Rescue it before it is digested.")
+				if time<4.0: caption("SOMETHING IS HUNGRY", "An amoeba can swallow your cells.")
+				else: caption("15 SECONDS TO SAVE A LIFE", "Loop around its golden nucleus.")
 			"phages":
-				if time<2.5: caption("TINY ALLIES", "Nudge phages toward a bacterium.")
-				elif time<9.8: caption("NATURE HAS ITS OWN WEAPONS", "Watch them attach, infect and multiply.")
-				else: caption("A BURST OF NEW LIFE", "Recover the food it stole.")
+				if time<2.0: caption("TINY ALLIES", "Nudge phages toward a bacterium.")
+				else: caption("NATURE HAS ITS OWN WEAPONS", "Watch them attach and infect.")
 			"danger": caption("YOU ARE NOT ALONE", "Hunters are closing in.")
 			"defend": caption("PROTECT YOUR COLONY", "Catch the hunter. Save a life.")
-			"evolve": caption("TURN FOOD INTO EVOLUTION", "Grow a colony that plays your way.")
+			"mother_growth": caption("SHE GROWS WITH THE JOURNEY", "%d living cores. Your choices shape her." % film.growth_cores)
+			"film": caption("EVERY CREATURE HAS A STORY", "Watch once, skip, or revisit in the Field Journal.")
+			"route_choice":
+				tracked("CHOOSE THE WATER AHEAD",Vector2(960,88),22,5,Color(0.82,0.96,0.91,alpha))
 			"world_a": caption("THREE LIVING WATERS", "Stillwater")
 			"world_b": caption("THREE LIVING WATERS", "Glassgarden")
 			"world_c": caption("THREE LIVING WATERS", "Blue Deep")
+			"final_wave":
+				if time<3.0: caption("THE DEEP ANSWERS BACK", "Finish the goal. The final wave is coming.")
+				else: caption("EVERY SECOND MATTERS", "A swift clear draws more hunters.")
 			"rare_a": caption("KEEP DISCOVERING", "Rare life. New encounters.")
 			"rare_b": caption("KEEP DISCOVERING", "Every journey holds a surprise.")
 			"boss_a": caption("LEARN THEIR RHYTHM", "The Bellwether")
@@ -103,8 +113,11 @@ class Titles extends Node2D:
 				draw_rect(Rect2(0,0,1920,1080),Color(0.005,0.02,0.03,0.60))
 				draw_texture_rect(logo,Rect2(440,70,1040,693),false,Color(1,1,1,alpha))
 				tracked("FEED.  PROTECT.  EVOLVE.",Vector2(960,828),28,4.5,Color(0.81,0.95,0.90,alpha))
-				line("One more journey into the unknown.",Vector2(960,911),30,Color(0.84,0.91,0.89,alpha))
+				line("Choose your path through the living deep.",Vector2(960,911),30,Color(0.84,0.91,0.89,alpha))
 				tracked("MAC  /  WINDOWS  /  LINUX",Vector2(960,994),19,3.0,Color(0.63,0.80,0.77,alpha))
+		if film.shot=="mother_growth":
+			var pulse := 1.0-smoothstep(0.0,0.4,fmod(time,1.2))
+			draw_circle(Vector2(960,470),190,Color(0.65,1.0,0.82,0.06*pulse))
 		if film.pointer_visible:
 			var at: Vector2 = film.root.canvas_transform*film.pointer
 			draw_circle(at,17,Color(0.65,1.0,0.92,0.09))
@@ -216,10 +229,30 @@ func setup() -> void:
 			subject = Drifter.new(902,focus+Vector2(14,0),5.4)
 			subject.age = 3.0
 			game.run.enemies.append(subject)
-		"evolve":
+		"mother_growth":
+			prepare(1)
+			game.run.integrity = game.run.max_integrity
+			focus = game.run.board.center
+			growth_cores = MotherAppearance.capacity_for_stage(game.run.stage_index)
+		"film":
 			prepare(5)
-			focus = game.run.board.center+Vector2(0,-22)
+			game.microscope.hide()
+			film_stage = FilmStage.new()
+			root.add_child(film_stage)
+			film_stage.prepare(CreatureCinema.entries()["amber_nautilus"],false,2)
+		"route_choice":
+			game.run.fixed_seed = 73
+			game.run.long_journey = true
+			game.run.restart()
+			game.run.route_position = 8
+			game.run.stage_index = int(game.run.route_plan[8].stage)
 			game.run.mutations = ["elastic","enzyme","filter"]
+			game.run.start_stage()
+			game.run.habitat_confirmed = false
+			game.run.enemies.clear()
+			game.reset_presentation()
+			game.hud.show()
+			game.hud.refresh()
 		"world_a","world_b","world_c":
 			var stage: int = {"world_a":2,"world_b":6,"world_c":10}[shot]
 			prepare(stage,true)
@@ -230,14 +263,34 @@ func setup() -> void:
 					body.age = 4.0
 					game.run.harvest.rotation += 2
 			focus = Vector2(640,435)
-		"rare_a","rare_b":
-			prepare(6 if shot=="rare_a" else 10)
-			var form: String = "amber_nautilus" if shot=="rare_a" else "comet_spore"
-			for entry in Expedition.ENTRIES:
-				if entry.id==form:
-					subject = Expedition.spawn(game.run,entry)
-					subject.age = 4.0
-			focus = subject.nucleus
+		"final_wave":
+			game.run.fixed_seed = 73
+			game.run.long_journey = true
+			game.run.restart()
+			var short_route: Array = game.run.route_plan.duplicate(true)
+			game.run.route_plan.clear()
+			for visit in short_route:
+				game.run.route_plan.append(visit.duplicate(true))
+				game.run.route_plan.append(visit.duplicate(true))
+			game.run.route_position = 24
+			game.run.stage_index = int(game.run.route_plan[24].stage)
+			game.run.mutations = ["elastic","enzyme","filter","nursery","feast","frenzy"]
+			game.run.start_stage()
+			game.run.begin_encounter()
+			game.run.enemies.clear()
+			game.run.harvest.ecology.pending.clear()
+			game.run.harvest.next_bloom = 9999.0
+			game.run.harvest.next_spore = 9999.0
+			game.run.harvest.ecology.next_wave = 9999.0
+			game.run.harvest.visitor_at = -1.0
+			game.run.harvest.spec.duration = 999.0
+			game.run.harvest.spec.target = 999
+			game.run.stage_elapsed = 125.0
+			game.run.harvest.start_final_surge(game.run)
+			if not game.run.harvest.final_surge_enabled: failures.append("Late journey final wave is not active")
+			for i in 225: game.run.step(1.0/FPS)
+			focus = game.run.board.center
+			game.reset_presentation()
 		"boss_a","boss_b","boss_c":
 			var stage: int = {"boss_a":3,"boss_b":7,"boss_c":11}[shot]
 			prepare(stage,true)
@@ -316,7 +369,7 @@ func animate(time: float, frame: int) -> void:
 		"reveal": zoom = lerpf(2.1,1.6,smoothstep(0,1,fraction))
 		"loop":
 			zoom = 3.6
-			drag_loop(time,1.5,[0,8,9],1.2,1.15)
+			drag_loop(time,1.5,[0,8,9],1.0,0.4)
 		"fluid":
 			zoom = 4.6
 			if frame==30:
@@ -340,7 +393,7 @@ func animate(time: float, frame: int) -> void:
 		"amoeba":
 			zoom = 4.0
 			if subject.captive_node>=0: witnessed_swallow = true
-			if time>=4.5: drag_loop(time,5.0,rescue_path,1.0,0.45)
+			if time>=3.5: drag_loop(time,4.0,rescue_path,0.85,0.4)
 		"phages":
 			zoom = lerpf(5.3,5.8,fraction)
 			if frame==9:
@@ -367,20 +420,31 @@ func animate(time: float, frame: int) -> void:
 		"defend":
 			zoom = 4.0
 			drag_loop(time,1.15,[8,16,17],0.5,0.2)
-		"evolve":
-			zoom = lerpf(3.6,2.9,smoothstep(0,1,fraction))
-			if frame==24:
-				game.run.add_mutation("nursery")
-				game.microscope.start_growth("nursery")
+		"mother_growth":
+			zoom = lerpf(4.5,4.0,fraction)
+			if frame in [30,66,102,138]:
+				game.run.stage_index = {30:2,66:4,102:8,138:10}[frame]
+				if frame==66: game.run.mutations.append("elastic")
+				game.run.start_stage()
+				game.run.begin_encounter()
+				game.run.enemies.clear()
+				growth_cores = MotherAppearance.capacity_for_stage(game.run.stage_index)
 				events.append({"time":time,"sound":"evolve"})
-			if frame==138:
-				game.run.add_mutation("feast")
-				game.microscope.start_growth("feast")
-				events.append({"time":time,"sound":"evolve"})
+		"film":
+			film_stage.advance(1.0/FPS)
+			overlay.time = time
+			overlay.queue_redraw()
+			return
+		"route_choice":
+			var ui_zoom := lerpf(1.19,1.23,smoothstep(0,1,fraction))
+			root.canvas_transform = Transform2D(0,Vector2.ONE*ui_zoom,0,Vector2(960-640*ui_zoom,540-450*ui_zoom))
+			overlay.time = time
+			overlay.queue_redraw()
+			return
 		"world_a","world_b","world_c": zoom = lerpf(1.72,1.86,fraction)
-		"rare_a","rare_b":
-			zoom = lerpf(5.4,5.9,fraction)
-			focus = focus.lerp(subject.nucleus,0.05)
+		"final_wave":
+			zoom = lerpf(2.25,2.55,fraction)
+			surge_arrivals = maxi(surge_arrivals,game.run.harvest.final_surge_ids.size())
 		"boss_a","boss_b","boss_c":
 			zoom = lerpf(3.4,3.8,fraction)
 			focus = focus.lerp(subject.nucleus,0.06)
@@ -391,7 +455,7 @@ func animate(time: float, frame: int) -> void:
 	overlay.queue_redraw()
 
 func render() -> void:
-	var output := "/tmp/petriverse-trailer-frames/"+shot
+	var output := "/tmp/petriverse-0.2.3-trailer-frames/"+shot
 	DirAccess.make_dir_recursive_absolute(output)
 	root.gui_disable_input = true
 	root.size = Vector2i(1920,1080)
@@ -423,7 +487,7 @@ func render() -> void:
 		animate(time,frame)
 		game.run.step(1.0/FPS)
 		game._process(1.0/FPS)
-		game.hud.hide()
+		if shot!="route_choice": game.hud.hide()
 		game.hovered = -1
 		game.toast_time = 0
 		await process_frame
@@ -440,6 +504,9 @@ func render() -> void:
 	if shot=="phages":
 		if not witnessed_infection or not witnessed_rupture: failures.append("Phage infection lifecycle did not complete")
 		if game.run.enemies.filter(func(e): return e.kind=="food" and e.story=="phage_salvage").size()!=2: failures.append("Phage rupture did not release two stolen food")
+	if shot=="mother_growth" and growth_cores!=7: failures.append("Mother did not reach seven cores")
+	if shot=="route_choice" and not game.run.Habitats.pending(game.run): failures.append("Route choice was not actually available")
+	if shot=="final_wave" and surge_arrivals<2: failures.append("Final hunter wave did not arrive")
 	var report := {"shot":shot,"duration":duration,"frames":int(duration*FPS),"events":events,"failures":failures,"integrity":game.run.integrity,"nourishment":game.run.harvest.nourishment,"source":"Native Godot simulation, camera and title overlays only; staged isolated encounters"}
 	var file := FileAccess.open(output+"/report.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify(report,"\t"))

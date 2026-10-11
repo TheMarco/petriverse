@@ -15,6 +15,14 @@ var defended := 0
 var visited: Array = []
 var clean_food := 0
 var threats_spawned := 0
+var hunters_captured := 0
+var final_surge_enabled := false
+var final_surge_started := false
+var final_surge_start_time := -1.0
+var final_surge_rapid := false
+var final_surge_needed := 0
+var final_surge_captured := 0
+var final_surge_ids: Array = []
 var spores_spawned := 0
 var next_spore := 14.0
 var tide := 0
@@ -24,6 +32,7 @@ var visitor_at := -1.0
 var visitor_spawned := false
 
 func begin(run: RefCounted) -> void:
+	final_surge_enabled = run.encounter_total()==30 and run.stage_index>=8 and run.route_position%2==0 and spec.mode!="boss"
 	rotation = run.rng.randi_range(0,7)
 	var starting_areas: Array = [0,3,6] if run.stage_index==0 else [0] if spec.mode=="boss" else [0,3]
 	for area in starting_areas:
@@ -94,6 +103,13 @@ func step(run: RefCounted) -> void:
 			spawn_spore(run)
 		next_bloom += Ecology.Rhythm.CYCLE if run.stage_index>0 else 26.0
 	ecology.step(run,delta)
+	if final_surge_started and final_surge_captured < final_surge_needed:
+		final_surge_ids = final_surge_ids.filter(func(id): return run.enemies.any(func(body): return body.id==id))
+		var pending_final: int = ecology.pending.filter(func(event): return event.get("final_surge",false)).size()
+		var missing: int = final_surge_needed-final_surge_captured-final_surge_ids.size()-pending_final
+		for i in maxi(0,missing):
+			ecology.pending.append({"at":now+8.0+float(i)*4.0,"kind":"hunter","area":(rotation+4+i*3)%8,"species":"drifter","final_surge":true,"rapid_surge":final_surge_rapid})
+			ecology.announce("The final hunter returns · watch the marked water")
 	Discoveries.step(run,delta)
 	HabitatEvents.step(run,delta)
 	# Water motion affects real bodies, with a very slow, bounded oscillation.
@@ -154,11 +170,32 @@ func outcome(ids: Array, run: RefCounted, loop_size: int = -1) -> Dictionary:
 		result.food_bonuses.symbiosis = result.threats * 2
 	if run.mutations.has("catalyst") and result.purified == 0 and cysts>0:
 		result.food_bonuses.catalyst = cysts * 2
+	if run.journey and run.growth_active("feeder")>0 and result.raw_food>=4 and result.poison==0:
+		result.food_bonuses.feeder = run.growth_active("feeder")
 	# This ledger drives both the actual award and visible attribution. The
 	# preview must never claim a bonus that the committed meal cannot earn.
 	for amount in result.food_bonuses.values():
 		result.food += amount
 	return result
+
+func hunter_quota() -> int:
+	# Later feeding visits need a defended harvest. This also gives existing
+	# long-route saves a real goal after their colony has already grown strong.
+	if spec.mode != "feed" or not spec.get("generated",false):
+		return 0
+	var stage: int = int(spec.get("stage",0))
+	return 2 if stage >= 4 else 0
+
+func start_final_surge(run: RefCounted) -> void:
+	final_surge_started = true
+	final_surge_start_time = run.stage_elapsed
+	final_surge_rapid = run.stage_elapsed <= 140.0
+	var defender: bool = spec.mode=="defend"
+	final_surge_needed = (3 if run.habitat_choice=="refuge" else 4) if final_surge_rapid and defender else (2 if run.habitat_choice=="refuge" else 3) if final_surge_rapid or defender else (1 if run.habitat_choice=="refuge" else 2)
+	var first_kind := "twinspore" if spec.mode in ["rescue","sectors"] else "shellback"
+	for i in final_surge_needed:
+		ecology.pending.append({"at":run.stage_elapsed+8.0+float(i)*2.0,"kind":"hunter","area":(rotation+4+i*3)%8,"species":first_kind if i==0 or (final_surge_rapid and defender and i==2) else "drifter","final_surge":true,"rapid_surge":final_surge_rapid})
+	ecology.announce("Swift harvest stirred the deep · more hunters approaching" if final_surge_rapid else "Final hunter wave approaching · watch the marked water")
 
 func commit(path: Array, polygon: PackedVector2Array, ids: Array, recovery: float, run: RefCounted) -> Dictionary:
 	var result := outcome(ids, run, path.size())
@@ -189,6 +226,11 @@ func commit(path: Array, polygon: PackedVector2Array, ids: Array, recovery: floa
 			if not body.apply_pulse(MutationRules.damage(run.mutations, path.size())):
 				armor += 1
 				continue
+			if body.kind in ["drifter", "shellback", "twinspore", "divider"]:
+				hunters_captured += 1
+				if final_surge_ids.has(body.id):
+					final_surge_ids.erase(body.id)
+					final_surge_captured += 1
 		if body.kind == "food":
 			var sector := posmod(roundi((body.nucleus - run.board.center).angle() / (TAU / 8.0)), 8)
 			if not visited.has(sector):
@@ -240,7 +282,19 @@ func commit(path: Array, polygon: PackedVector2Array, ids: Array, recovery: floa
 	run.kills += result.raw_food + result.threats
 	run.best_capture = maxi(run.best_capture, result.raw_food)
 	run.loops_drawn += 1
-	run.score += result.food * 25 + result.threats * 100 + result.rescued * 150 + result.purified * 30 + boss_layers * 300
+	var capture_grade := ""
+	var capture_bonus := 0
+	if result.poison == 0 and positions.size() >= 7:
+		capture_grade = "Living constellation"
+		capture_bonus = 300
+	elif result.poison == 0 and positions.size() >= 5:
+		capture_grade = "Grand sweep"
+		capture_bonus = 150
+	elif result.poison == 0 and result.raw_food >= 2 and result.threats >= 1:
+		capture_grade = "Balanced harvest"
+		capture_bonus = 75
+	var earned_points: int = result.food * 25 + result.threats * 100 + result.rescued * 150 + result.purified * 30 + boss_layers * 300 + capture_bonus
+	run.score += earned_points
 	if run.mutations.has("nursery") and result.poison == 0:
 		clean_food += result.raw_food
 		if clean_food >= 12 and run.integrity > 0:
@@ -264,7 +318,7 @@ func commit(path: Array, polygon: PackedVector2Array, ids: Array, recovery: floa
 					break
 	if run.mutations.has("residual"):
 		run.residuals.append({"polygon": polygon.duplicate(), "remaining": 4.0})
-	result.merge({"valid": true, "ids": ids, "points": result.food * 25, "polygon": polygon, "positions": positions,
+	result.merge({"valid": true, "ids": ids, "points": earned_points, "capture_grade": capture_grade, "capture_bonus": capture_bonus, "polygon": polygon, "positions": positions,
 		"prey_kinds": kinds, "prey_forms": forms, "nodes": path.duplicate(), "kills": result.raw_food + result.threats,
 		"bodies": positions.size(), "armor_hits": armor, "restored_node": restored, "recovery": recovery}, true)
 	result.boss_layers = boss_layers
@@ -272,6 +326,8 @@ func commit(path: Array, polygon: PackedVector2Array, ids: Array, recovery: floa
 
 func objective_count() -> int:
 	match spec.mode:
+		"feed":
+			if hunter_quota()>0: return hunters_captured
 		"rescue": return rescued
 		"purify": return purified
 		"defend": return defended
@@ -280,7 +336,12 @@ func objective_count() -> int:
 	return nourishment
 
 func objective_label() -> String:
+	if hunter_quota()>0:
+		return "hunters captured"
 	return {"rescue": "spores rescued", "purify": "cysts neutralized", "defend": "hunters captured", "sectors": "feeding sectors", "boss": "layers dissolved", "feed": "food gathered"}[spec.mode]
+
+func deadline() -> float:
+	return maxf(float(spec.duration),final_surge_start_time+60.0) if final_surge_started else float(spec.duration)
 
 func check_completion(run: RefCounted) -> void:
 	if run.Lesson.active(run):
@@ -291,9 +352,12 @@ func check_completion(run: RefCounted) -> void:
 		run.state = run.LOSS
 	elif spec.mode == "boss" and run.boss_defeated:
 		run.finish_journey_stage()
-	elif spec.mode != "boss" and nourishment >= int(spec.food) and (spec.mode == "feed" or objective_count() >= int(spec.target)):
-		run.finish_journey_stage()
-	elif run.stage_elapsed >= float(spec.duration):
+	elif spec.mode != "boss" and nourishment >= int(spec.food) and (hunters_captured >= hunter_quota() if spec.mode == "feed" else objective_count() >= int(spec.target)):
+		if final_surge_enabled and not final_surge_started:
+			start_final_surge(run)
+		elif not final_surge_enabled or final_surge_captured >= final_surge_needed:
+			run.finish_journey_stage()
+	if run.state == run.ACTIVE and run.stage_elapsed >= deadline():
 		loss_title = "The current moved on."
 		loss_reason = "The encounter's goals were unfinished. Retry this encounter with your colony intact."
 		run.state = run.LOSS

@@ -6,6 +6,7 @@ const Arrival = preload("res://scripts/organism_arrival.gd")
 const Forms = preload("res://scripts/creature_forms.gd")
 const Appearance = preload("res://scripts/mission_appearance.gd")
 const Anatomy = preload("res://scripts/evolution_anatomy.gd")
+const MotherAppearance = preload("res://scripts/mother_appearance.gd")
 const CELL = preload("res://assets/organisms/cell.png")
 const MOTHER = preload("res://assets/organisms/mother.png")
 const FOOD = preload("res://assets/organisms/desmid.png")
@@ -205,15 +206,6 @@ func organism(texture: Texture2D, extent: float, phase: float, living_details: b
 		sprite.add_child(details)
 	sprite.z_index = 1
 	add_child(sprite)
-	if kind == 1:
-		for i in 3:
-			var bud := organism(CELL,24.0,phase+float(i),false)
-			bud.reparent(sprite)
-			bud.name = "GrowthBud%d" % i
-			bud.position = Vector2.from_angle([-0.35,2.55,-1.95][i])*MOTHER.get_width()*(0.43 if i==2 else 0.405)
-			bud.scale = Vector2.ONE*MOTHER.get_width()*0.20/CELL.get_width()
-			bud.z_index = -1
-			bud.visible = false
 	return sprite
 
 func animate_organism(sprite: Sprite2D, time: float, movement: float, vitality: float, meal: float = 0.0, shock: float = 0.0) -> void:
@@ -329,6 +321,7 @@ func sync() -> void:
 			buds[i].scale = Vector2.ONE*27.0/CELL.get_width()*traits.x
 			buds[i].modulate.a = traits.x
 			animate_organism(buds[i], time, movement, 0.75)
+	MotherAppearance.apply(mother,game.run.stage_index if game.run.journey else 4,game.run.mutations)
 	Anatomy.apply(mother,anatomy)
 	mother.material.set_shader_parameter("nourishment", clampf(float(game.run.harvest.nourishment) / (float(game.run.harvest.spec.food) if game.run.journey else game.run.harvest.GOAL), 0.0, 1.0) if game.run.harvest != null else 0.0)
 	animate_organism(mother, time, movement, 0.5 + 0.1 * game.run.integrity, meal, shock)
@@ -336,6 +329,7 @@ func sync() -> void:
 	mother.material.set_shader_parameter("threat_direction",Vector2(alert.direction).rotated(-mother.rotation))
 	mother.material.set_shader_parameter("threat_strength",alert.strength)
 	sync_injuries(time, movement, shock)
+	sync_mother_outcome()
 	var alive := {}
 	for enemy in game.run.enemies:
 		alive[enemy.id] = true
@@ -476,13 +470,32 @@ func disturb_water(from: Vector2, to: Vector2) -> void:
 func core_position(index: int) -> Vector2:
 	return mother.to_global((MotherDamage.CORE_UVS[index] - Vector2.ONE * 0.5) * MOTHER.get_width())
 
+func sync_mother_outcome() -> void:
+	var triumph := 0.0
+	var collapse := 0.0
+	var death := 0.0
+	if game.run.journey and game.run.state in [game.run.EVOLVE, game.run.SUCCESS, game.run.LOSS]:
+		var progress: float = 1.0 if game.reduced_motion else clampf(1.0-game.result_reveal_remaining/game.RESULT_REVEAL_SECONDS,0.0,1.0)
+		var reaction: float = smoothstep(0.04,0.78,progress)
+		if game.run.state == game.run.LOSS:
+			death = reaction if game.run.integrity == 0 else 0.0
+			collapse = reaction if game.run.integrity == 0 else reaction*0.35
+		else:
+			triumph = reaction
+	var unfurl: float = 0.0 if game.reduced_motion else sin(clampf(triumph,0.0,1.0)*PI)
+	mother.scale *= 1.0+triumph*(0.08+unfurl*0.08)-death*0.18-(collapse-death)*0.08
+	mother.rotation += death*0.14
+	mother.modulate.a = 1.0-death*0.30
+	mother.material.set_shader_parameter("mother_response",triumph-collapse)
+	mother.material.set_shader_parameter("dissolve",death*0.46)
+
 func sync_injuries(time: float, movement: float, shock: float) -> void:
 	var damage = game.run.mother_damage
 	var progress: PackedFloat32Array = damage.progress_values()
 	var sites := PackedVector2Array(MotherDamage.CORE_UVS)
-	var pulses_now := PackedFloat32Array([0, 0, 0, 0, 0])
-	var openings := PackedFloat32Array([0, 0, 0, 0, 0])
-	var seals := PackedFloat32Array([0, 0, 0, 0, 0])
+	var pulses_now := PackedFloat32Array([0, 0, 0, 0, 0, 0, 0])
+	var openings := PackedFloat32Array([0, 0, 0, 0, 0, 0, 0])
+	var seals := PackedFloat32Array([0, 0, 0, 0, 0, 0, 0])
 	var alive := {}
 	var recoil := Vector2.ZERO
 	for bite in damage.bites:
@@ -527,7 +540,7 @@ func sync_injuries(time: float, movement: float, shock: float) -> void:
 			lobe.scale = Vector2(1.0-burrow*0.25+press*0.08-squeeze*0.3,1.0-burrow*0.34-press*0.11-squeeze+feeding*0.06*movement) * float(lobe.get_meta("extent")) / lobe.texture.get_width()
 			animate_organism(lobe, time, movement, 1.0, sin(progress[bite.core] * PI))
 			lobe.material.set_shader_parameter("invading_depth",burrow)
-			lobe.material.set_shader_parameter("host_texture",MOTHER)
+			lobe.material.set_shader_parameter("host_texture",mother.texture)
 			lobe.material.set_shader_parameter("host_center",mother.position)
 			lobe.material.set_shader_parameter("host_extent",mother.scale*MOTHER.get_width())
 			lobe.material.set_shader_parameter("core_sites",PackedVector2Array(MotherDamage.CORE_UVS))
@@ -552,8 +565,8 @@ func sync_injuries(time: float, movement: float, shock: float) -> void:
 	mother.material.set_shader_parameter("injury_opening", openings)
 	mother.material.set_shader_parameter("injury_seal", seals)
 	var fatal := 1.0 if game.run.integrity == 0 else 0.0
-	for value in progress:
-		fatal = minf(fatal, value)
+	for i in damage.active_indices():
+		fatal = minf(fatal, progress[i])
 	mother.material.set_shader_parameter("fatal_damage", fatal)
 	injury_motes.visible = movement > 0.0
 	injury_motes.queue_redraw()

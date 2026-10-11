@@ -2,16 +2,16 @@ extends RefCounted
 ## Anatomy is derived from owned traits, so it persists without new save fields.
 const IDS := ["fission","elastic","symbiosis","enzyme","lure","filter","feast","grazer","catalyst","nursery","frenzy","residual"]
 const CHANGES := {
-	"fission":"New buds grow from the Mother and her cells.",
-	"elastic":"Broad, folded membranes unfurl around the colony.",
-	"symbiosis":"Ribbed membranes and folded feeding organs develop.",
+	"fission":"A division network spreads through the Mother as her cells begin to bud.",
+	"elastic":"Layered, flexible membranes grow around the colony.",
+	"symbiosis":"A luminous network grows through the Mother's cytoplasm.",
 	"enzyme":"Digestive sacs form inside the Mother and her cells.",
 	"lure":"Long sensory hairs and fluid channels grow.",
 	"filter":"A fine, porous veil forms over the living tissue.",
 	"feast":"Large, folded storage chambers swell into shape.",
 	"grazer":"Delicate feeding brushes and narrow channels develop.",
 	"catalyst":"Dense catalytic granules gather in new vesicles.",
-	"nursery":"Pale nursery chambers grow; Mother develops a living pearl bud.",
+	"nursery":"Pale nursery chambers grow throughout the colony.",
 	"frenzy":"Folded fluid channels develop throughout the colony.",
 	"residual":"Soft trailing membrane folds grow along the cell edges.",
 }
@@ -46,17 +46,18 @@ static func recipe(owned: Array, growing: String = "", progress: float = 1.0) ->
 		"growth_pulse":sin(clampf(progress,0.0,1.0)*PI) if owned.has(growing) else 0.0}
 
 static func apply(sprite: Sprite2D, anatomy: Dictionary) -> void:
+	var is_mother: bool = sprite.material.get_shader_parameter("kind") == 1.0
 	for parameter in ["traits","adaptations"]:
 		sprite.material.set_shader_parameter(parameter,anatomy[parameter])
-	sprite.material.set_shader_parameter("evolution_form",anatomy.form)
-	sprite.material.set_shader_parameter("evolution_organs",anatomy.organs)
-	sprite.material.set_shader_parameter("evolution_layers",anatomy.layers)
+	sprite.material.set_shader_parameter("evolution_form",Vector4.ZERO if is_mother else anatomy.form)
+	sprite.material.set_shader_parameter("evolution_organs",PackedFloat32Array([0,0,0,0,0,0,0,0,0,0,0,0]) if is_mother else anatomy.organs)
+	sprite.material.set_shader_parameter("evolution_layers",0.0 if is_mother else anatomy.layers)
 	sprite.material.set_shader_parameter("growth_front",anatomy.growth_front)
 	sprite.material.set_shader_parameter("growth_pulse",anatomy.growth_pulse)
 	var life := sprite.get_node_or_null("Life")
 	if life != null:
 		life.lure = anatomy.traits.w
-		life.morphology = anatomy.form
+		life.morphology = Vector4.ZERO if is_mother else anatomy.form
 	for i in 3:
 		var bud := sprite.get_node_or_null("GrowthBud%d" % i)
 		if bud != null:

@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 91.7 - Compatibility - Using Device: Apple - Apple M3 Max
+
+TRAILER route_choice 0/120
+TRAILER route_choice 60/120
+TRAILER COMPLETE route_choice {"duration":4.0,"events":[],"failures":[],"frames":120,"integrity":5,"nourishment":0,"shot":"route_choice","source":"Native Godot simulation, camera and title overlays only; staged isolated encounters"}

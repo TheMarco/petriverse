@@ -1,0 +1,317 @@
+{
+  "provider": "ElevenLabs via Magnific",
+  "model": "eleven_v3",
+  "voice": "Willa Ashford",
+  "catalog_voice_id": 918,
+  "mastering": "44.1kHz stereo Vorbis, -18 LUFS, -2.5 dBTP target",
+  "assets": {
+    "amoeba": {
+      "creation": "vQ7bWnda47",
+      "narration": "This is an amber amoeba. Watch its membrane reach around a blue cell and swallow it. You have fifteen seconds to save that cell. Loop around the amoeba's golden nucleus with your other cells.",
+      "duration": 15.800544,
+      "sha256": "c8729de597f2820477a2ee348dd0bc31890115fff86bc391b175ff977f167bab",
+      "original_sha256": "ae5304383ccb579d32851bc66863a344132ab02db928413eda5aea17d6c7c619"
+    },
+    "food": {
+      "creation": "BhLCzVkoQR",
+      "narration": "Meet the Desmid, a lobed green meal glowing at its bright center. Draw a loop through ready blue cells around that center, close it, and release for one food. Keep purple poison out of your meals to protect Mother.",
+      "duration": 16.10127,
+      "sha256": "06b9e2757205ce75420c8c4d2d0249b590898f49d1fbec0c87b5469a50d87998",
+      "original_sha256": "5ce5e3187e27d2a87d0595a463bf8b94f355ca91cfa3b4ee6c05c74ce8ad4b37"
+    },
+    "cyst": {
+      "creation": "IfgQcNstvE",
+      "narration": "The Toxic cyst is spiked violet poison, never food. Nudge it away from green meals before you close your loop, since swallowing one costs Mother a health core. Only in purification encounters may you safely capture poison alone in its own loop.",
+      "duration": 17.000726,
+      "sha256": "8a9b5b08aa9a2015149237c07441cab17c3d6f1d8ee7247fec64c0db9c048fa1",
+      "original_sha256": "1f5fcaa129097464f225b765cdad87db2565796e751c7ef0f0340ce51c116b02"
+    },
+    "spore": {
+      "creation": "ovsEY34829",
+      "narration": "This Pearl spore is a young colony waiting for rescue. Loop its bright pearl center with ready blue cells, close, and release before it fades away. Every rescued spore joins your home pond and counts toward the nursery rescue goal.",
+      "duration": 20.701088,
+      "sha256": "8c5c8520433626db18b066045c9b10ea864e6a110bfc2046aa335ea6f82215c3",
+      "original_sha256": "dc3948da8cd39a2e8610c6c9c83b7ecd0d4ea10f6cb999375e41672e9d5e4f7c"
+    },
+    "drifter": {
+      "creation": "VX5I34IMMU",
+      "narration": "The Drifter is an amber hunter swimming toward Mother. It pauses six seconds over green food or spores, so loop its gold center quickly to stop it. A full hunter slows down and returns stolen food when captured; ignored, it wounds Mother.",
+      "duration": 19.800181,
+      "sha256": "8ab7da5166bbafb8f609c9d05816e5d36b676eb5f9e14c98292a5fbd3dadf210",
+      "original_sha256": "b1d1b16d24284c6822cc2489cad3a8af7d0027ad610cdafe9367e0bc12346054"
+    },
+    "shellback": {
+      "creation": "CqykeMtEEy",
+      "narration": "Meet the Shellback, an amber hunter hiding behind a ridged glass shell. Loop its gold center once to crack the shell, then loop it again to finish the capture. It keeps marching toward Mother meanwhile, so plan both loops before it arrives.",
+      "duration": 17.200181,
+      "sha256": "c2dbe3f0d71791c3262504fe37dd47dc24e82d6135c2f82cc42fc4111625b875",
+      "original_sha256": "04b0922e5e1b11c876e52de06236682c7fc7c2f7cff31588bce537652b222ca0"
+    },
+    "twinspore": {
+      "creation": "vQ7bMVXa47",
+      "narration": "The Twinspore swims as two linked violet bodies with two gold hearts. Draw one wider loop that holds both glowing centers at once, then release to capture it. A loop around only one heart fails, and the pair keeps drifting toward Mother.",
+      "duration": 19.2,
+      "sha256": "220e29c0b724b8b4ff50208741e19bd87f724f720bfab9b2dfdb37259e5b476b",
+      "original_sha256": "4fa1f4a9cd80f1b02f86615f4e61d74fbef19ef09fb08922dfac83b5bbeb8be6"
+    },
+    "phage": {
+      "creation": "tCSF0VCmZJ",
+      "narration": "These Silver bacteriophages are tiny silver helpers that only attack copper bacteria. Drag a cluster beside one rod and release; they attach and burst it after nine seconds. Then loop the spilled green food yourself, since freed meals still need capturing.",
+      "duration": 22.800544,
+      "sha256": "db7cadac133d35614c3d65d4e2439b7795db98f796ac5e5feb21b7013f8f1a45",
+      "original_sha256": "938d75b7c07636fe572ea63d6d7c23cca7bff4e7e646cbe0567e48fbb8171f86"
+    },
+    "bacterium": {
+      "creation": "XmjfW1XBfo",
+      "narration": "Meet the Copper bacterium, a copper rod that steals green food. Loop its center to reclaim the meal at once, or nudge silver helpers close so infection bursts it after nine seconds, then gather the released food. It never harms Mother.",
+      "duration": 19.600726,
+      "sha256": "6ef7c6515ece1aa7437dead0599bc2fade642ae72e55c2e60d85314191ce618a",
+      "original_sha256": "7780e9f8aea26fe5c2f61aedf532abdfd2830e714e4809622f0dde6b4c8d6b94"
+    },
+    "grazer": {
+      "creation": "jUnOFnzLD0",
+      "narration": "Watch the Fan grazer sweep up nearby green food into its pale stomach. Loop its golden center before it swims away to reclaim every stolen meal at once. Ignored, it keeps stealing and starves your feeding plan while Mother waits hungry.",
+      "duration": 18.200907,
+      "sha256": "053776696814ac7b0aa0fdea66f73a38b057eec3f3edcf8bbf457c9406185d66",
+      "original_sha256": "e169c83c784e5dd9f2d08b2597f0e61d830c817c1de255966c66698c8368d255"
+    },
+    "parasite": {
+      "creation": "N28nSmj6D9",
+      "narration": "The Coral parasite curls pink around one blue cell and blocks it with a tether. Leave that cell out, then loop the parasite's pink body with your other ready blue cells. Until you capture it, that blocked cell cannot join any loop.",
+      "duration": 19.200181,
+      "sha256": "7e38e8cd1ece9fa3ec4f7558e4824103f745b8f10952a48a0aee17386e5ba2d0",
+      "original_sha256": "0a5194c2a4f0eddec435ff5b0d7d5003c26c30387ff73eb8dcaef0bb0c6bf54a"
+    },
+    "divider": {
+      "creation": "lJc4bDqgv9",
+      "narration": "The Divider splits into two young hunters after twenty seconds. Capture its golden center early to stop it. If it divides, catch the young together in a wider loop, or deal with each one separately.",
+      "duration": 15.900363,
+      "sha256": "709b268dcb627c0fb5edb3ce457606ca8b4e6544393853204e6e22b489f6a671",
+      "original_sha256": "e3334bce5388058d8c5d03b3a6472cdc5a68cc23b8d0d878f37ecdeeb5fec45e"
+    },
+    "bell_bud": {
+      "creation": "8aluTyJIrU",
+      "narration": "This Bell bud is a young hunter learning to breathe. While it inhales, nearby green food drifts inward, then its gold center opens for sixteen seconds. Loop that glowing center only while open to remove it; a closed bud cannot be captured.",
+      "duration": 19.600726,
+      "sha256": "c81bb0f42eb188ec5e2d5007c6b8e02a3c0d98a01f2ba61cc5e2cc1156bb5be0",
+      "original_sha256": "703f96186b956802bc3a70f31eff15d5b4dcd3cd00e2556c9511ae63f6f0f630"
+    },
+    "bellwether": {
+      "creation": "MBKtASbDCm",
+      "narration": "The Bellwether inhales for eight seconds, dragging nearby green food and purple poison inward. When its gold center opens for sixteen seconds, spend three stored food to strike it. You must land three such timed hits while keeping poison from your loops.",
+      "duration": 21.600544,
+      "sha256": "0af15560f1112b436b098852c3c2fc1355bfba54e60e953ea895745db4ab2d45",
+      "original_sha256": "b19ad237142625d359443e456a7262cdda3cf8b96f9eec3f8e9aa80468f36be0"
+    },
+    "regent": {
+      "creation": "N28nSFJ6D9",
+      "narration": "The Glass Regent hides behind two linked shields. Capture both together, or the second within eighteen seconds before they regrow, to expose its center for fourteen seconds. Spend three stored food per hit, and repeat the cycle three times to win.",
+      "duration": 19.401088,
+      "sha256": "1f44fd8c2d4401fff825c1a98e1c942cfbad7084023ac087d6d25f087377be7d",
+      "original_sha256": "dce95d8b66cd5decf925f9404e49cf432e74a970d43a86c4b127c75951caeab3"
+    },
+    "conjoined": {
+      "creation": "yid2swiPW9",
+      "narration": "The Conjoined has two golden hearts that must both fit inside one loop. Each of three captures costs three food; wait for the spread hearts to meet or loop wider. Each hit hatches young pairs nearby, so catch them before they reach Mother.",
+      "duration": 20.800907,
+      "sha256": "8692241d08517cf2b09fafc010027d9e1111f7b7a0fcfe10cb2df3e0f098dbbb",
+      "original_sha256": "e4d057ce69c6731cbf6687faf5f517fd7afd05f3bfaa4239adaea34f6f4f3041"
+    },
+    "warden": {
+      "creation": "O6eZL7vynm",
+      "narration": "This Shield organism guards another creature behind pale linked strands. Capture both shields together, or finish the second within eighteen seconds before they regrow. Breaking the link exposes the hidden center inside for your next loop.",
+      "duration": 20.400181,
+      "sha256": "97af479eecadeaf456e0d39485579834442dcda1b63b14b9a7649be9f8e93e30",
+      "original_sha256": "5fc8ad5e82258bc1cfa7b63a3d81bb592d4fdf593d71b77fb1f0569e2cbef31e"
+    },
+    "moonlace": {
+      "creation": "xSzJHLBjfW",
+      "narration": "Moonlace is a rare visitor whose opening petals release fresh green food into the water. Let it bloom to feed the pond, or loop its glowing pearl and release to bring it home. Every rescued Moonlace pearl joins your home pond collection.",
+      "duration": 16.000181,
+      "sha256": "3de3d436b0f4b859cf9f1bdb1f15df97f8235f711b99217535fb70616a6a598d",
+      "original_sha256": "2f5b5ab46778c2944536fcca31c59432d8fbb22ae2582ba8f8772be8a07b8e72"
+    },
+    "glass_harp": {
+      "creation": "gO09kJGSXO",
+      "narration": "The Glass Harp is a rare helper that draws green food inward while gently pushing purple poison away. Let it separate a crowded meal, or loop its pearl and release to rescue it. Rescued Glass Harp pearls live on in your home pond.",
+      "duration": 15.800544,
+      "sha256": "6b041d3c7612dc56737729848b2e2be3650a62032acffd8548abb7dead21526f",
+      "original_sha256": "53cd2acab0757397ee6ccf8043e1cf51d45cc8f7d82663f74c28cc4bd742f13d"
+    },
+    "glowdrift": {
+      "creation": "iGtWJzA3uK",
+      "narration": "Glowdrift is a rare shelter whose shining chambers slow nearby ordinary hunters. Leave it glowing to buy calm time, or loop its central pearl and release to rescue it. Every rescued Glowdrift pearl joins your home pond before the visitor leaves.",
+      "duration": 17.700544,
+      "sha256": "3bd19f02058f8ccfcd5ef872ccd0f4b4034130e243ff07da175cdeb5df860ff6",
+      "original_sha256": "6ed04b1a30ed217fe81d806d4aabae2353a6c6851d190085f172b2a280d72505"
+    },
+    "fern_desmid": {
+      "creation": "rgG7FwFxtc",
+      "narration": "Meet the Fern desmid, green food with delicate fern-like leaves. Enclose its bright golden center in a clean loop for one nourishment, keeping purple poison out. Only its shape is different; the feeding rule stays exactly the same as other green food.",
+      "duration": 19.000544,
+      "sha256": "e465005cf86e501bd75b691e20e1c2591d9be9d4a0a22319dc63a607d3e8e9b3",
+      "original_sha256": "999f13a9ffb67c732cd01341db049e71dea0a07ebe76d34cb9bc51a5181f7b39"
+    },
+    "spiral_alga": {
+      "creation": "bx3lfUe5Y2",
+      "narration": "Meet the Spiral alga, green food curled into a shining spiral. Enclose its bright golden center in a clean loop for one nourishment, keeping purple poison out. Only its shape is different; the feeding rule stays exactly the same as other green food.",
+      "duration": 19.600544,
+      "sha256": "9dab9f87e9bcca0e998ad471bbbaeeeb2f9304dc839902788f07b6ed8370cabe",
+      "original_sha256": "0e0d5979d6e23419007b817bf219bec510ce7c556f8cdebe9048e96e78a6dcd6"
+    },
+    "lantern_grazer": {
+      "creation": "cpHBAe10eP",
+      "narration": "The Lantern grazer is a pale-gold food thief shaped like a lantern. Like other grazers, loop its golden center before it swims away to reclaim every stolen green meal. Its looks are new, but the capture rule stays exactly the same.",
+      "duration": 16.500363,
+      "sha256": "afb7185ab48879aaf5012f46c3ec2874ac2846eb461eb143230285a9255817d8",
+      "original_sha256": "d2d5b252e6806f0331bc826c98bb72370e5c17c42ce5950b447149211a7c0968"
+    },
+    "comb_grazer": {
+      "creation": "ovsEDCd829",
+      "narration": "The Comb grazer is a pale-gold food thief with a fine combed crest. Like other grazers, loop its golden center before it swims away to reclaim every stolen green meal. Its looks are new, but the capture rule stays exactly the same.",
+      "duration": 20.100907,
+      "sha256": "51c2d0e5b98df0b6d219da7d1a9418c287a8a0962703e94a268f3f54217ba33f",
+      "original_sha256": "d568ebef3e9e9bec443bda45b70e929ff2f62a43626b7da9802167b3cfe8d879"
+    },
+    "crown_cyst": {
+      "creation": "LwYyK4QswO",
+      "narration": "The Crown cyst wears a violet crown, but it is still purple poison. Nudge it out of green meals, since any mixed capture costs Mother one health core. Only in purification encounters may you clear Crown cysts safely inside a poison-only loop.",
+      "duration": 19.800181,
+      "sha256": "e1af23c6bb7a6391630c11afa1c7bb73c438ba5d4b3acc3a83b24667022afc4e",
+      "original_sha256": "c5b29b5935873d0a153d66874764c5e5e6fe00c0eed8e9bb465baf6b41c81f19"
+    },
+    "bramble_cyst": {
+      "creation": "xSzJb9EjfW",
+      "narration": "The Bramble cyst hides poison inside a violet tangle of brambles. Nudge it out of green meals, since any mixed capture costs Mother one health core. Only in purification encounters may you clear Bramble cysts safely inside a poison-only loop.",
+      "duration": 20.800726,
+      "sha256": "ec489ef09cd91377485558b2af52a5344ef58953e804e084ee0c897365121592",
+      "original_sha256": "c4d0341ce212873a1543b021c35b0f812f6aaa792e63248e2c57dbbb8ac9ba92"
+    },
+    "snow_spore": {
+      "creation": "ovsEDKv829",
+      "narration": "The Snow spore is a pearl-white rescue spore sparkling like fresh snow. Loop its bright center with ready blue cells before it fades away. Like every rescued spore, a saved Snow spore joins your home pond and counts toward rescue goals.",
+      "duration": 19.500907,
+      "sha256": "966267f4f00fe28345b758820dab3d006404f9ed2bb0ffb8a15743446a43fb84",
+      "original_sha256": "60b8a42e7998d1f4e4ac016e8a1782bba92b4b85b61a5e1f9b139d90d665304a"
+    },
+    "sail_spore": {
+      "creation": "UPV6jYpwny",
+      "narration": "The Sail spore drifts like a pearl-white rescue spore under a tiny sail. Loop its bright center with ready blue cells before it fades away. Like every rescued spore, a saved Sail spore joins your home pond and counts toward rescue goals.",
+      "duration": 15.800544,
+      "sha256": "aa812b714c4c38983a7fa8d5a0bc1cc7555478e88e65529d0e44220f50681135",
+      "original_sha256": "f592581e0bf01724af91a492f4660f25ae634110357d7f679674ce1971d86bc9"
+    },
+    "needle_hunter": {
+      "creation": "fHOKIJWCDY",
+      "narration": "The Needle hunter is an amber hunter. It hunts food and young spores before heading toward Mother. Loop around its golden center to protect the colony. One clean capture absorbs it, and returns any green food it has swallowed.",
+      "duration": 17.3,
+      "sha256": "9622dd63d4151010c4bc7ca27ce014e9715b88e8c1d4fa345c7da36f99bfac66",
+      "original_sha256": "1d9368477284c8a7fd1231c8194d001a26bade5f585ca963d1b8b09d46cbeefd"
+    },
+    "ribbon_hunter": {
+      "creation": "rgG7bbbxtc",
+      "narration": "The Ribbon hunter is an amber hunter. It hunts food and young spores before heading toward Mother. Loop around its golden center to protect the colony. One clean capture absorbs it, and returns any green food it has swallowed.",
+      "duration": 17.100544,
+      "sha256": "ea65087e4f702cd34c8b5f9ad2233670b0fe81beaf107050b48d372b5d7c5237",
+      "original_sha256": "cb85d1e92f6f02fe2f70d319da830e611489d58935110160bb3d1e419fabbbef"
+    },
+    "lace_parasite": {
+      "creation": "iGtWP9J3uK",
+      "narration": "The Lace parasite spreads pink lace over one blue cell and blocks it. Follow its thin tether, leave that cell out, then loop the parasite body with other ready blue cells. Until captured, the Lace parasite keeps that one cell closed.",
+      "duration": 17.000726,
+      "sha256": "6de1a765f342c15460857881f4360360640dca1a2a26df7c0d6cfeba99e7b1ce",
+      "original_sha256": "73af60a1e50fc87648cec9ff34ed75a59fd6234eb3fb8c7c7e86c83c35193475"
+    },
+    "hourglass_divider": {
+      "creation": "cpHBGcQ0eP",
+      "narration": "The Hourglass divider splits into two young hunters after twenty seconds. Capture its golden center early to stop it. If it divides, catch the young together in a wider loop, or deal with each one separately.",
+      "duration": 13.700907,
+      "sha256": "5a903d6088775698b9870bc50140f014cedb4e693c55183d039756929f5f6e24",
+      "original_sha256": "075875cd5806c251dcd4678adeac09d4c7ce51e8bc004e4ad850902277ce56f0"
+    },
+    "chalice_grazer": {
+      "creation": "dtxaMo6XSL",
+      "narration": "The Chalice grazer is a rare trumpet-shaped food thief sipping green algae. Loop its golden center before it leaves to reclaim every stolen meal at once. Its shape is unusual, but it steals and returns food exactly like other grazers.",
+      "duration": 20.001088,
+      "sha256": "770c62c0fc418629c999dfcf7891376dc76e77499f163c487c671c1b23eea6fb",
+      "original_sha256": "483ad33462ff30ad94b9a0e38302865d345b7c9fc9a02e2d2840a5725c6bda97"
+    },
+    "sundial_alga": {
+      "creation": "Tdb8YdiVNR",
+      "narration": "The Sundial alga is rare edible green algae with spiraling glass leaves. Enclose its golden center in a clean loop with ready blue cells to feed Mother one food. Keep purple poison out; its rarity changes nothing about the feeding rule.",
+      "duration": 18.900726,
+      "sha256": "d97782cbb5e198a8a33bc0cb5c12c1399832b57e36a1187c760d5e437091701f",
+      "original_sha256": "5852e220ea501665d673feb6df8f5b957629d770e450c924215277ae67d3be25"
+    },
+    "glasswing_spore": {
+      "creation": "rgG75wUxtc",
+      "narration": "The Glasswing spore is a pearl spore gliding on three glass wings. Loop its golden center with ready blue cells before it fades away. Like every rescued spore, a saved Glasswing spore joins your home pond and counts toward rescue goals.",
+      "duration": 18.0,
+      "sha256": "0875327be0c1a883fd22919d13fe230ebbbcc559c09f37922773aaf0b54a5039",
+      "original_sha256": "6b694b64abdfad6351c8d9592c02bd7a682909a6c3b7840c99c22da19557795c"
+    },
+    "trident_hunter": {
+      "creation": "CqykhrxEEy",
+      "narration": "The Trident hunter is a rare three-pronged amber hunter swimming toward Mother. Loop its golden center and release for one clean capture before it arrives. Its shape is unusual, but it threatens Mother exactly like other amber hunters.",
+      "duration": 15.900363,
+      "sha256": "7c84769f8e658efe07f0d55b857682855e93cdb7847d699906df9199c465d986",
+      "original_sha256": "9ebd568e63575644132cb5ed9580777a8491d78d96332c17769bb8440fa44eab"
+    },
+    "amber_nautilus": {
+      "creation": "fHOKhiMCDY",
+      "narration": "The Amber nautilus is an amber hunter curled inside a spiral silica shell. Loop its golden center once to crack the shell, then loop it again to finish. It keeps drifting toward Mother, so plan both captures before it arrives.",
+      "duration": 15.601088,
+      "sha256": "05608d6fa2ef61fdc339c9f27a435b1088a62a5fb25c3c1dad6c4722c672d073",
+      "original_sha256": "48c5a1ad7d328dd7604d67d64bd4146bdf7e65eaac0a6c76eba52de17c25dd0c"
+    },
+    "comet_spore": {
+      "creation": "xSzJkDojfW",
+      "narration": "The Comet spore streaks past trailing silver filaments behind its pearl. Loop its golden center with ready blue cells before it fades away. Like every rescued spore, a saved Comet spore joins your home pond and counts toward rescue goals.",
+      "duration": 18.800907,
+      "sha256": "8e20156a3b30f2abc36dabc28abfa2f43babd9766436c78db6b9f815ab03103a",
+      "original_sha256": "2db9295d40b6830fd4eab9a0ea050cfeac28d67b163bd370b79e72e5f479de4f"
+    },
+    "crown_rotifer": {
+      "creation": "w4Miga07EI",
+      "narration": "The Crown rotifer spins twin filtering wheels that steal nearby green food. Loop its golden center before it drifts away to reclaim the algae in its stomach. Its crown is new, but it steals and returns food exactly like other grazers.",
+      "duration": 20.800907,
+      "sha256": "e605697b69956864b22b7cda0f042268207f1c0e33005dda6fe285b07a5c87d1",
+      "original_sha256": "99fa565d57e3ea8eafba394332d0ccc73190fde3ae62d992fef7b30cd0b91245"
+    },
+    "prism_hunter": {
+      "creation": "rgG7KoXxtc",
+      "narration": "The Prism hunter hides inside a pointed glass lattice that flashes like a prism. Loop its golden center twice before it reaches Mother: first to crack the lattice, then to finish. Its armor changes nothing except needing that second capture.",
+      "duration": 16.0,
+      "sha256": "3618297b56f70a9c94e3bf6a6c74cb3b3991f16d65d961663d85fbf4d28581e1",
+      "original_sha256": "5d13e143be6b70cfb96fc6cca501cecf4d6c660d4157664859be96241efde331"
+    },
+    "ribbon_divider": {
+      "creation": "UPV6lubwny",
+      "narration": "The Ribbon divider splits into two young hunters after twenty seconds. Capture its golden center early to stop it. If it divides, catch the young together in a wider loop, or deal with each one separately.",
+      "duration": 16.7,
+      "sha256": "3c65233574be85483f08565322bafe4d2ce2ba4b8ccd66cd842f27ecbd65a76a",
+      "original_sha256": "6858fc9e6c230ea993a7039d29613e22653cc6708e31bfab2d8e78ea48e1e801"
+    },
+    "sieve_alga": {
+      "creation": "lJc4jELgv9",
+      "narration": "The Sieve alga is edible green lace holding its golden center on a living bridge. Capture that glowing center inside a clean green meal with ready blue cells. Its delicate shape is new, but the feeding rule stays exactly the same.",
+      "duration": 17.100544,
+      "sha256": "c1ab628332070526556d1b92c475629fdd50358e737881500e39e6dbdca6bc51",
+      "original_sha256": "34fde28145725978baeae3973202c07ab178128f3f37ffb0242d481ab65d6760"
+    },
+    "thistle_capsule": {
+      "creation": "LwYyrF8swO",
+      "narration": "The Thistle capsule is a violet poison pod with a thistled husk. Nudge it out of green meals, since any mixed capture hurts Mother. Only in purification encounters may you capture Thistle capsules alone in a safe poison-only loop.",
+      "duration": 17.000726,
+      "sha256": "ab1721b6fc3a6a3f75a8d7428aa639fbaf529c9132695f21edd8740197e1e70a",
+      "original_sha256": "ce0b18ae951179379ecf3c1e891b858a232f2351f36a18364011d7c40b95ee55"
+    },
+    "veil_parasite": {
+      "creation": "MBKt0nUDCm",
+      "narration": "The Veil parasite drapes pink lace over one blue cell and blocks it. Leave that cell out, then loop the parasite's golden center with your other ready blue cells. Until captured, the Veil parasite keeps that one cell closed to loops.",
+      "duration": 19.200181,
+      "sha256": "10a8a47c596cf1bfc4e00270416261e018ae4ae36eb5b53add301bb25586fd84",
+      "original_sha256": "372b841624fdae5fe09ac1e6890ee064dbd5797b4a3b0b8723c48346ebcef421"
+    }
+  }
+}

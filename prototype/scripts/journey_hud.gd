@@ -1,5 +1,7 @@
 extends "res://scripts/hud.gd"
 const Journey = preload("res://scripts/journey_plan.gd")
+const MotherAppearance = preload("res://scripts/mother_appearance.gd")
+const LoopStrain = preload("res://scripts/loop_strain.gd")
 const Guidance = preload("res://scripts/journey_guidance.gd")
 const TitleScreen = preload("res://scripts/title_screen.gd")
 var title_screen := TitleScreen.new()
@@ -27,6 +29,7 @@ var pond_button: Button
 var pond_previous: Button
 var pond_next: Button
 var habitat_buttons: Array[Button] = []
+var growth_buttons: Array[Button] = []
 var colony_buttons: Array[Button] = []
 var continue_button: Button
 var journal_button: Button
@@ -36,6 +39,9 @@ var travel_button: Button
 var help_button: Button
 var help_close: Button
 var journal_page := 0
+var journal_films: Array[Button] = []
+var film_watch_button: Button
+var film_later_button: Button
 var journal_previous: Button
 var journal_next: Button
 var trait_tooltips: Array[Control] = []
@@ -56,6 +62,8 @@ var pip_styles := {}
 func _ready() -> void:
 	super._ready()
 	journal_button = button("Field journal", Vector2.ZERO, Vector2(172, 40), game.toggle_journal, "J")
+	film_watch_button = button("Watch film", Vector2(RIGHT, 660), Vector2(COLUMN, 38), watch_new_film)
+	film_later_button = button("Later · Journal", Vector2(RIGHT, 704), Vector2(COLUMN, 34), save_new_films_for_later)
 	new_button = button("New journey", Vector2.ZERO, Vector2(320, 50), game.new_journey.bind("wanderer"))
 	advanced_button = button("Advanced starting colonies", Vector2.ZERO, Vector2(320, 40), toggle_advanced)
 	continue_button = button("Continue your journey", Vector2.ZERO, Vector2(320, 50), game.resume_journey)
@@ -64,6 +72,8 @@ func _ready() -> void:
 	pond_next = button("More residents", Vector2(650, 812), Vector2(200, 40), game.home_pond.turn_page.bind(1))
 	for i in 2:
 		habitat_buttons.append(button("Take the food-rich route" if i == 0 else "Take the sheltered route", Vector2(CHOICE.position.x + 32 + i * 366, CHOICE.position.y + 416), Vector2(320, 46), game.choose_habitat.bind("bloom" if i == 0 else "refuge")))
+	growth_buttons.append(button("Grow a guard organelle",Vector2(CHOICE.position.x+32,CHOICE.position.y+416),Vector2(320,50),game.choose_growth_role.bind("guard")))
+	growth_buttons.append(button("Grow a feeder organelle",Vector2(CHOICE.position.x+398,CHOICE.position.y+416),Vector2(320,50),game.choose_growth_role.bind("feeder")))
 	journal_close = button("Close", Vector2(JOURNAL.end.x - 24 - snug("Close", "J"), JOURNAL.position.y + 22), Vector2(snug("Close", "J"), 38), game.toggle_journal, "J")
 	UI.style_button(journal_close, "quiet", 14)
 	repair_button = button("Repair", Vector2.ZERO, Vector2(320, 44), game.repair_and_travel)
@@ -73,6 +83,10 @@ func _ready() -> void:
 		var control := button(colony.name, Vector2(COLONIES.position.x + 43 + i * 248, COLONIES.position.y + 250), Vector2(220, 48), game.new_journey.bind(colony.id))
 		control.tooltip_text = colony.detail + "\n" + colony.unlock
 		colony_buttons.append(control)
+	for slot in JOURNAL_PAGE_SIZE:
+		var control := button("Watch film",Vector2(JOURNAL.position.x+40+(slot%2)*388+18,JOURNAL.position.y+124+(slot/2)*248+80),Vector2(110,32),watch_creature_film.bind(slot))
+		UI.style_button(control,"quiet",12)
+		journal_films.append(control)
 	journal_previous = button("Previous", Vector2(JOURNAL.position.x + 40, JOURNAL.end.y - 72), Vector2(140, 44), turn_journal.bind(-1))
 	journal_next = button("Next", Vector2(JOURNAL.end.x - 180, JOURNAL.end.y - 72), Vector2(140, 44), turn_journal.bind(1))
 	help_button = button("?", Vector2(RIGHT + COLUMN - 80, 30), Vector2(36, 36), game.toggle_help)
@@ -109,7 +123,7 @@ func _ready() -> void:
 	refresh()
 
 func managed_controls() -> Array:
-	return [pause_button, restart_button, debug_button, mode_button, motion_button, center_button, sound_button, journal_button, help_button, help_close, new_button, continue_button, pond_button, advanced_button, pond_previous, pond_next, journal_close, journal_previous, journal_next, repair_button, travel_button, rename_button, name_blocker, name_input, name_save, name_cancel] + habitat_buttons + colony_buttons + cards + trait_tooltips
+	return [pause_button, restart_button, debug_button, mode_button, motion_button, center_button, sound_button, journal_button, film_watch_button, film_later_button, help_button, help_close, new_button, continue_button, pond_button, advanced_button, pond_previous, pond_next, journal_close, journal_previous, journal_next, repair_button, travel_button, rename_button, name_blocker, name_input, name_save, name_cancel] + journal_films + habitat_buttons + growth_buttons + colony_buttons + cards + trait_tooltips
 
 ## Each screen lists only the controls it needs; everything else is hidden.
 func refresh() -> void:
@@ -120,12 +134,17 @@ func refresh() -> void:
 	var home: bool = state == "home"
 	var habitat: bool = home and game.home_pond_open
 	var blocked: bool = game.settings_open or game.journal_open or game.help_open or renaming() or (game.evolution_reveal != null and game.evolution_reveal.visible)
-	var overlay: bool = not home and not blocked and state in ["brief", "paused", "loss", "success"] and overlay_visible()
+	var overlay: bool = not home and not blocked and state in ["brief", "paused", "loss", "success"] and overlay_visible() and not game.round_result_showing()
 	var shown: Array = []
 	if renaming():
 		shown.append_array([name_blocker, name_input, name_save, name_cancel])
 	elif game.journal_open:
 		shown.append(journal_close)
+		for slot in JOURNAL_PAGE_SIZE:
+			var i := journal_page*JOURNAL_PAGE_SIZE+slot
+			if i<Journey.SPECIES.size() and game.creature_cinema!=null:
+				var id: String = Journey.SPECIES[i].id
+				if game.journey_profile.discovered.has(id) or run.seen_species.has(id): shown.append(journal_films[slot])
 		if journal_page > 0:
 			shown.append(journal_previous)
 		if (journal_page + 1) * JOURNAL_PAGE_SIZE < Journey.SPECIES.size():
@@ -191,6 +210,10 @@ func refresh_encounter(overlay: bool) -> Array:
 		help_button.tooltip_text = "How to play  (H)"
 		pause_button.disabled = false
 		shown.append_array([help_button, pause_button])
+		if game.creature_cinema != null and not game.creature_cinema.pending_ids.is_empty():
+			place(film_watch_button, Vector2(RIGHT, 660), Vector2(COLUMN, 38), "primary", "Watch film", "", 13)
+			place(film_later_button, Vector2(RIGHT, 704), Vector2(COLUMN, 34), "quiet", "Later · Journal", "", 12)
+			shown.append_array([film_watch_button, film_later_button])
 		for i in trait_tooltips.size():
 			if i < run.mutations.size():
 				var definition: Dictionary = Mutations.journey_definition(run.mutations[i])
@@ -200,7 +223,11 @@ func refresh_encounter(overlay: bool) -> Array:
 		place(help_button, Vector2(RIGHT + COLUMN - 36, 30), Vector2(36, 36), "icon", "?", "", 16)
 		help_button.tooltip_text = "How to play  (H)"
 		shown.append(help_button)
-		if run.Habitats.pending(run):
+		if run.growth_slot() >= 0:
+			for i in growth_buttons.size():
+				place(growth_buttons[i],Vector2(CHOICE.position.x+32+i*366,CHOICE.position.y+416),Vector2(320,50),"primary" if i==0 else "secondary","Guard · stop one hunter" if i==0 else "Feeder · reward wide meals","",14)
+				shown.append(growth_buttons[i])
+		elif run.Habitats.pending(run):
 			for i in habitat_buttons.size():
 				place(habitat_buttons[i], Vector2(CHOICE.position.x + 32 + i * 366, CHOICE.position.y + 416), Vector2(320, 46), "secondary", "", "", 15)
 			shown.append_array(habitat_buttons)
@@ -209,7 +236,7 @@ func refresh_encounter(overlay: bool) -> Array:
 			place(center_button, Vector2(middle - 140, brief.end.y - 76), Vector2(280, 48), "primary", "Begin encounter", "Enter")
 			place(restart_button, Vector2(brief.position.x + 24, brief.end.y - 70), Vector2(snug("Return home", "", 13), 36), "quiet", "Return home", "", 13)
 			shown.append_array([center_button, restart_button])
-	elif run.evolution_ready():
+	elif run.evolution_ready() and not game.round_result_showing():
 		var first_choice: bool = run.mutations.is_empty() and run.offered_mutations.size() == 2
 		var top := EVOLVE.position.y + 160.0
 		for i in cards.size():
@@ -227,9 +254,9 @@ func refresh_encounter(overlay: bool) -> Array:
 		var row := EVOLVE.end.y - 128.0 if not run.offered_mutations.is_empty() else REST.end.y - 108.0
 		var span := (EVOLVE if not run.offered_mutations.is_empty() else REST)
 		var width := 320.0 if span == EVOLVE else 270.0
-		repair_button.disabled = run.integrity >= 5 or run.biomass < run.repair_cost()
-		place(repair_button, Vector2(middle - width - 8, row), Vector2(width, 44), "secondary", "Mother is healthy, no repair needed" if run.integrity >= 5 else "Repair +%d health for %d food" % [mini(2, 5 - run.integrity), run.repair_cost()], "", 14)
-		repair_button.tooltip_text = "Restore up to 2 of the mother's 5 health cores, then travel. You have %d food; repair costs %d." % [run.biomass, run.repair_cost()]
+		repair_button.disabled = run.integrity >= run.max_integrity or run.biomass < run.repair_cost() or run.repair_waiting() or run.repair_needs_deeper_wound()
+		place(repair_button, Vector2(middle - width - 8, row), Vector2(width, 44), "secondary", "Mother is healthy, no repair needed" if run.integrity >= run.max_integrity else "Repair needs two wounded cores" if run.repair_needs_deeper_wound() else "Repair tissue still resting" if run.repair_waiting() else "Repair +%d health for %d food" % [mini(2, run.max_integrity - run.integrity), run.repair_cost()], "", 14)
+		repair_button.tooltip_text = "Late-route repair becomes available when at least two cores are wounded." if run.repair_needs_deeper_wound() else "Repair becomes available after the next encounter." if run.repair_waiting() else "Restore up to 2 of the mother's %d health cores, then travel. You have %d food; repair costs %d." % [run.max_integrity, run.biomass, run.repair_cost()]
 		place(travel_button, Vector2(middle + 8, row), Vector2(width, 44), "secondary", "Keep all %d food and travel" % run.biomass, "", 14)
 		travel_button.tooltip_text = "Skip this upgrade. Your saved food carries into the next encounter."
 		place(restart_button, Vector2(span.position.x + 24, span.end.y - (62.0 if span == EVOLVE else 54.0)), Vector2(snug("Save and return home", "", 13), 36), "quiet", "Save and return home", "", 13)
@@ -242,6 +269,9 @@ func refresh_encounter(overlay: bool) -> Array:
 		place(sound_button, Vector2(MENU.position.x + 40, y + 152), Vector2(MENU.size.x - 80, 44), "menu", "Settings", "V")
 		place(restart_button, Vector2(MENU.position.x + 40, y + 218), Vector2(MENU.size.x - 80, 44), "menu", "Save and return home", "")
 		shown.append_array([center_button, help_button, journal_button, sound_button, restart_button])
+		if game.developer_tools:
+			place(debug_button, Vector2(RIGHT, 721), Vector2(COLUMN, 38), "quiet", "Hide inspect" if game.debug_mode else "Inspect dish", "D", 13)
+			shown.append(debug_button)
 	elif state == "loss" and overlay:
 		place(center_button, Vector2(middle - 140, loss_rect().end.y - 80), Vector2(280, 48), "primary", "Retry encounter", "Enter")
 		shown.append(center_button)
@@ -303,16 +333,21 @@ func _draw() -> void:
 		if run.state == "active" and not topmost:
 			draw_targets()
 			draw_nudge()
+			draw_big_capture()
 			if run.selection.mother_blocked():
 				# HUD draws above the living tissue, keeping the warning visible.
 				draw_circle(run.board.center, 58.0, Color("d9b58b"), false, 1.5, true)
 		if not topmost:
 			if run.state == "brief":
 				scrim()
-				if run.Habitats.pending(run):
+				if run.growth_slot() >= 0:
+					draw_growth_choice()
+				elif run.Habitats.pending(run):
 					draw_habitats()
 				else:
 					draw_brief()
+			elif game.round_result_showing():
+				draw_round_result_cue()
 			elif run.evolution_ready() and run.offered_mutations.is_empty():
 				scrim()
 				draw_rest()
@@ -345,13 +380,25 @@ func draw_status() -> void:
 		label_at(run.Habitats.name_for(run.stage_index, run.habitat_choice), Vector2(LEFT, 93), 12, Color(dish.color, 0.75))
 	var low: bool = run.integrity <= 2
 	label_at("Mother", Vector2(LEFT, 152), 13, MUTED)
-	right_at("%d of 5" % run.integrity, Vector2(LEFT + COLUMN, 152), 13, UI.DANGER if low else INK, UI.MEDIUM)
-	for i in 5:
-		draw_style_box(pip_box(i < run.integrity, low), Rect2(LEFT + i * 35.5, 164, 30, 6))
+	right_at("%d of %d" % [run.integrity,run.max_integrity], Vector2(LEFT + COLUMN, 152), 13, UI.DANGER if low else INK, UI.MEDIUM)
+	var pip_step: float = minf(35.5,COLUMN / float(run.max_integrity))
+	for i in run.max_integrity:
+		draw_style_box(pip_box(i < run.integrity, low), Rect2(LEFT + i * pip_step, 164, pip_step - 5.0, 6))
+	var organelle_status: Array[String] = []
+	if run.growth_roles.values().has("guard"):
+		var ready_guards: int = maxi(0,run.growth_active("guard")-run.guardian_spent)
+		var guard_status := "Guard %d ready" % ready_guards if ready_guards>0 else "Guard wounded" if run.growth_active("guard")==0 else "Guard recovering" if run.guardian_recovery==0 else "Guard spent"
+		organelle_status.append(guard_status)
+	if run.growth_roles.values().has("feeder"):
+		var active_feeders: int = run.growth_active("feeder")
+		organelle_status.append("Feeder %d active" % active_feeders if active_feeders>0 else "Feeder wounded")
+	if not organelle_status.is_empty():
+		wrapped(" · ".join(organelle_status),Vector2(LEFT,190),COLUMN,11,CYAN)
 	label_at("Food saved", Vector2(LEFT, 214), 13, MUTED)
 	label_at(str(run.biomass), Vector2(LEFT - 1, 254), 32, UI.FOOD, UI.SEMIBOLD)
 	if run.biomass >= 30:
 		label_at("Stores full", Vector2(LEFT + measure(str(run.biomass), 32, UI.SEMIBOLD) + 10, 254), 12, MUTED)
+	label_at("Score  %d" % run.score, Vector2(LEFT, 281), 13, CYAN, UI.MEDIUM)
 	label_at(UI.sentence(Mutations.build_name(run.mutations)), Vector2(LEFT, 304), 13, CYAN, UI.SEMIBOLD)
 	if run.mutations.is_empty():
 		wrapped("Choose your first upgrade." if run.evolution_ready() else "Your first upgrade comes after this encounter.", Vector2(LEFT, trait_y(0)), COLUMN, 13, MUTED)
@@ -381,7 +428,7 @@ func draw_status() -> void:
 		if not objective.is_empty():
 			y += 25.0
 			label_at(objective, Vector2(RIGHT, y), 13, CYAN, UI.MEDIUM)
-	var remaining := maxi(0, ceili(float(spec.duration) - run.stage_elapsed))
+	var remaining := maxi(0, ceili(run.harvest.deadline() - run.stage_elapsed))
 	y += 22.0
 	label_at("Practice, no time limit" if run.Lesson.active(run) else "%d:%02d left" % [remaining / 60, remaining % 60], Vector2(RIGHT, y), 13, UI.DANGER if remaining < 20 else MUTED)
 	if run.state in ["active", "paused"]:
@@ -390,6 +437,11 @@ func draw_status() -> void:
 		wrapped(guide.detail, Vector2(RIGHT, title_bottom + 27.0), COLUMN, 13, Color(UI.DANGER, 0.85) if guide.urgent else MUTED)
 		if not run.Lesson.active(run) and nudge_relevant():
 			draw_nudge_meter()
+	if run.state == "active" and game.creature_cinema != null and not game.creature_cinema.pending_ids.is_empty():
+		var count: int = game.creature_cinema.pending_ids.size()
+		draw_style_box(UI.toast_box(), Rect2(RIGHT - 10, 598, COLUMN + 20, 154))
+		label_at("NEW DISCOVERY", Vector2(RIGHT, 620), 11, CYAN, UI.SEMIBOLD)
+		wrapped("%d new film%s" % [count, "s" if count != 1 else ""], Vector2(RIGHT, 639), COLUMN, 13, INK, UI.MEDIUM)
 	draw_feedback()
 
 ## Loop preview or the latest toast, below the lens. Shared with practice HUDs.
@@ -415,9 +467,10 @@ func draw_feedback() -> void:
 		if outcomes.is_empty():
 			outcomes.append("No food collected")
 		outcomes.append("−%d health" % preview.poison if preview.poison > 0 else "No health lost")
-		var return_time: float = Mutations.recovery(run.mutations, run.selection.path.size(), run.board.tuning.recovery_seconds)
+		var strain: float = LoopStrain.penalty(run.selection.path, run.board.anchors)
+		var return_time: float = Mutations.recovery(run.mutations, run.selection.path.size(), run.board.tuning.recovery_seconds) + strain
 		var benefit := Mutations.food_bonus_text(preview)
-		var timing := "Cells return in %.1fs" % return_time
+		var timing := "Cells return in %.1fs · long links +%.1fs" % [return_time, strain] if strain >= 0.1 else "Cells return in %.1fs" % return_time
 		# Feedback belongs below the lens: lower cells remain visible and
 		# selectable throughout a gesture, even with a two-line preview.
 		toast_panel("  ·  ".join(outcomes), "Includes " + benefit + "  ·  " + timing if not benefit.is_empty() else timing, UI.DANGER if preview.poison > 0 else CYAN)
@@ -623,12 +676,28 @@ func draw_approaching_life() -> void:
 			draw_arc(p,radius,angle,angle+1.1,20,Color(color,0.18+amount*0.2),1.0,true)
 		water_label("arrival:%s" % p,Rect2(p-Vector2.ONE*radius,Vector2.ONE*radius*2.0),"%s · %ds" % [{"bacterium":"BACTERIUM", "amoeba":"AMOEBA", "hunter":"HUNTER", "grazer":"FOOD THIEF", "parasite":"PARASITE", "divider":"DIVIDER"}.get(site.kind,"ARRIVAL"), ceili(site.remaining)],color)
 
+func draw_growth_choice() -> void:
+	var run = game.run
+	dialog(CHOICE)
+	centered("The Mother has grown a new organelle",CHOICE.position.y+100,30)
+	centered("Choose what this living tissue will do.",CHOICE.position.y+135,15,MUTED)
+	for i in 2:
+		var x := CHOICE.position.x+32+i*366.0
+		var card := Rect2(x,CHOICE.position.y+192,320,208)
+		draw_style_box(UI.card_box(),card)
+		label_at("GUARD" if i==0 else "FEEDER",Vector2(x+22,card.position.y+42),13,CYAN,UI.SEMIBOLD)
+		label_at("A safer center" if i==0 else "More from a wide meal",Vector2(x+22,card.position.y+79),19,INK,UI.SEMIBOLD)
+		wrapped("Blocks one hunter, then rests through two encounters." if i==0 and run.encounter_total()==30 else "Blocks one hunter that reaches Mother each encounter." if i==0 else "Clean loops with four or more food gain one extra food.",Vector2(x+22,card.position.y+111),276,15,MUTED)
+		wrapped("If this organelle is wounded, its ability sleeps until repaired.",Vector2(x+22,card.position.y+177),276,13,MUTED)
+	centered("%d health organelles now · both choices can be repaired" % run.max_integrity,CHOICE.end.y-42,13,MUTED)
+
 func draw_habitats() -> void:
 	var run = game.run
 	dialog(CHOICE)
 	route_map(Vector2(CHOICE.position.x + 70, CHOICE.position.y + 44), CHOICE.size.x - 140)
 	centered("Choose where to travel", CHOICE.position.y + 124, 30)
-	centered("Both routes lead onward through %s." % Journey.dish(run.stage_index).name, CHOICE.position.y + 152, 14, MUTED)
+	var route_context := "Original 30-encounter save · routes lead through %s." % Journey.dish(run.stage_index).name if run.encounter_total()==30 else "Both routes lead onward through %s." % Journey.dish(run.stage_index).name
+	centered(route_context, CHOICE.position.y + 152, 14, MUTED)
 	for i in 2:
 		var x := CHOICE.position.x + 16 + i * 366.0 + 16
 		var card := Rect2(x - 16, CHOICE.position.y + 176, 352, 306)
@@ -642,6 +711,14 @@ func draw_habitats() -> void:
 		for j in lines.size():
 			draw_circle(Vector2(x + 11, y - 5), 2.5, tint if j != 1 else Color(tint, 0.6), true, -1, true)
 			y = wrapped(lines[j], Vector2(x + 26, y), 290, 15, INK) + 36.0
+	if run.harvest.final_surge_enabled:
+		centered("Final hunter wave after the goal · a swift clear draws more.", CHOICE.end.y - 62, 13, CYAN)
+	elif run.harvest.hunter_quota()>0:
+		centered("This feeding visit needs two hunter captures%s." % (" · quicker hunters ahead" if run.mutations.size()>=4 else ""), CHOICE.end.y - 62, 13, CYAN)
+	elif run.encounter_total()==30 and run.stage_index>=8 and run.mutations.size()>=5:
+		centered("Stored food draws faster hunters in the Blue Deep.", CHOICE.end.y - 62, 13, CYAN)
+	elif run.stage_index>=4 and run.mutations.size()>=4:
+		centered("This evolved colony attracts quicker hunters. Watch the arrival marks.", CHOICE.end.y - 62, 13, CYAN)
 	centered("Next: %s. Your health and upgrades travel with you." % run.harvest.spec.name, CHOICE.end.y - 36, 13, MUTED)
 
 ## Wrapped text that can also be measured without painting, so dialogs fit.
@@ -670,7 +747,9 @@ func brief_content(paint: bool, top: float) -> float:
 	if paint:
 		route_map(Vector2(320, top + 44), 640)
 		centered(spec.name, top + 136, 32)
-		centered("%s  ·  encounter %d of %d" % [dish.name, run.encounter_index() + 1, run.encounter_total()], top + 166, 14, dish.color, UI.MEDIUM)
+		centered("%s  ·  encounter %d of %d%s" % [dish.name, run.encounter_index() + 1, run.encounter_total(), " · original journey" if run.encounter_total()==30 else ""], top + 166, 14, dish.color, UI.MEDIUM)
+		if run.stage_index in [2,4,8,10] and not spec.get("generated",false):
+			centered("Mother grew another health organelle · %d of %d healthy" % [run.integrity,run.max_integrity], top + 190, 13, CYAN, UI.MEDIUM)
 	var section := top + 210.0
 	var featured: String = spec.featured
 	var captioned: bool = featured in ["grazer", "parasite", "divider", "amoeba", "bacterium"]
@@ -700,6 +779,10 @@ func brief_content(paint: bool, top: float) -> float:
 	if run.stage_index > 0:
 		var detail: String = run.JourneyRoute.FAMILY_DETAILS[spec.featured] if spec.get("generated", false) else run.Mastery.suggestion(run)
 		y = block(paint, detail, Vector2(left, y + 28), width, 13, MUTED)
+		if run.encounter_total()==30 and run.stage_index>=8 and run.mutations.size()>=5:
+				y = block(paint, "Stored food draws faster hunters. Follow arrival marks. Guard tissue rests for two encounters after blocking a hunter.", Vector2(left, y + 24), width, 13, CYAN)
+		elif run.stage_index>=4 and run.mutations.size()>=4:
+			y = block(paint, "Hunters now close in faster. Follow the marked arrivals and protect Mother before they reach her.", Vector2(left, y + 24), width, 13, CYAN)
 		var feat := "guardian" if spec.mode == "rescue" else "gatherer"
 		if not spec.get("generated", false) and not game.journey_profile.keepsake_unlocked(feat):
 			y = block(paint, "First time: grows a %s in your home pond." % run.Mastery.KEEPSAKES[feat].to_lower(), Vector2(left, y + 26), width, 12, CYAN)
@@ -735,7 +818,7 @@ func draw_rest() -> void:
 	var texture: Texture2D = game.microscope.enemy_texture("spore")
 	draw_texture_rect(texture, Rect2(590, REST.position.y + 118, 100, 100), false)
 	centered("Next: " + run.next_encounter_name(), REST.position.y + 262, 20)
-	centered("%d food saved  ·  mother has %d of 5 health" % [run.biomass, run.integrity], REST.position.y + 292, 14, CYAN)
+	centered("%d food saved  ·  mother has %d of %d health" % [run.biomass, run.integrity,run.max_integrity], REST.position.y + 292, 14, CYAN)
 	var note := "Your six evolutions define this colony. Try a different combination next journey." if run.mutations.size() >= run.JourneyRoute.MAX_TRAITS else "Evolution choices return at the next milestone. Your food and colony travel with you."
 	wrapped_centered(note + " Repair the mother if needed, or carry on.", REST.position.y + 330, REST.size.x - 120, 13, MUTED)
 
@@ -793,7 +876,7 @@ func draw_home() -> void:
 	centered("Optional starting traits for players who know the pond.", COLONIES.position.y + 100, 15, MUTED)
 	for i in 3:
 		var x := COLONIES.position.x + 153.0 + i * 248.0
-		draw_texture_rect(game.microscope.MOTHER if i == 2 else game.microscope.CELL, Rect2(x - 40, COLONIES.position.y + 140, 80, 80), false, [Color("c7eee4"), Color("b0dcd8"), Color("d6d0b7")][i])
+		draw_texture_rect(MotherAppearance.SYMBIOSIS_YOUNG if i == 2 else game.microscope.CELL, Rect2(x - 40, COLONIES.position.y + 140, 80, 80), false, [Color("c7eee4"), Color("b0dcd8"), Color("d6d0b7")][i])
 		if i == 1:
 			draw_texture_rect(game.microscope.CELL, Rect2(x + 20, COLONIES.position.y + 187, 24, 24), false)
 		var colony: Dictionary = Journey.COLONIES[i]
@@ -890,7 +973,7 @@ func draw_result() -> void:
 		var dish: Dictionary = Journey.dish(run.stage_index)
 		dialog(MENU)
 		centered("Paused", MENU.position.y + 62, 30)
-		var remaining := maxi(0, ceili(float(run.harvest.spec.duration) - run.stage_elapsed))
+		var remaining := maxi(0, ceili(run.harvest.deadline() - run.stage_elapsed))
 		var context := "%s  ·  encounter %d of %d" % [dish.name, run.encounter_index() + 1, run.encounter_total()]
 		if not run.Lesson.active(run):
 			context += "  ·  %d:%02d left" % [remaining / 60, remaining % 60]
@@ -901,6 +984,33 @@ func draw_result() -> void:
 	var rect := loss_rect()
 	dialog(rect)
 	loss_content(true, rect.position.y)
+
+func draw_round_result_cue() -> void:
+	var run = game.run
+	var won: bool = run.state != "loss"
+	var color: Color = CYAN if won else UI.DANGER
+	if won:
+		var pulse: float = 0.0 if game.reduced_motion else 1.0 - game.result_reveal_remaining / game.RESULT_REVEAL_SECONDS
+		draw_arc(run.board.center, 76.0 + pulse * 34.0, 0.0, TAU, 64, Color(color, 0.55 * (1.0 - pulse * 0.7)), 2.0, true)
+	var title := "Journey complete" if run.state == "success" else "Boss defeated" if run.harvest.spec.mode == "boss" else "Encounter complete"
+	if not won:
+		title = run.harvest.loss_title
+	var detail := "Mother survived with %d health   ·   Score %d" % [run.integrity, run.score] if won else "Mother lost · retry this encounter" if run.integrity == 0 else "Goal unfinished · retry this encounter"
+	var rect := Rect2(400, 695, 480, 88)
+	draw_style_box(UI.toast_box(), rect)
+	centered(title, rect.position.y + 36, 25, color, UI.SEMIBOLD)
+	centered(detail, rect.position.y + 64, 14, INK)
+
+func draw_big_capture() -> void:
+	if game.big_capture_remaining <= 0.0:
+		return
+	var progress: float = 1.0 - game.big_capture_remaining / 2.0
+	var opacity: float = 0.5 * (1.0 - progress)
+	var radius: float = 32.0 if game.reduced_motion else 32.0 + 118.0 * progress
+	draw_arc(game.big_capture_center, radius, 0.0, TAU, 48, Color(CYAN, opacity), 2.0, true)
+	if not game.reduced_motion:
+		draw_arc(game.big_capture_center, radius * 0.72, 0.0, TAU, 48, Color(UI.FOOD, opacity * 0.55), 1.0, true)
+		draw_arc(game.big_capture_center, radius * 1.18, 0.0, TAU, 48, Color(CYAN, opacity * 0.25), 1.0, true)
 
 func loss_rect() -> Rect2:
 	var height := loss_content(false, 0.0) + 120.0
@@ -924,7 +1034,7 @@ func draw_epilogue() -> void:
 	var run = game.run
 	centered("A whole world, alive.", 152, 36)
 	centered("Stillwater, Glassgarden and the Blue Deep. The lives you brought home.", 186, 15, INK)
-	var stats := "Lives rescued %d   ·   Evolutions %d   ·   Routes explored %d" % [run.total_rescued, run.mutations.size(), run.habitat_history.size()]
+	var stats := "Score %d   ·   Lives rescued %d   ·   Evolutions %d" % [run.score, run.total_rescued, run.mutations.size()]
 	var undiscovered := 0
 	for species in Journey.SPECIES:
 		if species.id not in game.journey_profile.discovered and species.id not in run.seen_species:
@@ -943,6 +1053,7 @@ func draw_ending_status() -> void:
 		label_at(Mutations.journey_definition(run.mutations[i]).name, Vector2(LEFT, y + i * 26), 13, MUTED)
 	label_at("%d health cores survived" % run.integrity, Vector2(LEFT, 560), 13, CYAN, UI.MEDIUM)
 	label_at("%d food gathered" % run.total_food, Vector2(LEFT, 586), 13, MUTED)
+	label_at("Journey score %d" % run.score, Vector2(LEFT, 612), 13, CYAN, UI.MEDIUM)
 	wrapped("The pond remembers.", Vector2(RIGHT, 86), COLUMN, 22, INK, UI.SEMIBOLD)
 	wrapped("Every rescued organism stays in your home pond. These are some of the lives you brought home.", Vector2(RIGHT, 150), COLUMN, 13, MUTED)
 	wrapped("Next time, follow a different habitat, discover another species, or raise a new kind of colony.", Vector2(RIGHT, 290), COLUMN, 13, INK)
@@ -968,6 +1079,19 @@ func draw_journal() -> void:
 		label_at(entry.name if known else "Undiscovered", origin + Vector2(76, 34), 17, INK if known else MUTED, UI.SEMIBOLD)
 		wrapped(entry.detail if known else Journey.search_hint(entry), origin + Vector2(0, 92), cell.size.x - 48, 13, MUTED if known else UI.FAINT)
 	centered("Page %d of %d" % [journal_page + 1, ceili(Journey.SPECIES.size() / float(JOURNAL_PAGE_SIZE))], JOURNAL.end.y - 44, 13, MUTED)
+
+func watch_creature_film(slot: int) -> void:
+	var i := journal_page*JOURNAL_PAGE_SIZE+slot
+	if i<Journey.SPECIES.size() and game.creature_cinema!=null:
+		game.creature_cinema.present(Journey.SPECIES[i].id,true)
+
+func watch_new_film() -> void:
+	if game.creature_cinema != null:
+		game.creature_cinema.watch_new_film()
+
+func save_new_films_for_later() -> void:
+	if game.creature_cinema != null:
+		game.creature_cinema.save_new_films_for_later()
 
 func turn_journal(direction: int) -> void:
 	journal_page = clampi(journal_page+direction,0,ceili(Journey.SPECIES.size()/float(JOURNAL_PAGE_SIZE))-1)

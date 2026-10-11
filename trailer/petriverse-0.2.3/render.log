@@ -1,0 +1,37 @@
+Capturing hook: 5s
+Ready: hook; 150 frames; 0 capture failures
+Capturing reveal: 4s
+Ready: reveal; 120 frames; 0 capture failures
+Capturing loop: 7s
+Ready: loop; 210 frames; 0 capture failures
+Capturing fluid: 3s
+Ready: fluid; 90 frames; 0 capture failures
+Capturing amoeba: 10s
+Ready: amoeba; 300 frames; 0 capture failures
+Capturing phages: 12s
+Ready: phages; 360 frames; 0 capture failures
+Capturing mother_growth: 6s
+Ready: mother_growth; 180 frames; 0 capture failures
+Capturing film: 6s
+Ready: film; 180 frames; 0 capture failures
+Capturing route_choice: 4s
+Ready: route_choice; 120 frames; 0 capture failures
+Capturing world_a: 3s
+Ready: world_a; 90 frames; 0 capture failures
+Capturing world_b: 3s
+Ready: world_b; 90 frames; 0 capture failures
+Capturing world_c: 3s
+Ready: world_c; 90 frames; 0 capture failures
+Capturing final_wave: 5s
+Ready: final_wave; 150 frames; 0 capture failures
+Capturing boss_a: 3s
+Ready: boss_a; 90 frames; 0 capture failures
+Capturing boss_b: 3s
+Ready: boss_b; 90 frames; 0 capture failures
+Capturing boss_c: 3s
+Ready: boss_c; 90 frames; 0 capture failures
+Capturing home: 4s
+Ready: home; 120 frames; 0 capture failures
+Capturing end: 6s
+Ready: end; 180 frames; 0 capture failures
+Render pass complete. Failed shots: []

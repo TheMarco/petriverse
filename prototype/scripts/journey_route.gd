@@ -2,8 +2,9 @@ extends RefCounted
 ## Seeded compositions around authored teaching beats. Stored in full in saves,
 ## so a balance/content update never rerolls a journey already in progress.
 const Plan = preload("res://scripts/journey_plan.gd")
-const EXTRA := {1:1,2:3,4:2,5:2,6:2,8:3,9:3,10:2}
-const TOTAL := 30
+const EXTRA := {2:1,5:1,8:1}
+const TOTAL := 15
+const LEGACY_TOTAL := 30
 const MAX_TRAITS := 6
 const NAMES := {
 	"feed":["Algae orchard","A generous current","Gathering season","Drifting banquet"],
@@ -78,7 +79,8 @@ static func make(seed_value: int) -> Array:
 	return result
 
 static func valid(route: Array) -> bool:
-	if route.size()!=TOTAL:
+	# The full recipe is saved, so existing 30-encounter journeys can finish.
+	if route.size() not in [TOTAL,LEGACY_TOTAL]:
 		return false
 	var previous := 0
 	var milestones: Array = []

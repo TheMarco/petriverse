@@ -3,6 +3,7 @@ extends Node2D
 ## never advance here; only this habitat's independent presentation clock does.
 const Forms = preload("res://scripts/creature_forms.gd")
 const Anatomy = preload("res://scripts/evolution_anatomy.gd")
+const MotherAppearance = preload("res://scripts/mother_appearance.gd")
 const PAGE_SIZE := 36
 var game: Node2D
 var specimens: Array = []
@@ -95,9 +96,10 @@ func sync(delta: float) -> void:
 	game.microscope.animate_organism(mother,clock,movement,1.0)
 	var epilogue := showing_epilogue()
 	var traits: Array = game.run.mutations if epilogue else game.journey_profile.last_colony_traits
+	MotherAppearance.apply(mother,game.run.stage_index if epilogue else maxi(0,game.journey_profile.deepest_dish*4-1),traits)
 	Anatomy.apply(mother,Anatomy.recipe(traits))
 	mother.material.set_shader_parameter("colony_grade",game.microscope.appearance.colony_grade if epilogue else Vector3.ONE)
-	mother.material.set_shader_parameter("core_damage",game.run.mother_damage.progress_values() if epilogue else PackedFloat32Array([0,0,0,0,0]))
+	mother.material.set_shader_parameter("core_damage",game.run.mother_damage.progress_values() if epilogue else PackedFloat32Array([0,0,0,0,0,0,0]))
 	mother.position = Vector2(640,430 if epilogue else 450)
 	mother.scale = Vector2.ONE*(217.0 if epilogue else 145.0)/mother.texture.get_width()
 	mother.rotation = sin(clock*0.13)*0.06

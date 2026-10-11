@@ -1,0 +1,63 @@
+{
+  "scores": "User-supplied scores in prototype/assets/audio (petriverse-stillwater/glassgarden/blue-deep); see prototype/assets/audio/provided-scores-provenance.json. No ElevenLabs-generated music; no old harmonic/colony layers.",
+  "tracks": [
+    {
+      "track": "petriverse-stillwater",
+      "file": "prototype/assets/audio/petriverse-stillwater.ogg",
+      "timeline": [
+        0,
+        35
+      ],
+      "fade_in": 2.0,
+      "fade_out": 5.0,
+      "source_offset": 0,
+      "gain": 0.8
+    },
+    {
+      "track": "petriverse-glassgarden",
+      "file": "prototype/assets/audio/petriverse-glassgarden.ogg",
+      "timeline": [
+        30,
+        68
+      ],
+      "fade_in": 5.0,
+      "fade_out": 6.0,
+      "source_offset": 0,
+      "gain": 0.9
+    },
+    {
+      "track": "petriverse-blue-deep",
+      "file": "prototype/assets/audio/petriverse-blue-deep.ogg",
+      "timeline": [
+        62,
+        90
+      ],
+      "fade_in": 6.0,
+      "fade_out": 2.0,
+      "source_offset": 0,
+      "gain": 1.0
+    }
+  ],
+  "ambience": {
+    "track": "pond",
+    "file": "prototype/assets/audio/pond.ogg",
+    "gain": 0.12,
+    "loop": true
+  },
+  "effects_source": "Existing Ogg effects in prototype/assets/audio, placed at capture-report event times (already per-shot aligned); no invented events.",
+  "mastering": {
+    "target": "-16 LUFS, <=-1.5 dBTP, LRA 10",
+    "measured": {
+      "input_i": "-24.24",
+      "input_tp": "-6.66",
+      "input_lra": "6.40",
+      "input_thresh": "-34.33",
+      "output_i": "-15.98",
+      "output_tp": "-2.20",
+      "output_lra": "6.10",
+      "output_thresh": "-26.04",
+      "normalization_type": "dynamic",
+      "target_offset": "-0.02"
+    }
+  }
+}

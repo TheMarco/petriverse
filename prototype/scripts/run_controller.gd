@@ -2,6 +2,7 @@ extends RefCounted
 
 const Clot = preload("res://scripts/clot.gd")
 const MotherDamage = preload("res://scripts/mother_damage.gd")
+const MotherAppearance = preload("res://scripts/mother_appearance.gd")
 const Board = preload("res://scripts/board.gd")
 const Cell = preload("res://scripts/cell.gd")
 const Drifter = preload("res://scripts/drifter.gd")
@@ -44,6 +45,13 @@ var selection: RefCounted
 var state := ACTIVE
 var score := 0
 var integrity := 5
+var max_integrity := 5
+var growth_roles: Dictionary = {}
+var guardian_spent := 0
+var guardian_recovery := 0
+var guardian_resting := 0
+var last_repair_encounter := -100
+var guardian_block_serial := 0
 var kills := 0
 var elapsed := 0.0
 var last_contacts: Array = []
@@ -120,6 +128,12 @@ func restart() -> void:
 	checkpoint.clear()
 	board.reset_motion()
 	mutations.clear()
+	growth_roles.clear()
+	guardian_spent = 0
+	guardian_recovery = 0
+	guardian_resting = 0
+	last_repair_encounter = -100
+	guardian_block_serial = 0
 	residuals.clear()
 	best_capture = 0
 	loops_drawn = 0
@@ -140,6 +154,8 @@ func restart() -> void:
 	route_plan = JourneyRoute.make(run_seed) if journey and long_journey else []
 	expedition_roster = preload("res://scripts/expedition_creatures.gd").plan(run_seed,route_plan,discovery_history)
 	mother_damage = MotherDamage.new()
+	max_integrity = 3 if journey else 5
+	mother_damage.set_capacity(max_integrity)
 	clots.clear()
 	cells.clear()
 	for _i in board.anchors.size():
@@ -156,7 +172,7 @@ func restart() -> void:
 	state = ACTIVE
 	score = 0
 	kills = 0
-	integrity = int(board.tuning.mother_integrity)
+	integrity = max_integrity if journey else int(board.tuning.mother_integrity)
 	elapsed = 0.0
 	last_contacts.clear()
 	contact_time = -100.0
@@ -307,7 +323,7 @@ func step(delta: float) -> void:
 			mother_damage.step(delta)
 		return
 	if harvest != null:
-		delta = minf(delta, maxf(0.0, (float(harvest.spec.duration) - stage_elapsed) if journey else (Harvest.DURATION - elapsed)))
+		delta = minf(delta, maxf(0.0, (harvest.deadline() - stage_elapsed) if journey else (Harvest.DURATION - elapsed)))
 	elapsed += delta
 	nudge.step(delta,self)
 	if not Lesson.active(self):
@@ -372,7 +388,8 @@ func step_water(delta: float) -> void:
 	for clot in clots:
 		var p: float = clot.progress()
 		var envelope := sin(p*PI)
-		fluid.sources.append(Vector4(clot.center.x,clot.center.y,lerpf(-22.0,18.0,smoothstep(0.5,0.9,p))*envelope,9.0*envelope))
+		var flourish: float = 1.7 if journey and clot.serial==capture_serial and not last_capture.get("capture_grade","").is_empty() else 1.0
+		fluid.sources.append(Vector4(clot.center.x,clot.center.y,lerpf(-22.0,18.0,smoothstep(0.5,0.9,p))*envelope*flourish,9.0*envelope*flourish))
 	# Tissue and swimming organisms push small local wakes into the shared water.
 	# These forces do not pull targets toward the pointer or change capture rules.
 	for i in board.anchors.size():
@@ -439,7 +456,14 @@ func resolve_contacts() -> void:
 	# Batch all contacts, even when more arrive than remaining integrity.
 	contacts.sort()
 	mother_damage.prepare_integrity(integrity)
+	var damaging := 0
 	for id in contacts:
+		if growth_active("guard") > guardian_spent:
+			guardian_spent += 1
+			if encounter_total() == 30:
+				guardian_recovery += 1
+			guardian_block_serial += 1
+			continue
 		for enemy in enemies:
 			if enemy.id == id:
 				var sites: PackedVector2Array = enemy.nuclei()
@@ -448,10 +472,11 @@ func resolve_contacts() -> void:
 					if site.distance_squared_to(board.center) < contact.distance_squared_to(board.center):
 						contact = site
 				mother_damage.record(id, contact, board.center, enemy.kind, sites, enemy.health, enemy.form)
+				damaging += 1
 				break
 	last_contacts = contacts
 	contact_time = elapsed
-	integrity = maxi(0, integrity - contacts.size())
+	integrity = maxi(0, integrity - damaging)
 	enemies = enemies.filter(func(enemy): return not contacts.has(enemy.id))
 	encounter.resolved += contacts.size()
 	if integrity == 0:
@@ -493,19 +518,62 @@ func discover(kind: String) -> void:
 		discovery_serial += 1
 
 func heal(amount: int) -> void:
-	var restored := mini(amount, 5 - integrity)
+	var restored := mini(amount, max_integrity - integrity)
 	integrity += restored
-	for i in 5:
+	for i in mother_damage.active_indices():
 		if restored > 0 and mother_damage.lost[i]:
 			mother_damage.lost[i] = false
 			mother_damage.bites = mother_damage.bites.filter(func(b): return b.core != i)
 			restored -= 1
 
+func growth_slot() -> int:
+	if stage_index == 2 and not growth_roles.has(1):
+		return 1
+	if stage_index == 8 and not growth_roles.has(5):
+		return 5
+	return -1
+
+func choose_growth_role(role: String) -> bool:
+	if state != BRIEF or role not in ["guard", "feeder"]:
+		return false
+	var slot := growth_slot()
+	if slot < 0:
+		return false
+	growth_roles[slot] = role
+	checkpoint = JourneySave.capture(self)
+	journey_serial += 1
+	return true
+
+func growth_active(role: String) -> int:
+	var count := 0
+	for slot in growth_roles:
+		var index := int(slot)
+		if growth_roles[slot] == role and mother_damage.active_indices().has(index) and not mother_damage.lost[index]:
+			count += 1
+	return count
+
 func start_journey_stage() -> void:
+	var next_capacity := MotherAppearance.capacity_for_stage(stage_index)
+	var shrinking := next_capacity < max_integrity
+	if next_capacity > max_integrity:
+		integrity += next_capacity - max_integrity
+	else:
+		integrity = mini(integrity,next_capacity)
+	max_integrity = next_capacity
+	mother_damage.set_capacity(max_integrity)
+	if shrinking:
+		mother_damage.reset_from_integrity(integrity)
+	else:
+		mother_damage.prepare_integrity(integrity)
 	amoebas.reset()
 	phages.reset()
 	water_positions.clear()
 	nudge.reset_encounter()
+	# A Guard that intercepted a hunter rests through two following encounters
+	# on the original long route. Other ready Guards can still intercept.
+	guardian_spent = mini(growth_active("guard"), guardian_recovery+guardian_resting) if encounter_total() == 30 else 0
+	guardian_resting = guardian_recovery if encounter_total() == 30 else 0
+	guardian_recovery = 0
 	habitat_choice = "bloom"
 	habitat_confirmed = false
 	habitat_applied = false
@@ -538,6 +606,8 @@ func start_journey_stage() -> void:
 func begin_encounter() -> bool:
 	if state != BRIEF:
 		return false
+	if growth_slot() >= 0:
+		choose_growth_role("guard")
 	Habitats.enter(self)
 	state = ACTIVE
 	journey_serial += 1
@@ -567,6 +637,12 @@ func evolution_cost() -> int:
 func repair_cost() -> int:
 	return 6
 
+func repair_waiting() -> bool:
+	return journey and encounter_total() == 30 and encounter_index() < last_repair_encounter + 2
+
+func repair_needs_deeper_wound() -> bool:
+	return journey and encounter_total() == 30 and stage_index >= 8 and max_integrity-integrity < 2
+
 func bank_food(amount: int) -> void:
 	# Previously saved stores above capacity remain available to spend.
 	# Excess intake still advances the encounter and score.
@@ -577,10 +653,11 @@ func choose_journey_evolution(id: String) -> bool:
 	if not evolution_ready():
 		return false
 	if id == "repair":
-		if biomass < repair_cost() or integrity >= 5:
+		if biomass < repair_cost() or integrity >= max_integrity or repair_waiting() or repair_needs_deeper_wound():
 			return false
 		biomass -= repair_cost()
 		heal(2)
+		last_repair_encounter = encounter_index()
 	elif id != "continue":
 		var price := evolution_cost()
 		if biomass < price or not offered_mutations.has(id) or not add_mutation(id):

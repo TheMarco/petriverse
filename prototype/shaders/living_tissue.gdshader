@@ -26,19 +26,20 @@ uniform vec3 water_base = vec3(0.055,0.115,0.150);
 uniform vec2 light_direction = vec2(-0.65,-1.0);
 uniform float water_immersion = 0.0;
 uniform vec4 phenotype = vec4(1.0, 1.0, 0.0, 0.0);
-uniform vec2 core_sites[5];
-uniform float core_radii[5];
-uniform float core_damage[5];
-uniform vec2 injury_sites[5];
-uniform float injury_pulse[5];
-uniform float injury_opening[5];
-uniform float injury_seal[5];
+uniform vec2 core_sites[7];
+uniform float core_radii[7];
+uniform float core_damage[7];
+uniform vec2 injury_sites[7];
+uniform float injury_pulse[7];
+uniform float injury_opening[7];
+uniform float injury_seal[7];
 uniform float invading_depth = 0.0;
 uniform sampler2D host_texture : filter_linear_mipmap, repeat_disable;
 uniform vec2 host_center = vec2(0.0);
 uniform vec2 host_extent = vec2(120.0);
 uniform float host_rotation = 0.0;
 uniform float fatal_damage = 0.0;
+uniform float mother_response = 0.0; // positive: triumph, negative: collapse
 uniform float armor_damage = 0.0;
 uniform float protection_layers = 0.0;
 uniform float evolution_layers = 0.0;
@@ -125,7 +126,7 @@ void fragment() {
 	float pinned_core = smoothstep(0.055, 0.18, radius);
 	float health_pin = 1.0;
 	if (kind>0.5 && kind<1.5) {
-		for (int i=0; i<5; i++) {
+		for (int i=0; i<7; i++) {
 			health_pin *= smoothstep(core_radii[i]+0.01,core_radii[i]+0.045,length(body_uv-core_sites[i]));
 		}
 	}
@@ -176,7 +177,7 @@ void fragment() {
 		float brace = 0.8+0.2*organic_beat(t*(1.5+threat_strength));
 		displacement -= threat_direction*facing*0.065*threat_strength*brace;
 		float organelle_pin = 1.0;
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 7; i++) {
 			organelle_pin *= smoothstep(core_radii[i], core_radii[i] + 0.035, length(body_uv - core_sites[i]));
 			vec2 wound_delta = body_uv-injury_sites[i];
 			// Local tension pulls the surrounding skin inward as a core is eaten.
@@ -263,14 +264,19 @@ void fragment() {
 		color += vec3(0.12, 0.23, 0.24) * elastic * traits.z * energy;
 	}
 	if (kind > 0.5 && kind < 1.5) {
-		// Growth adds folded living membrane while leaving the five health organelles exact.
+		// The Mother carries authored tissue instead of attached generated pieces.
 		for (int layer = 0; layer < 3; layer++) {
 			float fold_radius = 0.36 + float(layer) * 0.014 + sin(theta * 5.0 + float(layer) + t * 0.28 * motion) * 0.014;
 			float fold = exp(-abs(radius - fold_radius) * 400.0) * smoothstep(float(layer),float(layer)+1.0,evolution_layers);
 			color += vec3(0.11, 0.17, 0.19) * fold * energy;
 		}
 		color = grown_organs(color,texture(TEXTURE,vec2(0.56,0.27)+(body_uv-vec2(0.5))*0.13).rgb,body_uv,t,energy,health_pin*pinned_core);
-		for (int i = 0; i < 5; i++) {
+		float mantle = smoothstep(0.23,0.33,radius)*(1.0-smoothstep(0.43,0.54,radius))*tissue.a;
+		float triumph = max(mother_response,0.0);
+		float collapse = max(-mother_response,0.0);
+		color += vec3(0.32,0.39,0.20)*mantle*triumph;
+		color = mix(color,color*vec3(0.48,0.60,0.65),collapse*0.72);
+		for (int i = 0; i < 7; i++) {
 			float eaten = core_damage[i];
 			vec2 q = uv - core_sites[i];
 			float r = core_radii[i];
@@ -327,7 +333,7 @@ void fragment() {
 		vec4 host = texture(host_texture,host_uv);
 		// The overlay must share the Mother's wounds, never repaint a spent
 		// golden health organelle from the original, healthy texture.
-		for (int i=0; i<5; i++) {
+		for (int i=0; i<7; i++) {
 			vec2 q = host_uv-core_sites[i];
 			float scar = (1.0-smoothstep(core_radii[i]*0.85,core_radii[i]*1.20,length(q)))*core_damage[i];
 			vec3 cytoplasm = texture(host_texture,vec2(0.56,0.27)+q*0.82).rgb*vec3(0.43,0.57,0.64);

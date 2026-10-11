@@ -171,6 +171,18 @@ static func next_action(run: RefCounted, clicks: bool = false) -> Dictionary:
 				var detail := "Cysts hatch in %ds. Loop around green food now; leave the purple cysts outside." % ceili(22.0-event.age) if event.kind=="hatching" else "Loop around this passing green bloom. A food thief follows it."
 				return message("Harvest before the garden wakes" if event.kind=="hatching" else "Catch the drifting bloom",detail,food[0].id)
 		return message("Collect %d more food" % food_left, "Loop around green organisms. Leave purple spikes outside to avoid losing health.",target_of_kind(run,"food"))
+	if harvest.hunter_quota()>harvest.hunters_captured:
+		var next_hunter := -1
+		for body in run.enemies:
+			if body.kind in ["drifter","shellback","twinspore","divider"]:
+				next_hunter = body.id
+				break
+		return message("Capture %d more hunters" % (harvest.hunter_quota()-harvest.hunters_captured), "Catch the approaching hunters before this feeding visit can end." if next_hunter>=0 else "Watch the arrival marks. The next hunter is coming with the bloom.",next_hunter)
+	if harvest.final_surge_started:
+		var final_target: int = harvest.final_surge_ids[0] if not harvest.final_surge_ids.is_empty() else -1
+		var armored: bool = run.enemies.any(func(body): return body.id==final_target and body.kind=="shellback")
+		var linked: bool = run.enemies.any(func(body): return body.id==final_target and body.kind=="twinspore")
+		return message("Repel the final hunter%s" % ("s" if harvest.final_surge_needed-harvest.final_surge_captured>1 else ""), "Crack its armor, then capture it again." if armored else "Fit both linked nuclei inside one loop." if linked else "Capture the approaching hunter before it reaches Mother." if final_target>=0 else "Watch the marked water. The final hunter is approaching.",final_target,true)
 	match spec.mode:
 		"rescue":
 			return message("Rescue %d more spores" % maxi(0,int(spec.target)-harvest.rescued), "Enclose the pearl-white organisms. Their bright centers mark what to rescue.",target_of_kind(run,"spore"))
@@ -194,10 +206,14 @@ static func goals(run: RefCounted) -> Array:
 		return ["Collect 3 food to charge each attack.", ["Wait through its inhale; attack during the 16-second exhale.","Break both shields together, or the second within 18 seconds.","Enclose BOTH hearts. They spread farther after each hit."][run.stage_index/4], "Hit 3 times. " + ("Young pairs hatch nearby. Catch them before they reach Mother." if run.stage_index==11 else "Recharge with green food between attacks.")]
 	var result: Array = ["Collect %d green food." % spec.food]
 	match spec.mode:
+		"feed":
+			if harvest.hunter_quota()>0: result.append("Capture %d approaching hunters before leaving." % harvest.hunter_quota())
 		"rescue": result.append("Rescue %d pearl-white spores." % spec.target)
 		"purify": result.append("Clear %d purple cysts in cyst-only loops." % spec.target)
 		"defend": result.append("Capture %d threats: hunters, grazers, or parasites." % spec.target)
 		"sectors": result.append("Collect food in %d different marked areas." % spec.target)
+	if harvest.final_surge_enabled:
+		result.append("Then repel a final hunter wave. Finishing the first goals within 140 seconds draws a larger wave.")
 	result.append("Keep the mother alive. Purple cysts in a meal cost health.")
 	return result
 
@@ -210,6 +226,10 @@ static func protection_instruction(boss: RefCounted) -> String:
 
 static func objective_text(run: RefCounted) -> String:
 	var h = run.harvest
+	if h.final_surge_started:
+		return "%d / %d final hunters captured" % [h.final_surge_captured,h.final_surge_needed]
+	if h.hunter_quota()>0:
+		return "%d / %d hunters captured" % [h.hunters_captured,h.hunter_quota()]
 	match h.spec.mode:
 		"rescue": return "%d / %d spores rescued" % [h.rescued,h.spec.target]
 		"purify": return "%d / %d cysts cleared" % [h.purified,h.spec.target]

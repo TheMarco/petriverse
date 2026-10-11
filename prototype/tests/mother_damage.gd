@@ -109,7 +109,7 @@ func exercise() -> void:
 	expect(damage.progress_values().count(1.0) == 2, "Both spent cores remain visible after their animations")
 	reset()
 	expect(game.run.mother_damage.lost.count(true) == 0 and game.microscope.invaders.is_empty(), "Restart restores all five cores and clears invaders")
-	expect(game.microscope.mother.material.get_shader_parameter("core_damage") == PackedFloat32Array([0, 0, 0, 0, 0]), "Restart clears all wound shader masks")
+	expect(game.microscope.mother.material.get_shader_parameter("core_damage") == PackedFloat32Array([0, 0, 0, 0, 0, 0, 0]), "Restart clears all wound shader masks")
 	# Reduced motion keeps the visual information without locomotion or sparks.
 	game.reduced_motion = true
 	hit(3, PI)
@@ -129,8 +129,8 @@ func exercise() -> void:
 	advance(0.6)
 	reset()
 	expect(not game.run.mother_damage.active() and game.microscope.invaders.is_empty(), "Restart during a bite removes its visual immediately")
-	expect(game.microscope.mother.material.get_shader_parameter("injury_pulse") == PackedFloat32Array([0, 0, 0, 0, 0]), "Restart clears injury lighting")
-	expect(game.microscope.mother.material.get_shader_parameter("injury_opening") == PackedFloat32Array([0,0,0,0,0]) and game.microscope.mother.material.get_shader_parameter("injury_seal") == PackedFloat32Array([0,0,0,0,0]),"Restart clears membrane opening and closure")
+	expect(game.microscope.mother.material.get_shader_parameter("injury_pulse") == PackedFloat32Array([0, 0, 0, 0, 0, 0, 0]), "Restart clears injury lighting")
+	expect(game.microscope.mother.material.get_shader_parameter("injury_opening") == PackedFloat32Array([0,0,0,0,0,0,0]) and game.microscope.mother.material.get_shader_parameter("injury_seal") == PackedFloat32Array([0,0,0,0,0,0,0]),"Restart clears membrane opening and closure")
 	hit(5, -2.0)
 	expect(game.microscope.invaders.size() == 1 and game.run.mother_damage.bites[0].core == 0, "The first hit after restart has fresh anatomy and visuals")
 	reset()
@@ -162,7 +162,7 @@ func exercise() -> void:
 	await capture("mother-fatal-bite-detail", true)
 	advance(1.5)
 	expect(not damage.active() and game.microscope.invaders.is_empty(), "Fatal invasion visuals finish before the results overlay")
-	expect(damage.progress_values() == PackedFloat32Array([1, 1, 1, 1, 1]), "All five cores are visibly spent at zero integrity")
+	expect(damage.progress_values() == PackedFloat32Array([1, 1, 1, 1, 1, 0, 0]), "All five active cores are visibly spent at zero integrity")
 	expect(game.microscope.mother.material.get_shader_parameter("fatal_damage") == 1.0, "Loss dims the central nucleus after the last cores are consumed")
 	expect(game.hud.overlay_visible() and game.hud.center_button.visible, "Results and replay appear as soon as the fatal bite finishes")
 	# Inspect the actual depleted tissue beneath the result panel in this fixture.

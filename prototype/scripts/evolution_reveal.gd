@@ -1,6 +1,7 @@
 extends Node2D
 ## A skippable, safe close-up between purchase and the next mission briefing.
 const Anatomy = preload("res://scripts/evolution_anatomy.gd")
+const MotherAppearance = preload("res://scripts/mother_appearance.gd")
 const Mutations = preload("res://scripts/mutations.gd")
 const UI = preload("res://scripts/ui_style.gd")
 var game: Node2D
@@ -56,6 +57,7 @@ func sync() -> void:
 		dismiss()
 		return
 	var recipe := Anatomy.recipe(game.run.mutations,trait_id,game.microscope.growth_progress())
+	MotherAppearance.apply(mother,game.run.stage_index,game.run.mutations)
 	var movement := 0.0 if game.reduced_motion else 1.0
 	for i in cells.size():
 		cells[i].material.set_shader_parameter("phenotype",game.microscope.appearance.cells[i])

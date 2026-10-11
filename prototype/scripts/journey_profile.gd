@@ -1,6 +1,8 @@
 extends RefCounted
 var path := "user://journey-profile.cfg"
 var discovered: Array = []
+var introduced_species: Array = []
+var offered_species: Array = []
 var residents: Array = []
 var cleared_encounters: Array = []
 var last_colony_traits: Array = []
@@ -21,6 +23,8 @@ func load_profile() -> void:
 	last_colony_traits = Array(config.get_value("profile", "last_colony_traits", []))
 	pond_memories = Array(config.get_value("profile", "pond_memories", []))
 	discovered = Array(config.get_value("profile", "discovered", []))
+	introduced_species = Array(config.get_value("profile", "introduced_species", [])).filter(func(id): return id is String)
+	offered_species = Array(config.get_value("profile", "offered_species", [])).filter(func(id): return id is String)
 	deepest_dish = clampi(int(config.get_value("profile", "deepest_dish", 0)), 0, 3)
 	victories = int(config.get_value("profile", "victories", 0))
 	best_score = int(config.get_value("profile", "best_score", 0))
@@ -71,7 +75,7 @@ func observe(run: RefCounted) -> bool:
 
 func save_profile() -> bool:
 	var config := ConfigFile.new()
-	for property in ["residents","cleared_encounters","last_colony_traits","pond_memories","discovered","deepest_dish","victories","best_score","completed_seeds"]:
+	for property in ["introduced_species","offered_species","residents","cleared_encounters","last_colony_traits","pond_memories","discovered","deepest_dish","victories","best_score","completed_seeds"]:
 		config.set_value("profile",property,get(property))
 	last_error = config.save(path)
 	dirty = last_error != OK

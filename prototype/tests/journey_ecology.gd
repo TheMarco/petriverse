@@ -36,7 +36,7 @@ func exercise() -> void:
 	tick(run,3.8)
 	expect(run.enemies.has(food) and grazer.stored_food==0,"Grazer leaves time to react before its first bite")
 	tick(run,0.3)
-	expect(not run.enemies.has(food) and grazer.stored_food==1 and run.integrity==5,"Grazer steals real food without damaging the mother")
+	expect(not run.enemies.has(food) and grazer.stored_food==1 and run.integrity==run.max_integrity,"Grazer steals real food without damaging the mother")
 	var result := capture_body(run,grazer)
 	expect(result.valid and result.food==1 and result.salvage==1,"Capturing a grazer returns its stolen food through the actual resolver")
 	quiet(run,4)
@@ -162,6 +162,159 @@ func exercise() -> void:
 	run.harvest.spawn_bloom(run,0)
 	run.harvest.visited = [0,1,2,3,4,5,6,7]
 	expect(guidance.next_action(run).target>=0,"After the area quota is met, food guidance includes already-fed areas")
+	quiet(run,6)
+	run.mutations = ["elastic","catalyst","lure","feast","enzyme","filter"]
+	eco = run.harvest.ecology
+	eco.queue_wave(run)
+	var hunters: Array = eco.pending.filter(func(event): return event.kind=="hunter")
+	expect(hunters.size()==2 and is_equal_approx(hunters[0].at,8.0) and is_equal_approx(hunters[1].at,14.0),"An evolved Glassgarden colony faces two staggered, warned hunters on the food-rich route")
+	expect(eco.Rhythm.warning_sites(run).filter(func(site): return site.kind=="hunter").size()==1,"The earlier hunter still has an eight-second arrival mark")
+	eco.spawn_event(run,hunters[0])
+	expect(run.enemies.any(func(body): return body.kind in ["drifter","shellback"] and body.speed>7.5),"Later hunters cross the dish sooner against a fully evolved colony")
+	var current_stage: int = run.stage_index
+	var current_route: Array = run.route_plan.duplicate(true)
+	run.stage_index = 9
+	run.route_plan = range(30)
+	run.biomass = 30
+	var stocked_speed: float = eco.hunter_speed(run)
+	run.biomass = 0
+	expect(stocked_speed>10.0 and eco.hunter_speed(run)<stocked_speed-2.0,"Stored food strengthens late hunter pursuit without accelerating an empty colony")
+	run.stage_index = current_stage
+	run.route_plan = current_route
+	quiet(run,6)
+	run.harvest.spec.mode = "feed"
+	run.harvest.spec.generated = true
+	run.harvest.spec.stage = 6
+	expect(run.harvest.hunter_quota()==2,"Glassgarden feeding visits ask for real hunter captures")
+	run.harvest.spec.food = 3
+	run.harvest.nourishment = 3
+	run.enemies.clear()
+	var hunter_center: Vector2 = (run.board.anchors[0]+run.board.anchors[8]+run.board.anchors[9])/3.0
+	for capture_number in 2:
+		run.next_enemy_id += 1
+		run.enemies.append(run.Drifter.new(run.next_enemy_id,hunter_center,0.0))
+		select(run,[0,8,9])
+		result = run.release()
+		expect(result.valid and run.harvest.hunters_captured==capture_number+1,"A feeding visit counts only real hunter captures")
+		if capture_number==0:
+			expect(run.state==Run.ACTIVE and run.harvest.hunter_quota()==2,"Enough food alone cannot finish a later feeding visit")
+			var mid_visit := Save.capture(run)
+			var restored_visit := Run.new(true,99,true,true)
+			expect(Save.restore(restored_visit,mid_visit) and restored_visit.harvest.hunters_captured==1,"Saved feeding defense progress survives resume")
+			restored_visit.dispose()
+			settle(run)
+	expect(run.state==Run.EVOLVE,"Two captured hunters finish the defended feeding visit")
 	run.dispose()
+	var thirty: Array = Route.make(79)
+	for i in 15:
+		thirty.insert(4,thirty[3].duplicate(true))
+	var final_position := -1
+	for i in thirty.size():
+		if thirty[i].generated and int(thirty[i].stage)>=8:
+			final_position = i
+			break
+	var recipe: Dictionary = thirty[final_position]
+	recipe.mode = "defend"
+	recipe.food = 1
+	recipe.target = 1
+	thirty[final_position] = recipe
+	expect(Route.valid(thirty),"The late defended visit remains a valid saved route")
+	var final_run := Run.new(true,79,true,true)
+	final_run.route_plan = thirty
+	final_run.route_position = final_position
+	final_run.long_journey = true
+	final_run.expedition_roster = Expedition.plan(final_run.run_seed,thirty,[])
+	final_run.stage_index = int(recipe.stage)
+	final_run.start_stage()
+	expect(final_run.harvest.final_surge_enabled,"A generated Blue Deep defense on the original journey promises a final surge")
+	final_run.Habitats.choose(final_run,"refuge")
+	final_run.begin_encounter()
+	final_run.harvest.nourishment = 1
+	final_run.harvest.defended = 1
+	if not final_run.harvest.event_state.is_empty():
+		final_run.harvest.event_state.warned = true
+	final_run.stage_elapsed = float(final_run.harvest.spec.duration) - 1.0
+	final_run.harvest.check_completion(final_run)
+	var final_events: Array = final_run.harvest.ecology.pending.filter(func(event): return event.get("final_surge",false))
+	expect(final_run.state==Run.ACTIVE and not final_run.harvest.final_surge_rapid and final_events.size()==2 and final_events[0].at-final_run.stage_elapsed>=8.0,"A later sheltered clear warns of two final hunters instead of ending the round")
+	final_run.stage_elapsed = float(final_run.harvest.spec.duration)
+	final_run.step(0.25)
+	expect(final_run.state==Run.ACTIVE and final_run.stage_elapsed>float(final_run.harvest.spec.duration) and final_run.harvest.final_surge_start_time>0.0,"A final hunter warned near the encounter limit gets simulation time to arrive and be captured")
+	final_run.stage_elapsed = 0.0
+	var final_event: Dictionary = final_events[0]
+	final_run.harvest.ecology.pending.erase(final_event)
+	final_run.harvest.ecology.spawn_event(final_run,final_event)
+	var final_id: int = final_run.harvest.final_surge_ids[0]
+	var final_body: RefCounted = final_run.enemies.filter(func(body): return body.id==final_id)[0]
+	final_body.nucleus = (final_run.board.anchors[0]+final_run.board.anchors[8]+final_run.board.anchors[9])/3.0
+	final_body.speed = 0.0
+	final_run.enemies = [final_body]
+	final_run.harvest.next_bloom = 9999.0
+	final_run.harvest.ecology.next_wave = 9999.0
+	var first_hit: Dictionary = capture_body(final_run,final_body)
+	expect(first_hit.valid and final_body.health==1 and final_run.harvest.final_surge_captured==0 and final_run.state==Run.ACTIVE,"The armored final hunter needs a second actual capture")
+	var final_snapshot: Dictionary = Save.capture(final_run)
+	var escaped_final := Run.new(true,81,true,true)
+	expect(Save.restore(escaped_final,final_snapshot),"The late defense can be restored after the first armored hit")
+	escaped_final.enemies = escaped_final.enemies.filter(func(body): return body.id!=final_id)
+	escaped_final.harvest.step(escaped_final)
+	expect(escaped_final.harvest.ecology.pending.any(func(event): return event.get("final_surge",false)),"A final hunter that reaches Mother is replaced after a visible warning")
+	escaped_final.dispose()
+	var final_resume := Run.new(true,80,true,true)
+	expect(Save.restore(final_resume,final_snapshot) and final_resume.harvest.final_surge_ids.has(final_id) and final_resume.harvest.final_surge_start_time==final_run.harvest.final_surge_start_time and not final_resume.harvest.final_surge_rapid,"The marked final hunter, wave pressure, grace period, and its damaged armor survive resume")
+	final_resume.harvest.next_bloom = 9999.0
+	final_resume.harvest.ecology.next_wave = 9999.0
+	settle(final_resume)
+	var resumed_hunter: RefCounted = final_resume.enemies.filter(func(body): return body.id==final_id)[0]
+	var final_hit: Dictionary = capture_body(final_resume,resumed_hunter)
+	expect(final_hit.valid and final_resume.harvest.final_surge_captured==1 and final_resume.state==Run.ACTIVE,"Capturing the first final hunter leaves the second still to repel")
+	final_resume.harvest.final_surge_captured = 2
+	final_resume.harvest.check_completion(final_resume)
+	expect(final_resume.state==Run.EVOLVE,"Repelling both final hunters completes the defended visit")
+	final_resume.dispose()
+	final_run.dispose()
+	var rich_run := Run.new(true,82,true,true)
+	rich_run.route_plan = thirty.duplicate(true)
+	rich_run.route_position = final_position
+	rich_run.long_journey = true
+	rich_run.expedition_roster = Expedition.plan(rich_run.run_seed,rich_run.route_plan,[])
+	rich_run.stage_index = int(recipe.stage)
+	rich_run.start_stage()
+	rich_run.Habitats.choose(rich_run,"bloom")
+	rich_run.begin_encounter()
+	rich_run.harvest.nourishment = 1
+	rich_run.harvest.defended = 1
+	rich_run.harvest.check_completion(rich_run)
+	var rich_final: Array = rich_run.harvest.ecology.pending.filter(func(event): return event.get("final_surge",false))
+	expect(rich_run.harvest.final_surge_rapid and rich_final.size()==4 and rich_final[2].species=="shellback" and is_equal_approx(rich_final[1].at-rich_final[0].at,2.0),"A swift food-rich clear draws four closely staggered hunters including two armored Shellbacks")
+	var rapid_resume := Run.new(true,84,true,true)
+	expect(Save.restore(rapid_resume,Save.capture(rich_run)) and rapid_resume.harvest.final_surge_rapid and rapid_resume.harvest.ecology.pending.filter(func(event): return event.get("rapid_surge",false)).size()==4,"The swift hunter wave survives save and resume")
+	rapid_resume.dispose()
+	rich_run.stage_elapsed = 14.5
+	rich_run.harvest.ecology.step(rich_run,14.5)
+	expect(rich_run.harvest.final_surge_ids.size()==4 and rich_run.enemies.filter(func(body): return body.kind=="shellback").size()>=2,"All four warned hunters enter the swift food-rich encounter")
+	rich_run.dispose()
+	var rescue_position := -1
+	for i in thirty.size():
+		if i%2==0 and int(thirty[i].stage)>=8 and thirty[i].mode=="rescue":
+			rescue_position = i
+			break
+	expect(rescue_position>=0,"The original route includes a late alternate rescue visit")
+	if rescue_position>=0:
+		var rescue_run := Run.new(true,83,true,true)
+		rescue_run.route_plan = thirty.duplicate(true)
+		rescue_run.route_position = rescue_position
+		rescue_run.long_journey = true
+		rescue_run.expedition_roster = Expedition.plan(rescue_run.run_seed,rescue_run.route_plan,[])
+		rescue_run.stage_index = int(thirty[rescue_position].stage)
+		rescue_run.start_stage()
+		rescue_run.Habitats.choose(rescue_run,"refuge")
+		rescue_run.begin_encounter()
+		rescue_run.harvest.nourishment = int(rescue_run.harvest.spec.food)
+		rescue_run.harvest.rescued = int(rescue_run.harvest.spec.target)
+		rescue_run.harvest.check_completion(rescue_run)
+		var rescue_final: Array = rescue_run.harvest.ecology.pending.filter(func(event): return event.get("final_surge",false))
+		expect(rescue_run.harvest.final_surge_enabled and rescue_run.state==Run.ACTIVE and rescue_final.size()==2 and rescue_final[0].species=="twinspore","An authored late rescue also ends with a linked-hunter wave after its goals")
+		rescue_run.dispose()
 	print("JOURNEY ECOLOGY: %d checks; %d failures" % [checks,failures.size()])
 	quit(0 if failures.is_empty() else 1)
