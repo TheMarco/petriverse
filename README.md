@@ -6,7 +6,7 @@ A living strategy game in a drop of water. You guide a microscopic colony throug
 
 Version 0.2.3. Single player, mouse driven, built with Godot 4.7 for macOS, Windows and Linux. [Watch the 90-second trailer](trailer/Petriverse-trailer-0.2.3.mp4).
 
-The game was developed under the working title Microverse, which is still the repository name. The Godot project lives in `prototype/`.
+The game was developed under the working title Microverse, which still appears in some file names. The Godot project lives in `prototype/`.
 
 ## How it plays
 
@@ -42,8 +42,8 @@ Progress saves automatically, including mid-encounter. A failed encounter can be
 Petriverse needs [Godot 4.7](https://godotengine.org/download) (tested with 4.7.2 stable) and uses the Compatibility renderer. Music, narration, art and fonts are all in the repository. The game makes no network requests and needs no API keys.
 
 ```sh
-git clone https://github.com/TheMarco/microverse.git
-cd microverse
+git clone https://github.com/TheMarco/petriverse.git
+cd petriverse
 godot --path prototype
 ```
 
