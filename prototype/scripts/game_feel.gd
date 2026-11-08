@@ -47,6 +47,9 @@ var tracked: Font
 var rings: Array = [] # {at (dish), age, life, from, to, color, width}
 var last_path_size := 0
 var last_closed := false
+var last_second := -1
+var boss_open := false
+var ready_cells: Array = []
 
 func _ready() -> void:
 	game = get_parent()
@@ -116,6 +119,7 @@ func reset() -> void:
 	flashes.clear()
 	numbers.clear()
 	rings.clear()
+	ready_cells.clear()
 	counters.clear()
 	trauma = 0.0
 	shake = Vector2.ZERO
@@ -148,6 +152,10 @@ func update(delta: float) -> void:
 		last_state = run.state
 	track_counters()
 	observe_selection()
+	if not paused:
+		observe_clock()
+		observe_boss()
+		observe_recovery()
 	if paused:
 		queue_draw()
 		return
@@ -169,6 +177,56 @@ func observe_selection() -> void:
 		rings.append({"at": game.run.board.anchors[first], "age": 0.0, "life": 0.55, "from": 30.0, "to": 64.0, "color": PEARL, "width": 2.4})
 	last_path_size = size
 	last_closed = closed
+
+## The last ten seconds drip audibly and pulse the timer.
+func observe_clock() -> void:
+	var run = game.run
+	if run.state != "active" or run.harvest == null or not run.journey or run.Lesson.active(run):
+		last_second = -1
+		return
+	var remaining := ceili(run.harvest.deadline() - run.stage_elapsed)
+	if remaining != last_second and last_second >= 0 and remaining <= 10 and remaining >= 1:
+		if not counters.has("timer"):
+			counters["timer"] = {"shown": 0.0, "target": 0, "pop": 0.0}
+		counters.timer.pop = 1.0
+		if game.soundscape != null:
+			game.soundscape.play_effect("ui_press", 0.35 + 0.04 * (10 - remaining), 0.62)
+	last_second = remaining
+
+## A boss opening its window is a moment: a ring, a word and a swell.
+func boss_window(boss) -> bool:
+	if boss == null or not boss.can_take_pulse():
+		return false
+	# The Conjoined is always exposed; its moment is when both hearts meet.
+	# Legacy campaign bosses have no variant and use their pulse window.
+	var variant = boss.get("variant")
+	return boss.contraction() > 0.8 if variant is int and variant == 2 else true
+
+func observe_boss() -> void:
+	var run = game.run
+	var boss = run.boss() if run.state == "active" else null
+	var open := boss_window(boss)
+	if open and not boss_open:
+		var conjoined: bool = boss.get("variant") is int and boss.get("variant") == 2
+		rings.append({"at": boss.nucleus, "age": 0.0, "life": 0.9, "from": 40.0, "to": 120.0, "color": PEARL, "width": 2.6})
+		numbers.append({"at": boss.nucleus + Vector2(0, -40), "text": "Together" if conjoined else "Open", "detail": "ONE LOOP, BOTH HEARTS" if conjoined else "CAPTURE THE CENTER", "age": 0.0, "life": 1.8, "color": PEARL, "size": 26})
+		if game.soundscape != null:
+			game.soundscape.play_effect("swell", 0.4)
+	boss_open = open
+
+## A recovered cell glints as it becomes available to draw again.
+func observe_recovery() -> void:
+	var run = game.run
+	if run.state != "active" or ready_cells.size() != run.cells.size():
+		ready_cells.clear()
+		for i in run.cells.size():
+			ready_cells.append(run.is_ready(i))
+		return
+	for i in run.cells.size():
+		var now: bool = run.is_ready(i)
+		if now and not ready_cells[i] and motion():
+			rings.append({"at": run.board.anchors[i], "age": 0.0, "life": 0.5, "from": 22.0, "to": 38.0, "color": Color(PEARL, 0.7), "width": 1.2})
+		ready_cells[i] = now
 
 func queue_draw() -> void:
 	glow.queue_redraw()
@@ -333,6 +391,19 @@ func on_capture(result: Dictionary) -> void:
 			# A chain lifts the arrival notes, so flow is heard as well as seen.
 			var lift := mini(maxi(int(result.get("flow", 0)) - 1, 0), 4)
 			motes.append({"from": screen(from), "to": target, "control": "objective", "age": 0.0, "delay": 0.12 + i * MOTE_STAGGER, "units": units, "color": FOOD, "note": i + lift, "bend": randf_range(-1.0, 1.0)})
+	# Rescues, removed threats and neutralized cysts travel to the goal line.
+	var goal_units: int = int(result.get("rescued", 0)) + int(result.get("threats", 0)) + int(result.get("purified", 0))
+	if goal_units > 0 and motion() and run.journey:
+		if not counters.has("goal"):
+			counters["goal"] = {"shown": 0.0, "target": 0, "pop": 0.0}
+		var origins: Array = []
+		for i in positions.size():
+			if i < kinds.size() and kinds[i] != "food":
+				origins.append(positions[i])
+		if origins.is_empty():
+			origins.append(center)
+		for i in mini(goal_units, 6):
+			motes.append({"from": screen(origins[i % origins.size()]), "to": target_for("goal"), "control": "goal", "age": 0.0, "delay": 0.2 + i * 0.09, "units": 0, "color": PEARL, "note": -1, "bend": randf_range(-1.0, 1.0)})
 	# A number that belongs to the place where it happened.
 	var headline := ""
 	var tint := FOOD
@@ -385,6 +456,7 @@ func on_state(previous: String, current: String) -> void:
 		# New encounter: counters start from the dish's real values.
 		counters.clear()
 		last_objective = -1
+		boss_open = boss_window(run.boss())
 		announce()
 	if current in ["brief", "home"]:
 		motes.clear()

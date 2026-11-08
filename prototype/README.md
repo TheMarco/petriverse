@@ -1,5 +1,19 @@
 # MICROVERSE — A living journey
 
+## Game feel and optics (source build)
+
+Every capture now lands with weight. The membrane flashes shut along the loop, light scatters from its edges, and a number rises where the meal happened. Each unit of food travels as a mote to the objective counter, which counts up and swells as the motes arrive, with a rising pentatonic tick per arrival. Rescues, removed threats and neutralized cysts send pearl motes to the goal line. Food saved and score roll up instead of jumping. While drawing, each added cell answers with a small ring, light runs along the membrane (pearl, amber when Mother is enclosed, pink when poison is inside), and closing the loop rings the first cell. Cells glint as they recover.
+
+Mother damage shakes the dish by a few pixels, flashes the lost organelle in the health bar and sparks at her edge. At one remaining organelle a heartbeat (synthesized, `assets/audio/heartbeat.ogg`) beats every 1.45 seconds and the lens rim and health bar pulse with it. The last ten seconds of an encounter drip audibly and pulse the timer. A boss opening its window is announced once with a ring, a word and a water swell: "Open" for the Bellwether and Glass Regent, "Together" when the Conjoined's hearts meet. Shake never moves input or capture geometry, and reduced motion keeps the flashes while removing shake, travelling motes and particles.
+
+A final optical pass (`shaders/lens_optics.gdshader`) sits between the dish and the interface: lateral color at the lens rim, softness only in the outermost band (playable cells stay sharp), a restrained bloom on bright tissue, fine grain, and a focus pull that defocuses the dish behind briefings, pause, evolution, help and the journal. A loss drains the dish to grey; a win lifts it briefly. The eyepiece now has a machined retaining ring that catches the scene light. Full detail uses every effect, Balanced keeps the rim optics without bloom and grain, and Light disables the pass.
+
+Encounters open with a title card: a new dish is named with its character ("Glassgarden · Life between the reeds"), a boss with its name, and other encounters with their goal. Dialogs fade in on their own layer while the side columns stay put. The first title of a session arrives in stages (water, logo, tagline, choices) with the focus pull. A microscope reticle replaces the arrow over the live dish, filling while you draw and showing tick marks over a nudgeable cyst. Buttons answer with quiet water-droplet cues, and evolution cards glow when hovered or focused. Help and the journal no longer show the title logo through their panels.
+
+**Flow** is a new score-only reward: meaningful, poison-free captures within three seconds of each other build a chain worth 40 points per step (up to +200). Poison or an empty loop breaks it. A **swift finish** converts unused seconds to score (two points per second) in non-boss encounters. Food, health, timers and recovery are unchanged. The encounter-complete cue lists the health, swift and best-flow bonuses. The title shows the best journey score once a journey is complete, and the epilogue names a new personal best.
+
+New sounds (heartbeat, swell, two interface droplets) were synthesized locally with SoX; exact commands are in `assets/audio/synthesized-provenance.json`. `tests/game_feel.gd` (74 headless checks, part of `./test.sh`) covers flow and swift rules, mote and counter behavior, reduced motion, shake isolation from input, the heartbeat, entrances, optics targets, cards and boss windows. `tests/showcase_capture.gd -- --out=/absolute/dir` renders 38 native screenshots of every screen, including mid-animation frames, without touching the player's saves.
+
 ## Producer improvements (source build)
 
 - Live loops show all simultaneous gains, poison damage, and remaining health. Entering poison triggers a fresh visual and sound cue. START, closure, cancellation and targeted nuclei are clearer; background tissue quiets while drawing.
@@ -443,6 +457,9 @@ API references: [ElevenLabs music](https://elevenlabs.io/docs/api-reference/musi
 | `scripts/microscope.gd`, `tissue_motion.gd`, `pond_life.gd`, `shaders/` | Animated microscopy, biological structures, pond depths and fusion |
 | `scripts/mother_damage.gd`, `injury_motes.gd` | Consumable organelles, invasion aftermath, golden fragments |
 | `scripts/soundscape.gd`, `../tools/generate_audio.py` | Offline audio runtime and authorized one-time asset generation |
+| `scripts/game_feel.gd` | Capture flashes, reward motes, rolling counters, shake, heartbeat, title cards, boss windows |
+| `scripts/lens_optics.gd`, `shaders/lens_optics.gdshader` | Rim aberration, bloom, grain, defocus behind dialogs, outcome grading |
+| `scripts/reticle_cursor.gd`, `scripts/title_screen.gd` | Reticle cursor over the dish; staged title introduction |
 
 ## Verification — October 5, 2026
 

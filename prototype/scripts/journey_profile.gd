@@ -11,6 +11,8 @@ var dirty := false
 var deepest_dish := 0
 var victories := 0
 var best_score := 0
+## The best score before the latest victory, for "new personal best". Not saved.
+var previous_best := -1
 var completed_seeds: Array = []
 var last_error := OK
 var recovered_from_backup := false
@@ -104,6 +106,7 @@ func observe(run: RefCounted) -> bool:
 	if run.state == "success" and not completed_seeds.has(run.run_seed):
 		completed_seeds.append(run.run_seed)
 		victories += 1
+		previous_best = best_score
 		best_score = maxi(best_score, run.score)
 		changed = true
 	for award in run.mastery_awards:

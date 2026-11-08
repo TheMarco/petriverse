@@ -74,5 +74,9 @@ func draw(hud: Node2D) -> void:
 	hud.centered("A small life. A whole world.", 500, 19, Color(Color("b9d2d0"), stage(age, 0.8, 0.7)))
 	if game.resume_data.is_empty():
 		hud.centered("Begins with a short, playable lesson.", STACK_TOP + 76, 13, Color(UI.FAINT, stage(age, 1.4, 0.6)))
+	var profile = game.journey_profile
+	if profile.victories > 0 and game.recovery_notice().is_empty():
+		var record := "Best journey score %d   ·   %d journey%s completed" % [profile.best_score, profile.victories, "" if profile.victories == 1 else "s"]
+		hud.centered(record, 806, 12, Color(UI.FAINT, stage(age, 1.8, 0.6)), UI.MEDIUM)
 	if not game.recovery_notice().is_empty():
 		hud.wrapped_centered(game.recovery_notice(), 870, 1000, 13, UI.ACCENT)

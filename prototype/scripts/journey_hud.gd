@@ -427,7 +427,8 @@ func draw_overlays() -> void:
 	if game.settings_open or game.comparisons_open or game.comfort_layout():
 		return
 	if run.state == "home":
-		draw_home()
+		if not topmost:
+			draw_home() # Modal dialogs replace the title rather than float over it.
 	elif not topmost:
 		if run.state == "brief":
 			scrim()
@@ -474,6 +475,7 @@ func overlay_key() -> String:
 
 func draw_status() -> void:
 	var run = game.run
+	anchors.clear() # Only counters drawn this frame can receive motes.
 	if run.state == "success":
 		draw_ending_status()
 		return
@@ -550,10 +552,11 @@ func draw_status() -> void:
 		var objective := Guidance.objective_text(run)
 		if not objective.is_empty():
 			y += 25.0
-			label_at(objective, Vector2(RIGHT, y), 13, CYAN, UI.MEDIUM)
+			popped(objective, Vector2(RIGHT, y), 13, CYAN, UI.MEDIUM, feel_pop("goal"))
+			anchors["goal"] = Vector2(RIGHT + 10, y - 5)
 	var remaining := maxi(0, ceili(run.harvest.deadline() - run.stage_elapsed))
 	y += 22.0
-	label_at("Practice, no time limit" if run.Lesson.active(run) else "%d:%02d left" % [remaining / 60, remaining % 60], Vector2(RIGHT, y), 13, UI.DANGER if remaining < 20 else MUTED)
+	popped("Practice, no time limit" if run.Lesson.active(run) else "%d:%02d left" % [remaining / 60, remaining % 60], Vector2(RIGHT, y), 13, UI.DANGER if remaining < 20 else MUTED, 0, feel_pop("timer"))
 	if run.state in ["active", "paused"]:
 		var guide: Dictionary = Guidance.next_action(run, game.click_mode)
 		var title_bottom := wrapped(guide.title, Vector2(RIGHT, y + 56.0), COLUMN, 17, UI.DANGER if guide.urgent else INK, UI.SEMIBOLD)
@@ -1159,6 +1162,11 @@ func draw_epilogue() -> void:
 	centered("A whole world, alive.", 152, 36)
 	centered("Stillwater, Glassgarden and the Blue Deep. The lives you brought home.", 186, 15, INK)
 	var stats := "Score %d   ·   Lives rescued %d   ·   Evolutions %d" % [run.score, run.total_rescued, run.mutations.size()]
+	var profile = game.journey_profile
+	if profile.previous_best >= 0 and run.score > profile.previous_best:
+		stats += "   ·   New personal best"
+	elif profile.best_score > run.score:
+		stats += "   ·   Best %d" % profile.best_score
 	var undiscovered := 0
 	for species in Journey.SPECIES:
 		if species.id not in game.journey_profile.discovered and species.id not in run.seen_species:

@@ -21,12 +21,17 @@ var reduced_motion := false
 var cost := -1
 var balance := 0
 var demo_time := 0.0
+## Eased hover and focus presence, drawn as an accent glow.
+var hover := 0.0
+var glow_box: StyleBoxFlat
 const FOOD = preload("res://assets/organisms/desmid.png")
 
 func _process(delta: float) -> void:
 	if visible:
 		if not reduced_motion:
 			demo_time += delta
+		var target := 1.0 if (is_hovered() or has_focus()) and not disabled else 0.0
+		hover = move_toward(hover, target, delta * (7.0 if target > hover else 4.0))
 		queue_redraw()
 
 func _ready() -> void:
@@ -100,9 +105,23 @@ func draw_comparison() -> void:
 	draw_line(Vector2(24,304),Vector2(size.x-24,304),UI.LINE,1.0)
 	centered("Need %d more food" % (cost-balance) if disabled else "Evolve for %d food" % cost,330,13,UI.FAINT if disabled else UI.ACCENT,UI.MEDIUM)
 
+func draw_hover() -> void:
+	if hover <= 0.01:
+		return
+	if glow_box == null:
+		glow_box = UI.box(Color.TRANSPARENT, 14, UI.ACCENT, Vector2.ZERO)
+		glow_box.set_border_width_all(1)
+		glow_box.shadow_size = 18
+	var eased := hover * hover * (3.0 - 2.0 * hover)
+	glow_box.bg_color = Color(UI.ACCENT, 0.035 * eased)
+	glow_box.border_color = Color(UI.ACCENT, 0.5 * eased)
+	glow_box.shadow_color = Color(UI.ACCENT, 0.10 * eased)
+	draw_style_box(glow_box, Rect2(Vector2.ZERO, size))
+
 func _draw() -> void:
 	if data.is_empty():
 		return
+	draw_hover()
 	draw_key()
 	if guided_choice:
 		draw_guided(UI.INK, UI.MUTED, UI.ACCENT)

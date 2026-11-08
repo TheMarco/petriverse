@@ -86,6 +86,7 @@ func _ready() -> void:
 				style.border_color = Color(CYAN, 0.7)
 			card.add_theme_stylebox_override(state, style)
 		card.pressed.connect(game.choose_evolution.bind(i))
+		card.mouse_entered.connect(interface_sound.bind(card, "ui_hover"))
 		add_child(card)
 		cards.append(card)
 	refresh()
@@ -116,9 +117,20 @@ func button(caption: String, at: Vector2, dimensions: Vector2, action: Callable,
 	result.focus_mode = Control.FOCUS_ALL
 	result.theme = UI.theme()
 	UI.style_button(result, "secondary", 15)
+	# The droplet is connected first: an action may hide its own button.
+	result.pressed.connect(interface_sound.bind(result, "ui_press"))
 	result.pressed.connect(action)
+	result.mouse_entered.connect(interface_sound.bind(result, "ui_hover"))
 	add_child(result)
 	return result
+
+## Quiet droplets acknowledge pointing and pressing; disabled controls stay silent.
+func interface_sound(control: Control, cue: String) -> void:
+	if game == null or game.get("soundscape") == null or not control.is_visible_in_tree():
+		return
+	if control is BaseButton and control.disabled:
+		return
+	game.soundscape.play_effect(cue, 0.55 if cue == "ui_press" else 0.35)
 
 ## One call places a control for the current screen: geometry, look and copy.
 func place(control: Button, at: Vector2, dimensions: Vector2, variant: String, caption: String = "", hint: String = "", size_px: int = 15) -> void:

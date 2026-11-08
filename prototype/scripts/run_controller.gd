@@ -631,6 +631,7 @@ func finish_journey_stage() -> void:
 	if stage_index == JourneyPlan.STAGES.size() - 1:
 		state = SUCCESS
 		score += integrity * 200
+		stage_bonus.health += integrity * 200
 		enemies.clear()
 	else:
 		state = EVOLVE

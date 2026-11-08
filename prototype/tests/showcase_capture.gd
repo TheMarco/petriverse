@@ -147,6 +147,45 @@ func exercise() -> void:
 	await capture("pre-evolution")
 	await advance(4.0)
 	await capture("evolution")
+	# Hover the first evolution card with a real pointer event.
+	if game.hud.cards[0].visible:
+		var hover := InputEventMouseMotion.new()
+		hover.position = game.hud.cards[0].get_global_rect().get_center()
+		root.push_input(hover, true)
+		await advance(0.5)
+		await capture("evolution-hover")
+	# Real boss encounters from the route plan, including the open window.
+	for position in run.route_plan.size():
+		if run.route_plan[position].mode != "boss":
+			continue
+		run.route_position = position
+		run.stage_index = int(run.route_plan[position].stage)
+		run.start_stage()
+		game.reset_presentation()
+		game.feel.last_card_dish = Run.JourneyPlan.dish(run.stage_index).name
+		run.begin_encounter()
+		await advance(1.0)
+		await capture("boss-card-%02d" % run.stage_index)
+		run.harvest.nourishment = 6
+		for i in 30:
+			await advance(0.5, 4)
+			if game.feel.boss_open:
+				break
+		await advance(0.4)
+		await capture("boss-window-%02d" % run.stage_index)
+	# The end of a journey: the final boss falls.
+	run.route_position = run.route_plan.size() - 1
+	run.stage_index = int(run.route_plan[run.route_position].stage)
+	run.start_stage()
+	game.reset_presentation()
+	run.begin_encounter()
+	await advance(0.5)
+	run.stage_elapsed = 120.0
+	run.finish_journey_stage()
+	await advance(1.2)
+	await capture("victory-reveal")
+	await advance(3.0)
+	await capture("epilogue")
 	game.return_home()
 	await advance(1.5)
 	await capture("home-pond")
@@ -161,6 +200,33 @@ func exercise() -> void:
 	await advance(0.5)
 	await capture("journal")
 	game.toggle_journal()
+	# Comfort layout: larger text reflows the dish to two thirds scale.
+	game.large_text = true
+	run.route_position = 2
+	run.stage_index = int(run.route_plan[2].stage)
+	run.start_stage()
+	game.reset_presentation()
+	await advance(0.6)
+	await capture("comfort-brief")
+	run.begin_encounter()
+	await advance(4.0)
+	var used: Array = []
+	for triangle in run.board.triangles:
+		if triangle.all(func(id): return run.is_ready(id)):
+			used = triangle
+			break
+	if not used.is_empty():
+		var center: Vector2 = (run.board.anchors[used[0]] + run.board.anchors[used[1]] + run.board.anchors[used[2]]) / 3.0
+		run.enemies.append(run.Harvest.Organism.new(9000, "food", center, Vector2.ZERO, 0.0))
+		run.enemies.append(run.Harvest.Organism.new(9001, "food", center + Vector2(8, 0), Vector2.ZERO, 0.0))
+		run.selection.start(run.board.anchors[used[0]])
+		run.selection.visit(used[1])
+		run.selection.visit(used[2])
+		run.selection.visit(used[0])
+		run.release()
+	await advance(0.3, 9)
+	await capture("comfort-capture")
+	game.large_text = false
 	game.queue_free()
 	await process_frame
 	quit()

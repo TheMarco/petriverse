@@ -2,7 +2,7 @@ extends Node
 ## User-supplied scores and baked ElevenLabs effects; all playback stays offline.
 
 const ROOT := "res://assets/audio/"
-const EFFECTS := ["connect", "close", "absorb", "injury", "fracture", "evolve", "warning", "victory", "loss", "mastery", "heartbeat", "swell"]
+const EFFECTS := ["connect", "close", "absorb", "injury", "fracture", "evolve", "warning", "victory", "loss", "mastery", "heartbeat", "swell", "ui_press", "ui_hover"]
 ## Presentation cues that reuse an existing recording under their own name,
 ## so their counts and rate limits stay separate from the original cue.
 const ALIASES := {"mote": "connect"}

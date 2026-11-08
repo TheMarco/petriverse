@@ -18,6 +18,22 @@
         "sox -n -r 44100 -c 2 swell-dry.wav synth 2.2 brownnoise synth 2.2 sine amod 0.35 0",
         "sox swell-dry.wav swell.wav sinc 140-1100 fade q 0.9 2.2 1.1 reverb 40 60 80 gain -n -6"
       ]
+    },
+    "ui_press.ogg": {
+      "use": "A water-droplet tick when an interface button is pressed.",
+      "commands": [
+        "sox -n -r 44100 -c 1 press-a.wav synth 0.11 sine 480:1250 fade q 0.002 0.11 0.10",
+        "sox -n -r 44100 -c 1 press-b.wav synth 0.11 sine 960:2500 fade q 0.002 0.11 0.10 gain -12",
+        "sox -m press-a.wav press-b.wav press-dry.wav",
+        "sox press-dry.wav -c 2 ui_press.wav gain -10 pad 0 0.10 lowpass 4200 reverb 20 40 50 gain -n -9"
+      ]
+    },
+    "ui_hover.ogg": {
+      "use": "A very quiet, higher droplet when the pointer reaches an enabled button or evolution card.",
+      "commands": [
+        "sox -n -r 44100 -c 1 hover-dry.wav synth 0.06 sine 1400:1750 fade q 0.002 0.06 0.055",
+        "sox hover-dry.wav -c 2 ui_hover.wav gain -10 pad 0 0.06 lowpass 5000 reverb 15 40 40 gain -n -18"
+      ]
     }
   }
 }
