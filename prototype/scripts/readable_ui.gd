@@ -16,6 +16,8 @@ var controls: Array[Control] = []
 ## The main dialog panel shrinks to its content, up to the full window height.
 var fitted: PanelContainer
 var fitted_column: VBoxContainer
+## Bottom edge for a panel that grows upward from the foot of the window; 0 centers it.
+var fitted_bottom := 0.0
 const FULL := Rect2(84, 38, 1112, 824)
 
 func _ready() -> void:
@@ -111,9 +113,10 @@ func fit() -> void:
 	if fitted == null or not is_instance_valid(fitted):
 		return
 	# Wrapped labels report their height once laid out at the panel's width.
-	var height := minf(FULL.size.y, fitted_column.get_combined_minimum_size().y + 44.0 + 18.0)
-	fitted.size = Vector2(FULL.size.x, height)
-	fitted.position = Vector2(FULL.position.x, roundf(450.0 - height * 0.5))
+	var limit := FULL.size.y if fitted_bottom <= 0.0 else 242.0
+	var height := minf(limit, fitted_column.get_combined_minimum_size().y + 44.0 + 18.0)
+	fitted.size = Vector2(fitted.size.x, height)
+	fitted.position.y = roundf(450.0 - height * 0.5) if fitted_bottom <= 0.0 else fitted_bottom - height
 
 func rebuild(key: String) -> void:
 	for child in screen.get_children():
@@ -121,6 +124,7 @@ func rebuild(key: String) -> void:
 		child.queue_free()
 	controls.clear()
 	fitted = null
+	fitted_bottom = 0.0
 	status = null
 	goal = null
 	instruction = null
@@ -263,7 +267,7 @@ func build_settings() -> void:
 
 func build_home() -> void:
 	label("PETRIVERSE", 48, UI.ACCENT)
-	label("Feed. Protect. Evolve.", 28)
+	label("A small life. A whole world.", 28)
 	if not game.recovery_notice().is_empty(): label(game.recovery_notice(),24,UI.ACCENT)
 	if not game.resume_data.is_empty(): button("Continue your journey", game.resume_journey, true)
 	button("Begin a new journey", game.request_new_journey.bind("wanderer"), game.resume_data.is_empty())
@@ -349,6 +353,9 @@ func build_pond() -> void:
 	back.size_flags_horizontal = Control.SIZE_FILL
 	back.custom_minimum_size.x = 140
 	body = panel(Rect2(24,644,1232,242))
+	fitted = body.get_parent().get_parent().get_parent()
+	fitted_column = body
+	fitted_bottom = 886.0
 	if game.save_message.begins_with("Could not"): label(game.save_message,24,UI.DANGER)
 	if not game.home_pond.welcome_tokens.is_empty(): label(("Welcome home · one new life, safe in your care" if game.home_pond.welcome_tokens.size()==1 else "Welcome home · %d new lives, safe in your care" % game.home_pond.welcome_tokens.size()),27,UI.FOOD)
 	var resident: Dictionary = game.home_pond.selected_record()

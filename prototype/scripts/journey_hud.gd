@@ -102,8 +102,10 @@ func _ready() -> void:
 		var colony: Dictionary = Journey.COLONIES[i]
 		colony_buttons.append(button(colony.name, Vector2(COLONIES.position.x + 43 + i * 248, COLONIES.position.y + 250), Vector2(220, 48), game.request_new_journey.bind(colony.id)))
 	for slot in JOURNAL_PAGE_SIZE:
-		var control := button("Watch film",Vector2(JOURNAL.position.x+40+(slot%2)*388+18,JOURNAL.position.y+124+(slot/2)*248+80),Vector2(110,32),watch_creature_film.bind(slot))
+		# Between the name and the description, its caption aligned with the name.
+		var control := button("Watch film",Vector2(JOURNAL.position.x+40+(slot%2)*388+86,JOURNAL.position.y+124+(slot/2)*248+66),Vector2(96,26),watch_creature_film.bind(slot))
 		UI.style_button(control,"quiet",12)
+		control.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		journal_films.append(control)
 	journal_previous = button("Previous", Vector2(JOURNAL.position.x + 40, JOURNAL.end.y - 72), Vector2(140, 44), turn_journal.bind(-1))
 	journal_next = button("Next", Vector2(JOURNAL.end.x - 180, JOURNAL.end.y - 72), Vector2(140, 44), turn_journal.bind(1))
