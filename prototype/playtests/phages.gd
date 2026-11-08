@@ -42,7 +42,7 @@ func _ready() -> void:
 	hud = PracticeHud.new()
 	add_child(hud)
 	practice()
-	DisplayServer.window_set_title("PETRIVERSE — Phage practice")
+	DisplayServer.window_set_title("Petriverse · Phage practice")
 
 func practice() -> void:
 	run.route_plan.clear()

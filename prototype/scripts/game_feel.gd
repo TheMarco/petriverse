@@ -12,7 +12,7 @@ const WARM := Color("edb184")
 const NOTES := [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24]
 const MAX_MOTES := 14
 const MOTE_FLIGHT := 0.72
-const MOTE_STAGGER := 0.065
+const MOTE_STAGGER := 0.075 # just above the 65 ms per-cue rate limit, so every arrival is heard
 
 var game: Node2D
 var glow: Node2D # additive layer for light: motes, sparks, flashes
@@ -332,7 +332,8 @@ func land(mote: Dictionary) -> void:
 		counters[mote.control].pop = 1.0
 	burst(mote.to, 3 if detail() > 0 else 1, mote.color, 26.0, 0.35, true)
 	if game.soundscape != null and mote.note >= 0:
-		game.soundscape.play_effect("mote", 0.16, pow(2.0, (NOTES[mini(mote.note, NOTES.size() - 1)] + 7) / 12.0))
+		# A fourth above the drawing notes; the top note stays below the 3.4x pitch limit.
+		game.soundscape.play_effect("mote", 0.16, pow(2.0, (NOTES[mini(mote.note, 7)] + 5) / 12.0))
 
 ## Where reward motes fly. The HUD records its live counter positions.
 func target_for(control: String) -> Vector2:

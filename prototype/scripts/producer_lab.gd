@@ -17,6 +17,9 @@ class LabHud:
 		if game != null and game.has_method("draw_lab_hud"): game.draw_lab_hud(self)
 	func draw_overlays() -> void:
 		pass # The lab draws its own screens.
+	func _init() -> void:
+		super() # Sets the HUD's draw target.
+		draws_start_caption = false # The lab's own drawing keeps main's caption.
 
 var lab_phase := "menu" # menu, choice, brief, playing, won, lost
 var experiment := 0 # 1 Safe passage, 2 Choose the current, 3 The Regent breaks
@@ -56,7 +59,7 @@ func _ready() -> void:
 	add_child(ui_layer)
 	_make_buttons()
 	show_menu()
-	DisplayServer.window_set_title("PETRIVERSE — Experiments (Producer Lab)")
+	DisplayServer.window_set_title("Petriverse · Experiments (Producer Lab)")
 
 func comfort_layout() -> bool:
 	return false
@@ -119,7 +122,7 @@ func select_experiment(id: int) -> void:
 	elif id == 2:
 		current_choice = ""
 		lab_phase = "choice"
-		feedback = "Same seeded dish. Choose a current — forecast is shown above."
+		feedback = "Same seeded dish. Choose a current; the forecast is shown above."
 		return
 	elif id == 3: _setup_boss()
 	lab_phase = "brief"
@@ -217,7 +220,7 @@ func _step_escort(delta: float) -> void:
 	for entry in hunter_schedule:
 		if not entry.warned and lab_elapsed >= entry.at - 3.0:
 			entry.warned = true
-			feedback = "Warning · a hunter is approaching the arc in 3s — watch the marked rim."
+			feedback = "Warning · a hunter is approaching the arc in 3s. Watch the marked rim."
 		if not entry.spawned and lab_elapsed >= entry.at:
 			entry.spawned = true
 			run.spawn_enemy({"position": entry.pos, "speed": 0.0, "kind": "drifter", "angle": 0.0, "radius": 0.0})
@@ -397,10 +400,10 @@ func draw_lab_hud(h: Node2D) -> void:
 	h.label_at("EXPERIMENTS · Producer Lab", Vector2(40, 48), 22, ink, UI.SEMIBOLD)
 	if lab_phase == "menu":
 		h.centered("Choose an experiment", 190, 30)
-		h.centered("1 · Safe passage — escort 3 pearl brood along the arc. Loop hunters away.", 250, 16, cy)
+		h.centered("1 · Safe passage: escort 3 pearl brood along the arc. Loop hunters away.", 250, 16, cy)
 		h.centered("Looping a brood rescues it safely, but a win needs at least 1 true arrival. Need 2 safe.", 282, 14, mut)
-		h.centered("2 · Choose the current — same dish, fast channel or sheltered eddy. Gather 8 food.", 330, 16, cy)
-		h.centered("3 · The Regent breaks — break shields, hit the open Regent; its shell breaks after hit 1.", 410, 16, cy)
+		h.centered("2 · Choose the current: same dish, fast channel or sheltered eddy. Gather 8 food.", 330, 16, cy)
+		h.centered("3 · The Regent breaks: break shields, hit the open Regent; its shell breaks after hit 1.", 410, 16, cy)
 		h.centered("Keyboard: 1/2/3 select · Enter start/retry · Space pause · R retry · Q exit to title", 480, 14, mut)
 		return
 	var title: String = {1: "Safe passage", 2: "Choose the current", 3: "The Regent breaks"}.get(experiment, "")
@@ -412,13 +415,13 @@ func draw_lab_hud(h: Node2D) -> void:
 	h.wrapped(status, Vector2(40, 104), 190, 15, ink)
 	h.wrapped(feedback, Vector2(1060, 104), 180, 15, ink)
 	if lab_phase == "choice":
-		h.centered("Forecast — Channel: food rides a fast lane; purple cysts wait just below it.", 250, 17, cy)
-		h.centered("Forecast — Shelter: three small safe pockets in slow eddies; cysts far below.", 286, 17, cy)
+		h.centered("Forecast · Channel: food rides a fast lane; purple cysts wait just below it.", 250, 17, cy)
+		h.centered("Forecast · Shelter: three small safe pockets in slow eddies; cysts far below.", 286, 17, cy)
 		h.centered("Both need %d food in %ds. Currents never push Mother or her blue cells." % [Rules.CURRENT_GOAL, int(Rules.CURRENT_SECONDS)], 330, 15, ink)
 	elif lab_phase == "brief":
 		h.centered("How to play", 210, 24)
 		var lines := {
-			1: "Drag through at least 3 blue cells, return to START, then release. Enclose hunters to remove them.\nBrood follow the glowing arc. Enclosing a brood rescues it — safe, but not an arrival.\nLose too many brood, run out of time, or lose Mother and the experiment fails.",
+			1: "Drag through at least 3 blue cells, return to START, then release. Enclose hunters to remove them.\nBrood follow the glowing arc. Enclosing a brood rescues it: safe, but not an arrival.\nLose too many brood, run out of time, or lose Mother and the experiment fails.",
 			2: "Connect 3+ blue cells around food, return to START, then release. Avoid purple cysts.\nWatch the arrows: the current really carries food. Keep loops clean and quick.",
 			3: "Loop both gold shield wardens to open the Regent, then loop the Regent (costs 3 food charge).\nAfter the first hit its shell breaks, shields move to opposite flanks, and food opens below it."}
 		var by := 280.0

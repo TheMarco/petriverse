@@ -119,7 +119,7 @@ func _ready() -> void:
 		if show_home_on_start:
 			run.state = Run.HOME
 			home_pond_open = false
-	DisplayServer.window_set_title("PETRIVERSE — A living journey" if run.journey else "PETRIVERSE — Risky harvest" if run.harvest_mode else "PETRIVERSE — Stillwater")
+	DisplayServer.window_set_title("Petriverse · A living journey" if run.journey else "Petriverse · Risky harvest" if run.harvest_mode else "Petriverse · Stillwater")
 	load_preferences()
 	records.load_records()
 	microscope = Microscope.new()
@@ -679,17 +679,25 @@ func draw_cell(id: int, legal_cells: Array) -> void:
 		draw_circle(p, 31.0, Color("06171c"), false, 5.0, true)
 		draw_circle(p, 31.0, PEARL, false, 2.0, true)
 		if id == run.selection.path[0]:
-			var radius: float = run.board.hit_radius + 12.0 if assisted_closure else 35.0
+			var radius := start_radius()
 			draw_circle(p, radius, PEARL, false, 2.2 if run.selection.can_close() else 1.2, true)
-			var label := "RELEASE" if run.selection.closed and not click_mode else "ENTER" if run.selection.closed else "CLOSE HERE" if run.selection.can_close() else "START"
-			var label_size := 17 if comfort_layout() else 13
-			draw_string(font, p + Vector2(-font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size).x * 0.5, -radius-8), label, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, PEARL)
+			# The journey HUD draws this caption above the organisms; other HUDs do not.
+			if hud.get("draws_start_caption") != true:
+				var label := start_caption()
+				var label_size := 17 if comfort_layout() else 13
+				draw_string(font, p + Vector2(-font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size).x * 0.5, -radius-8), label, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, PEARL)
 	if reject_time > 0.0 and id == run.selection.rejected_id:
 		draw_line(p + Vector2(-8, -8), p + Vector2(8, 8), WARM, 2.0, true)
 		draw_line(p + Vector2(8, -8), p + Vector2(-8, 8), WARM, 2.0, true)
 	if debug_mode:
 		var caption := "%02d" % id if ready else "%02d %.1fs" % [id, cell.remaining]
 		draw_string(font, p + Vector2(25, -29), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, PEARL)
+
+func start_radius() -> float:
+	return run.board.hit_radius + 12.0 if assisted_closure else 35.0
+
+func start_caption() -> String:
+	return "RELEASE" if run.selection.closed and not click_mode else "ENTER" if run.selection.closed else "CLOSE HERE" if run.selection.can_close() else "START"
 
 func draw_mother() -> void:
 	var p: Vector2 = run.board.center

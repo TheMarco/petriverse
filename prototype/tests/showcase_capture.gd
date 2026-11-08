@@ -22,11 +22,14 @@ func advance(seconds: float, steps: int = 0) -> void:
 		if game.run.state == Run.ACTIVE:
 			game.run.step(seconds / count)
 		game._process(seconds / count)
+		# Explicit drawing keeps captures reliable when the window is covered.
+		RenderingServer.force_draw(false)
 		await process_frame
 
 func capture(name: String) -> void:
 	# Real frames only: a zero-length refresh would finish every entrance.
 	await process_frame
+	RenderingServer.force_draw(false)
 	await process_frame
 	RenderingServer.force_draw(false)
 	var path := out.path_join("%02d-%s.png" % [shots, name])
@@ -72,6 +75,7 @@ func exercise() -> void:
 	root.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
 	root.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
 	root.size = Vector2i(1280, 900)
+	RenderingServer.render_loop_enabled = false
 	await advance(0.5)
 	await capture("title-intro-0.5s")
 	await advance(0.7)

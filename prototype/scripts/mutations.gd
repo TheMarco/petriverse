@@ -2,7 +2,7 @@ extends RefCounted
 ## Rules and player-facing descriptions share this small, fixed catalogue.
 
 const CATALOG := [
-	{"id": "fission", "name": "Rapid Fission", "mark": "I", "role": "PRECISION", "summary": "Small loops return sooner.", "detail": "3–4 cell loops recover in 2 seconds.\nKeep a nimble route near the mother.", "tradeoff": "Larger loops keep their usual recovery."},
+	{"id": "fission", "name": "Rapid Fission", "mark": "I", "role": "PRECISION", "summary": "Small loops return sooner.", "detail": "3-4 cell loops recover in 2 seconds.\nKeep a nimble route near the mother.", "tradeoff": "Larger loops keep their usual recovery."},
 	{"id": "elastic", "name": "Elastic Membranes", "mark": "II", "role": "REACH", "summary": "Reach across the whole colony.", "detail": "Connect up to 10 cells in one loop.\nCatch pairs or distant groups together.", "tradeoff": "Every loop takes 0.6s longer to return."},
 	{"id": "enzyme", "name": "Enzyme Sacs", "mark": "III", "role": "POWER", "summary": "Wide loops dissolve armor.", "detail": "Loops of 6+ cells deal two damage.\nDigest a Shellback in a single capture.", "tradeoff": "Those loops take 1.2s longer to return."},
 	{"id": "frenzy", "name": "Feeding Frenzy", "mark": "IV", "role": "FLOW", "summary": "A feast keeps your start alive.", "detail": "Digest 3+ bodies in one loop and its\nstarting cell stays immediately ready.", "tradeoff": "Twinspores count as two bodies."},
@@ -116,7 +116,7 @@ static func journey_definition(id: String) -> Dictionary:
 	if id == "fission":
 		item.role = "NIMBLE COLONY"
 		item.summary = "Quick, precise meals feed more."
-		item.detail = "Clean 3–4-cell meals give +1 food.\nThose cells recover in 2 seconds."
+		item.detail = "Clean 3-4 cell meals give +1 food.\nThose cells recover in 2 seconds."
 		item.tradeoff = "Larger loops get neither bonus."
 	elif id == "elastic":
 		item.role = "FEAST COLONY"

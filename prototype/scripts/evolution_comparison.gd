@@ -149,7 +149,7 @@ static func compare(run: RefCounted, offered: String) -> Dictionary:
 	lines.append(synergy)
 	lines.append(ASSUMPTION)
 	var definition: Dictionary = Mutations.journey_definition(offered)
-	var detail_summary := "%s — %s. %s %s Tradeoff: %s %s" % [definition.get("name", offered), PLAYSTYLES.get(offered, ""), " · ".join(lines.slice(0, lines.size() - 1)), ASSUMPTION, definition.get("tradeoff", ""), synergy]
+	var detail_summary := "%s: %s. %s %s Tradeoff: %s %s" % [definition.get("name", offered), PLAYSTYLES.get(offered, ""), " · ".join(lines.slice(0, lines.size() - 1)), ASSUMPTION, definition.get("tradeoff", ""), synergy]
 	return {"offered": offered, "playstyle": PLAYSTYLES.get(offered, ""),
 		"sample": sample.label, "assumption": ASSUMPTION, "before": before, "after": after,
 		"synergy": synergy, "effect": effect, "lines": lines, "detail_summary": detail_summary}

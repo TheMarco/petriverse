@@ -28,7 +28,8 @@ func choose_route(run: RefCounted, candidates: Array) -> Array:
 		var best: Array = []
 		var best_margin := 10.0
 		for path in candidates:
-			if not Geometry.validate(path, run.board.anchors, run.is_ready):
+			# The same predicate as the live preview and release: Mother stays outside.
+			if not Geometry.capture_valid(path, run.board, run.is_ready):
 				continue
 			var polygon := Geometry.polygon_for(path, run.board.anchors)
 			if not Geometry.contains(enemy.nucleus, polygon):
@@ -43,14 +44,31 @@ func choose_route(run: RefCounted, candidates: Array) -> Array:
 			return best.duplicate()
 	return []
 
+## Simple six-to-eight cell loops that keep Mother outside at the rest layout.
+func large_loops(board: RefCounted) -> Array:
+	var found: Array = []
+	var walk := func(walk: Callable, path: Array) -> void:
+		if path.size() >= 6 and board.neighbors[path[-1]].has(path[0]) and path[1] < path[-1]:
+			if Geometry.capture_valid(path, board, func(_id): return true):
+				found.append(path.duplicate())
+		if path.size() >= 8 or found.size() >= 400:
+			return
+		for id in board.neighbors[path[-1]]:
+			if id > path[0] and not path.has(id):
+				walk.call(walk, path + [id])
+	for start in board.anchors.size():
+		walk.call(walk, [start])
+	return found
+
 func simulate(profile: Dictionary, overrides: Dictionary = {}) -> Dictionary:
-	var run = Run.new(false)
+	var run = Run.new(false, int(profile.get("seed", 0)))
 	for setting in overrides:
 		run.board.tuning[setting] = overrides[setting]
 	run.restart()
 	var candidates: Array = run.board.triangles.duplicate()
 	if profile.get("large_loops", false):
-		candidates = [[0, 1, 2, 3, 4, 5, 6, 7]]
+		# The inner ring always enclosed Mother; wide loops now sit beside her.
+		candidates = large_loops(run.board)
 	var path: Array = []
 	var stage := "idle"
 	var timer := 0.0
@@ -144,7 +162,14 @@ func exercise() -> void:
 	# Keep wins with a margin at 3–4 segments/s and wins at 2 segments/s; the
 	# slowest profile with repeated mistakes is a stress observation, not a must-win.
 	var minimum_integrity := {"skillful": 3, "steady": 2, "deliberate": 1, "hesitations_and_cancels": 0, "large_loops": 3, "deliberate_large_loops": 1}
+	# A fixed seed makes the proxy repeatable; --seed=N samples another dish.
+	var seed_value := 0
+	for argument in arguments:
+		if argument.begins_with("--seed="):
+			seed_value = int(argument.substr(7))
 	for profile in profiles:
+		if seed_value != 0:
+			profile.seed = seed_value
 		if compare:
 			var before := simulate(profile, previous_tuning)
 			print("BEFORE ", JSON.stringify(before))
@@ -157,7 +182,8 @@ func exercise() -> void:
 		expect(result.integrity >= required_integrity, "%s meets its declared integrity floor of %d" % [profile.name, required_integrity])
 		expect(result.max_node_speed <= 12.00001, "%s keeps independent cell drift within 12 pixels/s" % profile.name)
 		expect(result.max_enemy_speed <= 7.0, "%s caps enemy motion at 7 pixels/s" % profile.name)
-	var file := FileAccess.open("res://artifacts/human-pacing.json", FileAccess.WRITE)
-	file.store_string(JSON.stringify(reports, "  ") + "\n")
+	if not arguments.has("--no-report"):
+		var file := FileAccess.open("res://artifacts/human-pacing.json", FileAccess.WRITE)
+		file.store_string(JSON.stringify(reports, "  ") + "\n")
 	print("PACING: %d checks; %d failures" % [checks, failures.size()])
 	quit(0 if failures.is_empty() else 1)

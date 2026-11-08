@@ -62,6 +62,8 @@ var label_styles := {}
 var pip_styles := {}
 ## Live screen positions of counters, so reward motes land on what they fill.
 var anchors := {}
+## This HUD draws the first cell's START / RELEASE caption above organisms.
+var draws_start_caption := true
 var overlay_layer: Node2D
 var overlay_shown := ""
 var overlay_age := 0.0
@@ -395,6 +397,7 @@ func _draw() -> void:
 			canvas.draw_set_transform(game.dish_offset(), 0.0, Vector2.ONE * game.dish_scale())
 			draw_targets()
 			draw_nudge()
+			draw_start_caption()
 			canvas.draw_set_transform(Vector2.ZERO)
 		return
 	if run.state != "home":
@@ -405,6 +408,7 @@ func _draw() -> void:
 			draw_targets()
 			draw_nudge()
 			draw_big_capture()
+			draw_start_caption()
 			if run.selection.mother_blocked():
 				# HUD draws above the living tissue, keeping the warning visible.
 				canvas.draw_circle(run.board.center, 58.0, Color("d9b58b"), false, 1.5, true)
@@ -472,6 +476,21 @@ func overlay_key() -> String:
 	if game.round_result_showing(): return "result:" + run.state
 	if run.evolution_ready(): return "rest" if run.offered_mutations.is_empty() else "evolve"
 	return run.state
+
+## START, CLOSE HERE or RELEASE above the first cell, over any organism.
+func draw_start_caption() -> void:
+	var selection = game.run.selection
+	if not selection.active or selection.path.is_empty():
+		return
+	var anchor: Vector2 = game.run.board.anchors[selection.path[0]]
+	var caption: String = game.start_caption()
+	var point_size := 17 if game.comfort_layout() else 12
+	var width := measure(caption, point_size, UI.SEMIBOLD)
+	var actual := scaled(point_size)
+	var baseline: float = anchor.y - game.start_radius() - 10.0
+	var box := Rect2(anchor.x - width * 0.5 - 8.0, baseline - actual - 3.0, width + 16.0, actual + 9.0)
+	canvas.draw_style_box(label_style(UI.ACCENT if not selection.closed else Color.WHITE), box)
+	label_at(caption, Vector2(anchor.x - width * 0.5, baseline), point_size, Color("c7eee4") if not selection.closed else Color.WHITE, UI.SEMIBOLD)
 
 func draw_status() -> void:
 	var run = game.run
