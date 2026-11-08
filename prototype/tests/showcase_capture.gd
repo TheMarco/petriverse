@@ -1,6 +1,6 @@
 extends SceneTree
 ## Native screenshots of every major screen for visual review.
-## godot --path . --script res://tests/showcase_capture.gd -- --out=/absolute/dir
+## godot --path . --script res://tests/showcase_capture.gd -- --out=/absolute/dir [--light]
 ## Uses temporary save files; never reads or writes the player's journey.
 const Main = preload("res://scripts/main.gd")
 const Run = preload("res://scripts/run_controller.gd")
@@ -84,6 +84,8 @@ func exercise() -> void:
 	game.pause_on_focus_loss = false
 	game.journey_path = "/tmp/petriverse-showcase-journey.cfg"
 	game.journey_profile.path = "/tmp/petriverse-showcase-profile.cfg"
+	if "--light" in OS.get_cmdline_user_args():
+		game.visual_quality = 0
 	root.add_child(game)
 	game.set_process(false)
 	game.set_physics_process(false)

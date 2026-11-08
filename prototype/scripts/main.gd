@@ -138,6 +138,7 @@ func _ready() -> void:
 	copy.z_index = 8
 	add_child(copy)
 	optics = LensOptics.new()
+	optics.backbuffer = copy
 	add_child(optics)
 	hud = JourneyHud.new() if run.journey else Hud.new()
 	hud.z_index = 10

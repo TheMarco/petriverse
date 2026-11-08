@@ -9,6 +9,8 @@ var defocus := 1.0
 var clock := 0.0
 var saturation := 1.0
 var exposure := 1.0
+## The screen copy this pass reads; hidden with the pass so Light skips it.
+var backbuffer: BackBufferCopy
 
 func _ready() -> void:
 	game = get_parent()
@@ -32,6 +34,8 @@ func target_defocus() -> float:
 
 func sync(delta: float) -> void:
 	visible = game.visual_quality > 0
+	if backbuffer != null:
+		backbuffer.visible = visible
 	if not visible:
 		return
 	clock += delta
