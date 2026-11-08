@@ -426,6 +426,10 @@ func on_capture(result: Dictionary) -> void:
 	var caption := grade
 	if flow >= 2:
 		caption = ("%s  ·  " % grade if not grade.is_empty() else "") + "Flow ×%d" % flow
+	if flow >= 2:
+		if not counters.has("flow"):
+			counters["flow"] = {"shown": 0.0, "target": 0, "pop": 0.0}
+		counters.flow.pop = 1.0
 	if not headline.is_empty():
 		numbers.append({"at": center, "text": headline, "detail": caption, "age": 0.0, "life": 1.45 if caption.is_empty() else 2.1, "color": tint, "size": 30 if not grade.is_empty() else 24})
 	if poison > 0:

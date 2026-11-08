@@ -576,6 +576,14 @@ func draw_status() -> void:
 	var remaining := maxi(0, ceili(run.harvest.deadline() - run.stage_elapsed))
 	y += 22.0
 	popped("Practice, no time limit" if run.Lesson.active(run) else "%d:%02d left" % [remaining / 60, remaining % 60], Vector2(RIGHT, y), 13, UI.DANGER if remaining < 20 else MUTED, 0, feel_pop("timer"))
+	# A live chain shows its multiplier and the time left to extend it.
+	var flow: int = int(harvest.get("flow")) if harvest.get("flow") != null else 0
+	if flow >= 2 and run.state in ["active", "paused"]:
+		var window: float = harvest.FLOW_WINDOW - (run.stage_elapsed - harvest.last_flow_time)
+		if window > 0.0:
+			popped("Flow ×%d  ·  +%d next" % [flow, harvest.FLOW_STEP * mini(flow, 5)], Vector2(RIGHT, y + 22.0), 12, UI.FOOD, UI.SEMIBOLD, feel_pop("flow"))
+			canvas.draw_rect(Rect2(RIGHT, y + 29.0, COLUMN, 2.0), Color(1, 1, 1, 0.08))
+			canvas.draw_rect(Rect2(RIGHT, y + 29.0, COLUMN * window / harvest.FLOW_WINDOW, 2.0), Color(UI.FOOD, 0.7))
 	if run.state in ["active", "paused"]:
 		var guide: Dictionary = Guidance.next_action(run, game.click_mode)
 		var title_bottom := wrapped(guide.title, Vector2(RIGHT, y + 56.0), COLUMN, 17, UI.DANGER if guide.urgent else INK, UI.SEMIBOLD)
@@ -979,7 +987,7 @@ func draw_help() -> void:
 		canvas.draw_circle(Vector2(571, 245 + i * 54), 12.0, Color(CYAN, 0.12), true, -1, true)
 		centered(str(i + 1), 250 + i * 54, 13, CYAN, UI.SEMIBOLD, 571.0)
 		wrapped(steps[i], Vector2(594, 251 + i * 54), 400, 16, INK)
-	wrapped("Use 3-%d cells. Keep the mother outside; avoid crossing her or your loop. Right-click cancels for free. Used cells absorb, then return." % game.run.selection.max_vertices, Vector2(559, 477), 425, 13, MUTED)
+	wrapped("Use 3-%d cells. Keep the mother outside; avoid crossing her or your loop. Right-click cancels for free. Used cells absorb, then return. Clean captures in quick succession build flow for bonus score." % game.run.selection.max_vertices, Vector2(559, 470), 425, 13, MUTED)
 	canvas.draw_line(Vector2(HELP.position.x + 44, 528), Vector2(HELP.end.x - 44, 528), UI.LINE)
 	label_at("This encounter", Vector2(278, 566), 15, INK, UI.SEMIBOLD)
 	var y := 596.0

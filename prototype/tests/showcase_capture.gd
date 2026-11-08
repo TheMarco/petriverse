@@ -51,6 +51,22 @@ func drag(from: Vector2, to: Vector2) -> void:
 	event.button_mask = MOUSE_BUTTON_MASK_LEFT
 	root.push_input(event, true)
 
+## A clean two-food capture on any ready triangle, as a player would draw it.
+func quick_capture(run: RefCounted, used: Array) -> void:
+	for triangle in run.board.triangles:
+		if triangle.all(func(id): return run.is_ready(id) and not used.has(id)):
+			used.append_array(triangle)
+			var center: Vector2 = (run.board.anchors[triangle[0]] + run.board.anchors[triangle[1]] + run.board.anchors[triangle[2]]) / 3.0
+			for i in 2:
+				run.next_enemy_id += 1
+				run.enemies.append(run.Harvest.Organism.new(run.next_enemy_id, "food", center + Vector2(i * 8.0 - 4.0, 0), Vector2.ZERO, 0.0))
+			run.selection.start(run.board.anchors[triangle[0]])
+			run.selection.visit(triangle[1])
+			run.selection.visit(triangle[2])
+			run.selection.visit(triangle[0])
+			run.release()
+			return
+
 func key(code: Key) -> void:
 	var event := InputEventKey.new()
 	event.keycode = code
@@ -120,6 +136,15 @@ func exercise() -> void:
 		await capture("card-stage-%02d" % stage)
 		await advance(5.1)
 		await capture("stage-%02d" % stage)
+		if stage == 1:
+			var used: Array = []
+			# A clean chain for the flow readout: no poison anywhere near.
+			run.enemies = run.enemies.filter(func(body): return body.kind == "food")
+			quick_capture(run, used)
+			await advance(0.8)
+			quick_capture(run, used)
+			await advance(0.5, 12)
+			await capture("flow-chain")
 	# Pause menu.
 	game.pause()
 	await advance(0.1, 3)
@@ -158,6 +183,13 @@ func exercise() -> void:
 		root.push_input(hover, true)
 		await advance(0.5)
 		await capture("evolution-hover")
+		game.choose_evolution(0)
+		await advance(1.6)
+		await capture("evolution-reveal")
+		await advance(2.5)
+		await capture("evolution-reveal-grown")
+		game.evolution_reveal.dismiss()
+		await advance(0.4)
 	# Real boss encounters from the route plan, including the open window.
 	for position in run.route_plan.size():
 		if run.route_plan[position].mode != "boss":

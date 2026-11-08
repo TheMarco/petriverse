@@ -144,6 +144,17 @@ func exercise() -> void:
 		expect(game.feel.shown("objective", live.harvest.nourishment) <= live.harvest.nourishment, "Displayed food never exceeds the real amount")
 	expect(game.feel.motes.is_empty() and game.feel.shown("objective", live.harvest.nourishment) == live.harvest.nourishment and popped, "Every mote lands and the counter pops to the real value")
 	expect(game.soundscape.events_played.get("mote", 0) >= 1 and game.soundscape.events_played.get("connect", 0) == 0, "Mote arrivals use their own cue, separate from cell selection")
+	# The first cell's caption is drawn by the HUD above organisms, not by the dish.
+	frames(game, 3.5)
+	used.clear()
+	var caption_path := ready_triangle(live, used)
+	live.selection.start(live.board.anchors[caption_path[0]])
+	expect(game.hud.draws_start_caption and game.start_caption() == "START", "Starting a loop is captioned START by the HUD")
+	live.selection.visit(caption_path[1])
+	live.selection.visit(caption_path[2])
+	live.selection.visit(caption_path[0])
+	expect(game.start_caption() == "RELEASE", "A closed loop is captioned RELEASE")
+	live.selection.cancel()
 	# Reduced motion: no travelling motes or shake; values settle at once.
 	game.reduced_motion = true
 	frames(game, 3.5)
