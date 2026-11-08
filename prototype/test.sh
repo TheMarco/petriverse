@@ -36,11 +36,8 @@ run fluid_dynamics 'FLUID DYNAMICS' yes
 run node_drift 'NODE DRIFT' yes
 run clot_recovery 'CLOT RECOVERY' yes
 run integration INTEGRATION yes
-# Observation only: human_pacing drives Run.new(false), an isolated enclosure
-# mode that no launch option reaches. Its integrity floors predate the rule
-# that Mother stays outside every membrane, and its bots plan against still
-# snapshots of moving hunters. It still runs and prints; it does not gate.
-run human_pacing PACING no -- --no-report
+# --no-report keeps artifacts/human-pacing.json unchanged on every run.
+run human_pacing PACING yes -- --no-report
 run visual_motion 'VISUAL MOTION' yes --fixed-fps 60
 run mother_damage 'MOTHER DAMAGE' yes
 
