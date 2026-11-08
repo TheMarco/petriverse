@@ -61,9 +61,6 @@ func _ready() -> void:
 			if name in TRACKS:
 				streams[name] = streams[name].duplicate()
 				streams[name].loop = false # The two-player crossfader owns each loop.
-	for alias in ALIASES:
-		if streams.has(ALIASES[alias]):
-			streams[alias] = streams[ALIASES[alias]]
 	for i in 2:
 		var player := AudioStreamPlayer.new()
 		player.volume_db = -80.0
@@ -200,7 +197,8 @@ func play_effect(name: String, gain: float = 1.0, pitch: float = 1.0) -> void:
 		return
 	recent[name] = clock
 	events_played[name] = int(events_played.get(name, 0)) + 1
-	if not streams.has(name) or muted or not enabled or effects_volume <= 0.0:
+	var source: String = ALIASES.get(name, name)
+	if not streams.has(source) or muted or not enabled or effects_volume <= 0.0:
 		return
 	var voice: AudioStreamPlayer = null
 	for candidate in voices:
@@ -214,7 +212,7 @@ func play_effect(name: String, gain: float = 1.0, pitch: float = 1.0) -> void:
 			voice.stop()
 		else:
 			return
-	voice.stream = streams[name]
+	voice.stream = streams[source]
 	voice.pitch_scale = clampf(pitch, 0.6, 3.4)
 	voice.set_meta("gain", gain)
 	voice.volume_db = gain_db(effects_volume * gain * 0.62)

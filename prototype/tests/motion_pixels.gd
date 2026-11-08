@@ -3,6 +3,15 @@ extends "res://tests/harvest_visual.gd"
 
 func photo() -> Image:
 	game._process(0.0)
+	# The comfort interface shows the HUD again on every sync; hide it after.
+	# The lens pass and feel layer are presentation over the dish (the lens
+	# deliberately defocuses on pause), so measure the dish itself.
+	game.hud.visible = false
+	if game.get("optics") != null:
+		game.optics.visible = false
+		game.optics.backbuffer.visible = false
+	if game.get("feel") != null:
+		game.feel.visible = false
 	game.hovered = -1
 	game.queue_redraw()
 	await process_frame
@@ -132,7 +141,7 @@ func exercise() -> void:
 	expect(difference(wake_frame,await photo(),dish)<0.0001,"Paused drawing freezes the particle wake")
 	game.run.selection.cancel()
 	game.run.state = Run.ACTIVE
-	game._process(2.5)
+	game._process(game.microscope.water.LIFETIME + 0.1)
 	expect(game.microscope.water.wakes.is_empty(),"Drawing wakes expire without a persistent particle pool")
 	var prey: Vector2 = (b.anchors[0]+b.anchors[8]+b.anchors[9])/3.0
 	game.run.enemies.append(game.run.Harvest.Organism.new(900,"food",prey,Vector2.ZERO,0.0))

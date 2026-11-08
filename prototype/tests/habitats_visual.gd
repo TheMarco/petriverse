@@ -22,6 +22,9 @@ func exercise() -> void:
 	expect(game.hud.habitat_buttons[0].visible and game.hud.habitat_buttons[1].visible and not game.hud.center_button.visible,"The player sees two explicit travel options before the briefing")
 	game.large_text = true
 	await capture("habitat-choice-large-text")
+	# Larger text uses the comfort layout's own controls; click the standard ones.
+	game.large_text = false
+	await refresh()
 	var at: Vector2 = game.hud.habitat_buttons[1].get_rect().get_center()
 	mouse(at,true)
 	mouse(at,false)
@@ -40,6 +43,11 @@ func exercise() -> void:
 	game.run.stage_index = 2
 	game.run.start_stage()
 	await refresh()
+	# Mother grows an organelle here first; Enter takes the highlighted Guard.
+	if game.run.growth_slot() >= 0:
+		key(KEY_ENTER)
+		await refresh()
+		expect(game.run.growth_slot() < 0 and game.run.Habitats.pending(game.run),"The organelle choice leads on to the travel choice")
 	key(KEY_ENTER)
 	await refresh()
 	expect(game.run.state==Run.BRIEF and game.run.habitat_confirmed and game.run.habitat_choice=="bloom","Keyboard travel confirms the food-rich route and leaves time to read its briefing")

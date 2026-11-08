@@ -62,7 +62,9 @@ void fragment() {
 	float grey = dot(color, vec3(0.2126, 0.7152, 0.0722));
 	color = mix(vec3(grey), color, saturation) * exposure;
 	if (grain > 0.0) {
-		float n = hash(floor(px * 1.5) + floor(clock * 24.0) * 17.0) - 0.5;
+		// A still pattern, like a sensor's fixed noise: settled water and paused
+		// frames stay pixel-still.
+		float n = hash(floor(px * 1.5)) - 0.5;
 		color += n * grain * 0.012;
 	}
 	COLOR = vec4(color, 1.0);

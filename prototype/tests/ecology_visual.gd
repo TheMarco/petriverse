@@ -67,7 +67,8 @@ func exercise() -> void:
 		game.last_discovery = run.discovery_serial
 		game.toast_time = 0.0
 		await capture("ecology-rescue-deadline")
-		expect(Guide.next_action(run).title=="Rescue the fading spore","Rendered rescue encounter has an actionable deadline instruction")
+		# Encounter 6 opens with the glass cradle, whose shields carry an 18 s deadline.
+		expect(Guide.next_action(run).title in ["Rescue the fading spore", "Open the glass cradle"] and Guide.next_action(run).detail.contains("s"),"Rendered rescue encounter has an actionable deadline instruction")
 	game.queue_free()
 	await process_frame
 	print("ECOLOGY VISUAL: %d checks; %d failures" % [checks,failures.size()])

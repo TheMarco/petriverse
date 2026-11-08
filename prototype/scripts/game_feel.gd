@@ -52,6 +52,8 @@ var boss_open := false
 var ready_cells: Array = []
 var drawn_points: PackedVector2Array = PackedVector2Array() # the loop being drawn, for a fizzle if abandoned
 var drawn_serial := 0
+var last_discovery := -1
+var pending_discovery := "" # a species named before its organism has surfaced
 
 func _ready() -> void:
 	game = get_parent()
@@ -123,6 +125,8 @@ func reset() -> void:
 	rings.clear()
 	ready_cells.clear()
 	drawn_points = PackedVector2Array()
+	pending_discovery = ""
+	last_discovery = game.run.discovery_serial
 	counters.clear()
 	trauma = 0.0
 	shake = Vector2.ZERO
@@ -159,6 +163,7 @@ func update(delta: float) -> void:
 		observe_clock()
 		observe_boss()
 		observe_recovery()
+		observe_discovery()
 	if paused:
 		queue_draw()
 		return
@@ -240,6 +245,30 @@ func observe_recovery() -> void:
 		if now and not ready_cells[i] and motion():
 			rings.append({"at": run.board.anchors[i], "age": 0.0, "life": 0.5, "from": 22.0, "to": 38.0, "color": Color(PEARL, 0.7), "width": 1.2})
 		ready_cells[i] = now
+
+## The first sighting of a species is marked on the organism itself.
+func observe_discovery() -> void:
+	var run = game.run
+	if last_discovery < 0 or run.state != "active":
+		last_discovery = run.discovery_serial
+		return
+	if run.discovery_serial != last_discovery:
+		last_discovery = run.discovery_serial
+		pending_discovery = run.last_discovery
+	if pending_discovery.is_empty():
+		return
+	for body in run.enemies:
+		if body.kind == pending_discovery or str(body.get("form")) == pending_discovery:
+			rings.append({"at": body.nucleus, "age": 0.0, "life": 1.1, "from": 24.0, "to": 70.0, "color": Color("c7caea"), "width": 1.8})
+			numbers.append({"at": body.nucleus + Vector2(0, -24), "text": "New species", "detail": species_name(pending_discovery), "age": 0.0, "life": 2.4, "color": Color("dfe2f7"), "size": 18})
+			pending_discovery = ""
+			return
+
+static func species_name(id: String) -> String:
+	for species in Journey.SPECIES:
+		if species.id == id:
+			return species.name
+	return ""
 
 func queue_draw() -> void:
 	glow.queue_redraw()

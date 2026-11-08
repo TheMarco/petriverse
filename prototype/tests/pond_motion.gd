@@ -28,6 +28,10 @@ func photograph() -> Image:
 	for child in game.microscope.get_children():
 		if child != game.microscope.field and child != game.microscope.pond:
 			child.visible = false
+	# The lens pass deliberately defocuses on pause; measure the water itself.
+	if game.get("optics") != null:
+		game.optics.visible = false
+		game.optics.backbuffer.visible = false
 	await process_frame
 	await process_frame
 	RenderingServer.force_draw(false, 0.0)

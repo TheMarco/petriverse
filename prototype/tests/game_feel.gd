@@ -159,6 +159,14 @@ func exercise() -> void:
 	live.selection.cancel()
 	game._process(1.0 / 60.0)
 	expect(game.feel.sparks.size() > sparks_before, "An abandoned loop dissolves with a fizzle")
+	# A first sighting is marked on the organism itself, once.
+	live.next_enemy_id += 1
+	live.enemies.append(live.Drifter.new(live.next_enemy_id, live.board.center + Vector2(220, 0), 0.0, "shellback"))
+	live.discover("shellback")
+	game._process(1.0 / 60.0)
+	var sightings: int = game.feel.numbers.filter(func(n): return n.text == "New species" and n.detail == "Shellback").size()
+	game._process(1.0 / 60.0)
+	expect(sightings == 1 and game.feel.numbers.filter(func(n): return n.text == "New species").size() == 1, "A new species is marked once on its organism")
 	# Reduced motion: no travelling motes or shake; values settle at once.
 	game.reduced_motion = true
 	frames(game, 3.5)

@@ -66,6 +66,9 @@ func exercise() -> void:
 	expect(loaded.residents.any(func(r): return r.token==record.token and r.get("nickname","")=="Luna"),"The native name edit persists to the isolated profile file")
 	game.large_text = true
 	await capture("home-pond-companions")
+	# Larger text uses the comfort layout's own controls; click the standard ones.
+	game.large_text = false
+	await refresh()
 	mouse(game.hud.rename_button.get_rect().get_center(),true)
 	mouse(game.hud.rename_button.get_rect().get_center(),false)
 	game.hud.name_input.text = "Cancelled"

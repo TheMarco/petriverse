@@ -1,5 +1,20 @@
 extends "res://tests/boss_patterns_visual.gd"
 
+## Simple loops of exactly `size` neighboring cells.
+func loops(board: RefCounted, size: int) -> Array:
+	var found: Array = []
+	var walk := func(walk: Callable, path: Array) -> void:
+		if path.size() == size:
+			if board.neighbors[path[-1]].has(path[0]) and path[1] < path[-1]:
+				found.append(path.duplicate())
+			return
+		for id in board.neighbors[path[-1]]:
+			if id > path[0] and not path.has(id):
+				walk.call(walk, path + [id])
+	for start in board.anchors.size():
+		walk.call(walk, [start])
+	return found
+
 func exercise() -> void:
 	game = Main.new()
 	game.audio_enabled = false
@@ -31,9 +46,11 @@ func exercise() -> void:
 	var uv: Vector2 = sprite.material.get_shader_parameter("nucleus_uv")
 	var center: Vector2 = sprite.to_global(sprite.offset+(uv-Vector2.ONE*0.5)*sprite.texture.get_size())
 	expect(center.distance_to(harp.nucleus)<0.1 and sprite.texture.get_image().has_mipmaps(),"The photographic visitor has a registered nucleus and small-sprite mipmaps")
+	# Any loop a player could draw counts: three to five ready cells with
+	# Mother outside, preferring the smallest.
 	var chosen: Array = []
-	for path in game.run.board.triangles:
-		if game.run.Geometry.contains(harp.nucleus,game.run.Geometry.polygon_for(path,game.run.board.anchors)):
+	for path in game.run.board.triangles + loops(game.run.board, 4) + loops(game.run.board, 5):
+		if game.run.Geometry.capture_valid(path,game.run.board,game.run.is_ready) and game.run.Geometry.contains(harp.nucleus,game.run.Geometry.polygon_for(path,game.run.board.anchors)):
 			chosen = path
 			break
 	expect(not chosen.is_empty(),"The director puts the visitor inside a real capture opportunity")

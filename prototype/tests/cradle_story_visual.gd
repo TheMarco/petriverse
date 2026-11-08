@@ -19,7 +19,11 @@ func exercise() -> void:
 	game.large_text = true
 	game.run.state = Run.BRIEF
 	await capture("cradle-story-brief")
+	# Larger text reflows the dish to two-thirds scale; the mouse gestures
+	# below use dish coordinates, so play continues in the standard layout.
+	game.large_text = false
 	game.run.state = Run.ACTIVE
+	await refresh() # Retire the comfort layout's panels before pointer input.
 	var b = game.run.board
 	var pearl = game.run.enemies.filter(func(e): return e.cradle)[0]
 	game.run.enemies = game.run.enemies.filter(func(e): return e==pearl or pearl.gate_ids.has(e.id))

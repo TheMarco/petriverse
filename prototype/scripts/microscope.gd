@@ -252,7 +252,8 @@ func sync() -> void:
 	water_tracers.sync(time,movement,game.run.fluid,appearance,game.visual_quality)
 	# Keep the living water present, while giving actionable organisms priority
 	# during a gesture. Reduced motion uses the same steady contrast treatment.
-	var tracing: bool = game.run.selection.active and game.run.state == "active"
+	# Pausing mid-gesture keeps the same emphasis, so resuming does not flicker.
+	var tracing: bool = game.run.selection.active and game.run.state in ["active", "paused"]
 	pond.modulate.a = 0.42 if tracing else 0.78
 	water_tracers.modulate.a = 0.35 if tracing else 0.7
 	phage_visual.sync(game.run,time,movement)

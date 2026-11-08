@@ -89,7 +89,14 @@ func exercise() -> void:
 			advance(3.0)
 	expect(regent.can_take_pulse(),"Two deliberate mouse captures open Regent before shield regeneration")
 	await capture("boss-regent-open")
+	# Wait for the shield-breaking cells to recover (mutations and long links
+	# lengthen recovery), then capture while the 14-second window is still open.
 	advance(3.2)
+	for i in 80:
+		if [0,8,9,1].all(func(id): return game.run.is_ready(id)) or not regent.can_take_pulse():
+			break
+		advance(0.1)
+	expect(regent.can_take_pulse(),"The Regent is still open once the capturing cells have recovered")
 	await gesture([0,8,9,1])
 	expect(game.run.harvest.boss_hits==1,"Recovery leaves enough time for the actual charged Regent capture")
 	prepare(11)

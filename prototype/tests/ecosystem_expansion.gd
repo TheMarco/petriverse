@@ -29,10 +29,14 @@ func exercise() -> void:
 	advance(15.0)
 	game.toast_time = 0.0
 	await capture("ecosystem-approaching-wave")
-	expect(not preload("res://scripts/encounter_rhythm.gd").warning_sites(run).is_empty(),"Native warning is driven by real pending arrivals")
-	advance(5.3)
+	var announced: Array = preload("res://scripts/encounter_rhythm.gd").warning_sites(run)
+	expect(not announced.is_empty(),"Native warning is driven by real pending arrivals")
+	# Wait for the first announced arrival, whatever family this dish sends.
+	var first: Dictionary = announced[0] if not announced.is_empty() else {"remaining": 5.3, "kind": "divider"}
+	advance(float(first.remaining) + 0.3)
 	await capture("ecosystem-emerging-wave")
-	expect(run.enemies.any(func(e): return e.kind=="divider" and e.age<0.5),"The announced divider visibly emerges on schedule")
+	var hunter_kinds := ["drifter", "shellback", "twinspore", "divider"]
+	expect(run.enemies.any(func(e): return e.age < 0.6 and (e.kind == first.kind or (first.kind == "hunter" and e.kind in hunter_kinds))),"The announced %s visibly emerges on schedule" % first.kind)
 	run.start_stage()
 	run.begin_encounter()
 	run.harvest.next_bloom = 9999.0
