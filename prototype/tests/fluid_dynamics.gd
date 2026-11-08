@@ -74,8 +74,9 @@ func _initialize() -> void:
 	var old_position: Vector2 = plain_food.nucleus
 	run.advect_body(plain_food,0.1)
 	expect(plain_food.nucleus.distance_to(old_position)>0.0 and plain_food.nucleus.distance_to(old_position)<=0.121,"Legacy plain organisms can advect without a swimming-origin property")
+	var health_before: int = run.integrity
 	var result: Dictionary = run.release()
-	expect(result.valid and result.food==1 and run.integrity==5,"Human-paced loop still feeds Mother in flowing water")
+	expect(result.valid and result.food==1 and run.integrity==health_before,"Human-paced loop still feeds Mother in flowing water")
 	run.step(0.4)
 	run.step(0.1)
 	expect(not run.fluid.sources.is_empty() and run.fluid.sources[0].z<0.0,"Absorption draws the surrounding water inward")

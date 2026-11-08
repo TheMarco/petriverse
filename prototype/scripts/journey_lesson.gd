@@ -54,7 +54,10 @@ static func instruction(run: RefCounted, clicks: bool) -> Dictionary:
 	var detail := "Drag 1 → 2 → 3 → 1, then release. Any ready blue cells can connect."
 	if run.lesson_step in [1, 3]:
 		title = "Watch your cells return"
-		detail = "They merge to digest the food. In 3 seconds they separate and can capture again."
+		var remaining := 0.0
+		for id in run.lesson_nodes:
+			remaining = maxf(remaining, run.cells[id].remaining)
+		detail = "They merge to digest the food. Ready again in %.1fs. Longer links take a little more time." % remaining
 	elif run.lesson_step == 2:
 		title = "Try a wider capture"
 		detail = "Drag through 1 to 6 to surround both food clusters. Return to 1, then release."

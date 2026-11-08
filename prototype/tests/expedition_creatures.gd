@@ -113,7 +113,7 @@ func exercise() -> void:
 			expect(result.get("rescued",0)==1 and run.rescued_specimens[-1].form==entry.id and run.rescued_specimens[-1].rare,"New spore can become an identified rare pond resident")
 	# Native pictures show each biome's small rare population, never all at once.
 	for biome in 3:
-		var index: int = run.route_plan.find(run.route_plan.filter(func(spec): return int(spec.stage)/4==biome and spec.get("generated",false) and int(spec.stage)>=biome*4+2)[0])
+		var index: int = run.route_plan.find(run.route_plan.filter(func(spec): return int(spec.stage)/4==biome and spec.get("generated",false))[0])
 		enter(run,index)
 		run.enemies.clear()
 		game.effects.clear()
@@ -131,7 +131,8 @@ func exercise() -> void:
 	game.journal_open = true
 	game.hud.turn_journal(99)
 	await capture("expedition-journal")
-	expect(run.JourneyPlan.SPECIES.size()==41 and not game.hud.journal_next.visible,"Expanded 41-entry journal reaches its last page")
+	var last_page := ceili(run.JourneyPlan.SPECIES.size()/float(game.hud.JOURNAL_PAGE_SIZE))-1
+	expect(game.hud.journal_page==last_page and not game.hud.journal_next.visible and Expedition.ENTRIES.all(func(entry): return run.JourneyPlan.SPECIES.any(func(species): return species.id==entry.id)),"The complete journal includes every expedition form and reaches its last page")
 	game.journal_open = false
 	run.enemies.clear()
 	var body = run.harvest.ecology.add(run,"grazer",1,run.board.center+Vector2(140,-90),"chalice_grazer")

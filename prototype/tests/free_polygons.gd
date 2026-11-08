@@ -1,6 +1,12 @@
 extends "res://tests/harvest_visual.gd"
 const Save = preload("res://scripts/journey_save.gd")
 
+func mouse(at: Vector2, pressed: bool) -> void:
+	super.mouse(at*game.dish_scale()+game.dish_offset(),pressed)
+
+func drag(from: Vector2, to: Vector2) -> void:
+	super.drag(from*game.dish_scale()+game.dish_offset(),to*game.dish_scale()+game.dish_offset())
+
 func click_cell(id: int) -> void:
 	mouse(game.run.board.anchors[id], true)
 	mouse(game.run.board.anchors[id], false)
@@ -49,8 +55,10 @@ func exercise() -> void:
 	restored.dispose()
 	run.step(0.9)
 	await capture("free-polygon-digestion")
-	run.step(2.2)
-	expect(run.is_ready(17), "Free-connected cells return on the unchanged recovery clock")
+	var remaining := 0.0
+	for cell in run.cells: remaining = maxf(remaining,cell.remaining)
+	run.step(remaining+0.01)
+	expect(run.is_ready(17), "Free-connected cells return after their actual link-strain recovery")
 	# Click input can make very long edges without pointer-hit intermediates.
 	game.click_mode = true
 	for id in [16,19,17,16]:

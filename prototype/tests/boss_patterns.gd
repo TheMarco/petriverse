@@ -86,7 +86,7 @@ func exercise() -> void:
 	fixture_stage(broad_run,11)
 	broad_run.enemies = [broad_run.boss()]
 	broad_run.harvest.nourishment = 3
-	select(broad_run,range(16,24))
+	select(broad_run,[7,15,23,16,17,18,2,1])
 	var broad_result: Dictionary = broad_run.release()
 	expect(broad_result.valid and broad_result.boss_layers==1,"A legal eight-cell membrane can catch both separated hearts immediately without waiting")
 	broad_run.dispose()

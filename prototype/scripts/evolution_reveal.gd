@@ -44,6 +44,9 @@ func present(id: String) -> void:
 	visible = true
 	sync()
 	game.hud.refresh()
+	if game.readable_ui != null:
+		game.readable_ui.sync()
+	continue_button.grab_focus()
 
 func dismiss() -> void:
 	visible = false

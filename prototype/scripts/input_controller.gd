@@ -10,6 +10,17 @@ var active := false
 var rejected_id := -1
 var rejection_reason := ""
 var max_vertices := 8
+var assisted_closure := false
+
+func close_near_start(point: Vector2) -> bool:
+	# Optional release assistance affects only the known closing cell. It cannot
+	# append another vertex, cross Mother, or turn an invalid shape into a loop.
+	if not assisted_closure or closed or not can_close():
+		return false
+	if point.distance_to(board.anchors[path[0]]) > board.hit_radius + 12.0:
+		return false
+	closed = true
+	return true
 
 func _init(board_data: RefCounted, readiness: Callable) -> void:
 	board = board_data

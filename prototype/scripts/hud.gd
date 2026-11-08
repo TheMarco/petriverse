@@ -93,7 +93,8 @@ func volume_slider(at: Vector2, value: float, action: Callable) -> HSlider:
 	slider.max_value = 1.0
 	slider.step = 0.01
 	slider.value = value
-	slider.focus_mode = Control.FOCUS_NONE
+	slider.focus_mode = Control.FOCUS_ALL
+	slider.accessibility_name = "Music volume" if action.get_method() == "set_music_volume" else "Living sounds volume"
 	slider.value_changed.connect(action)
 	slider.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	UI.style_slider(slider)
@@ -107,7 +108,7 @@ func button(caption: String, at: Vector2, dimensions: Vector2, action: Callable,
 	result.position = at
 	result.size = dimensions
 	result.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	result.focus_mode = Control.FOCUS_NONE
+	result.focus_mode = Control.FOCUS_ALL
 	result.theme = UI.theme()
 	UI.style_button(result, "secondary", 15)
 	result.pressed.connect(action)
@@ -186,7 +187,7 @@ func overlay_visible() -> bool:
 	return game.run.state != "active" and not (game.run.state in ["loss", "success"] and game.run.mother_damage.active())
 
 func scaled(size_px: int, always: bool = false) -> int:
-	return roundi(size_px * 1.12) if game.large_text and (always or size_px <= 17) else size_px
+	return roundi(size_px * 1.3) if game.large_text and (always or size_px <= 17) else size_px
 
 func measure(value: String, size_px: int, weight: int = 0) -> float:
 	var actual := scaled(size_px)

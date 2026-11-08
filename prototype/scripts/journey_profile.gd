@@ -13,11 +13,41 @@ var victories := 0
 var best_score := 0
 var completed_seeds: Array = []
 var last_error := OK
+var recovered_from_backup := false
 
-func load_profile() -> void:
+func _config_valid(candidate: String) -> bool:
 	var config := ConfigFile.new()
-	if config.load(path) != OK:
-		return
+	if config.load(candidate) != OK or not config.has_section("profile"):
+		return false
+	for key in ["introduced_species","offered_species","residents","cleared_encounters","last_colony_traits","pond_memories","discovered","completed_seeds"]:
+		if not config.get_value("profile", key, []) is Array:
+			return false
+	for key in ["deepest_dish","victories","best_score"]:
+		if not config.get_value("profile", key, 0) is int:
+			return false
+	for resident in config.get_value("profile", "residents", []):
+		if not resident is Dictionary or not resident.get("token") is String or not resident.get("form") is String:
+			return false
+	return true
+
+func _remove_file(candidate: String) -> void:
+	if FileAccess.file_exists(candidate):
+		DirAccess.remove_absolute(candidate)
+
+func _replace_file(temporary: String, target: String) -> Error:
+	return DirAccess.rename_absolute(temporary, target)
+
+func _refresh_backup() -> Error:
+	# Never replace a valid backup with missing or invalid current data.
+	if not _config_valid(path):
+		return OK
+	var backup := path + ".bak"
+	var backup_temporary := backup + ".tmp"
+	_remove_file(backup_temporary)
+	var error := DirAccess.copy_absolute(path, backup_temporary)
+	return error if error != OK else _replace_file(backup_temporary, backup)
+
+func _apply(config: ConfigFile) -> void:
 	residents = Array(config.get_value("profile", "residents", []))
 	cleared_encounters = Array(config.get_value("profile", "cleared_encounters", []))
 	last_colony_traits = Array(config.get_value("profile", "last_colony_traits", []))
@@ -29,6 +59,17 @@ func load_profile() -> void:
 	victories = int(config.get_value("profile", "victories", 0))
 	best_score = int(config.get_value("profile", "best_score", 0))
 	completed_seeds = Array(config.get_value("profile", "completed_seeds", []))
+
+func load_profile() -> void:
+	recovered_from_backup = false
+	var config := ConfigFile.new()
+	if _config_valid(path) and config.load(path) == OK:
+		_apply(config)
+		return
+	var backup := ConfigFile.new()
+	if _config_valid(path + ".bak") and backup.load(path + ".bak") == OK:
+		_apply(backup)
+		recovered_from_backup = true
 
 func unlocked(id: String) -> bool:
 	return id == "wanderer" or (id == "weaver" and deepest_dish >= 1) or (id == "symbiont" and deepest_dish >= 2)
@@ -42,6 +83,7 @@ func observe(run: RefCounted) -> bool:
 		if not tokens.has(specimen.token):
 			var resident: Dictionary = specimen.duplicate(true)
 			resident.arrived_after = cleared_encounters.size()
+			resident.welcomed = false
 			residents.append(resident)
 			tokens[specimen.token] = true
 			changed = true
@@ -77,8 +119,28 @@ func save_profile() -> bool:
 	var config := ConfigFile.new()
 	for property in ["introduced_species","offered_species","residents","cleared_encounters","last_colony_traits","pond_memories","discovered","deepest_dish","victories","best_score","completed_seeds"]:
 		config.set_value("profile",property,get(property))
-	last_error = config.save(path)
+	var temporary := path + ".tmp"
+	last_error = config.save(temporary)
+	if last_error != OK:
+		_remove_file(temporary)
+		dirty = true
+		return false
+	if not _config_valid(temporary):
+		_remove_file(temporary)
+		last_error = ERR_INVALID_DATA
+		dirty = true
+		return false
+	last_error = _refresh_backup()
+	if last_error != OK:
+		_remove_file(temporary)
+		dirty = true
+		return false
+	last_error = _replace_file(temporary, path)
 	dirty = last_error != OK
+	if dirty:
+		_remove_file(temporary)
+	else:
+		recovered_from_backup = false
 	return not dirty
 
 func rename_resident(token: String, nickname: String) -> bool:
@@ -132,3 +194,18 @@ func habit(resident: Dictionary) -> String:
 			return "Its spiral chambers shine and rest with the water."
 		return "Fans the water through its fine glass ribs." if resident.form=="glass_harp" else "Opens its lace petals to the current."
 	return ["Curious: gently explores near Mother.","Sociable: drifts near its own kind.","Dreamy: follows a quiet, slow current."][posmod(hash(resident.token),3)]
+
+func new_residents() -> Array:
+	# Legacy residents are already settled; only newly recorded rescues arrive.
+	return residents.filter(func(resident): return not resident.get("welcomed", true))
+
+func welcome(tokens: Array, persist: bool = true) -> void:
+	for resident in residents:
+		if tokens.has(resident.token): resident.welcomed = true
+	if persist: save_profile()
+
+func origin_text(resident: Dictionary) -> String:
+	if resident.get("story", "") == "hatchling": return "Hatched in Glassgarden after you opened its cradle."
+	if resident.get("story", "") == "cradle": return "Rescued inside the glass cradle in Glassgarden."
+	var journey = preload("res://scripts/journey_plan.gd")
+	return "Rescued in %s, encounter %d." % [journey.dish(resident.get("stage", 0)).name, resident.get("encounter", int(resident.get("stage", 0))+1)]

@@ -26,8 +26,9 @@ func exercise() -> void:
 	run.state = Run.ACTIVE
 	tick(run,3.5)
 	expect(run.enemies.has(food),"Feeding leaves six seconds to intervene")
+	var health_before: int = run.integrity
 	tick(run,0.7)
-	expect(not run.enemies.has(food) and hunter.carried_food==1 and hunter.fed_remaining>7.0 and run.integrity==5,"The hunter eats one real food, digests slowly, and leaves Mother unharmed")
+	expect(not run.enemies.has(food) and hunter.carried_food==1 and hunter.fed_remaining>7.0 and run.integrity==health_before,"The hunter eats one real food, digests slowly, and leaves Mother unharmed")
 	var result := capture_body(run,hunter)
 	expect(result.valid and result.salvage==1 and result.food==1,"Capturing the fed hunter recovers its swallowed food")
 	quiet(run,6)

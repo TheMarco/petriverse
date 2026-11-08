@@ -59,6 +59,10 @@ func exercise() -> void:
 	game.large_text = true
 	await capture("dish-labels-large")
 	expect(clear_action(),"Larger text uses its real width and avoids the action")
+	expect(game.readable_ui.screen.visible,"Larger text retains instructions in the reflowed HUD when a floating label yields")
+	game.large_text = false
+	await refresh()
+	RenderingServer.force_draw(false)
 	var key := "body:%d" % body.get_instance_id()
 	var old: Vector2 = game.hud.dish_labels.placements.get(key,Vector2.INF)
 	body.nucleus += Vector2(0.2,0.2)

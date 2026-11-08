@@ -24,6 +24,8 @@ const COLONIES := Rect2(241, 170, 798, 540)
 const RENAME := Rect2(370, 296, 540, 290)
 var advanced_open := false
 var new_button: Button
+var compare_button: Button
+var experiments_button: Button
 var advanced_button: Button
 var pond_button: Button
 var pond_previous: Button
@@ -64,7 +66,9 @@ func _ready() -> void:
 	journal_button = button("Field journal", Vector2.ZERO, Vector2(172, 40), game.toggle_journal, "J")
 	film_watch_button = button("Watch film", Vector2(RIGHT, 660), Vector2(COLUMN, 38), watch_new_film)
 	film_later_button = button("Later · Journal", Vector2(RIGHT, 704), Vector2(COLUMN, 34), save_new_films_for_later)
-	new_button = button("New journey", Vector2.ZERO, Vector2(320, 50), game.new_journey.bind("wanderer"))
+	new_button = button("New journey", Vector2.ZERO, Vector2(320, 50), game.request_new_journey.bind("wanderer"))
+	compare_button = button("Compare details", Vector2(850,142), Vector2(164,34), game.toggle_comparisons)
+	experiments_button = button("Experiments", Vector2.ZERO, Vector2(150,40), game.open_experiments)
 	advanced_button = button("Advanced starting colonies", Vector2.ZERO, Vector2(320, 40), toggle_advanced)
 	continue_button = button("Continue your journey", Vector2.ZERO, Vector2(320, 50), game.resume_journey)
 	pond_button = button("Visit your home pond", Vector2.ZERO, Vector2(320, 40), game.toggle_home_pond)
@@ -80,7 +84,7 @@ func _ready() -> void:
 	travel_button = button("Keep food and travel", Vector2.ZERO, Vector2(320, 44), game.travel_without_evolution)
 	for i in 3:
 		var colony: Dictionary = Journey.COLONIES[i]
-		var control := button(colony.name, Vector2(COLONIES.position.x + 43 + i * 248, COLONIES.position.y + 250), Vector2(220, 48), game.new_journey.bind(colony.id))
+		var control := button(colony.name, Vector2(COLONIES.position.x + 43 + i * 248, COLONIES.position.y + 250), Vector2(220, 48), game.request_new_journey.bind(colony.id))
 		control.tooltip_text = colony.detail + "\n" + colony.unlock
 		colony_buttons.append(control)
 	for slot in JOURNAL_PAGE_SIZE:
@@ -123,7 +127,7 @@ func _ready() -> void:
 	refresh()
 
 func managed_controls() -> Array:
-	return [pause_button, restart_button, debug_button, mode_button, motion_button, center_button, sound_button, journal_button, film_watch_button, film_later_button, help_button, help_close, new_button, continue_button, pond_button, advanced_button, pond_previous, pond_next, journal_close, journal_previous, journal_next, repair_button, travel_button, rename_button, name_blocker, name_input, name_save, name_cancel] + journal_films + habitat_buttons + growth_buttons + colony_buttons + cards + trait_tooltips
+	return [pause_button, restart_button, debug_button, mode_button, motion_button, center_button, sound_button, journal_button, film_watch_button, film_later_button, help_button, help_close, new_button, continue_button, pond_button, advanced_button, experiments_button, compare_button, pond_previous, pond_next, journal_close, journal_previous, journal_next, repair_button, travel_button, rename_button, name_blocker, name_input, name_save, name_cancel] + journal_films + habitat_buttons + growth_buttons + colony_buttons + cards + trait_tooltips
 
 ## Each screen lists only the controls it needs; everything else is hidden.
 func refresh() -> void:
@@ -136,6 +140,7 @@ func refresh() -> void:
 	var blocked: bool = game.settings_open or game.journal_open or game.help_open or renaming() or (game.evolution_reveal != null and game.evolution_reveal.visible)
 	var overlay: bool = not home and not blocked and state in ["brief", "paused", "loss", "success"] and overlay_visible() and not game.round_result_showing()
 	var shown: Array = []
+	if home and not habitat and not blocked and not advanced_open: shown.append(experiments_button)
 	if renaming():
 		shown.append_array([name_blocker, name_input, name_save, name_cancel])
 	elif game.journal_open:
@@ -158,8 +163,11 @@ func refresh() -> void:
 	else:
 		shown.append_array(refresh_encounter(overlay))
 	for control in managed_controls():
-		control.visible = shown.has(control)
+		control.visible = shown.has(control) and not game.comfort_layout() and not game.comparisons_open
 	refresh_settings()
+	if game.settings_open or game.comfort_layout():
+		for control in [sound_close, mute_button, music_slider, effects_slider, comfort_motion_button, contrast_button, text_button, quality_button, mode_button]:
+			control.hide()
 	title_screen.configure(self)
 	queue_redraw()
 
@@ -237,6 +245,7 @@ func refresh_encounter(overlay: bool) -> Array:
 			place(restart_button, Vector2(brief.position.x + 24, brief.end.y - 70), Vector2(snug("Return home", "", 13), 36), "quiet", "Return home", "", 13)
 			shown.append_array([center_button, restart_button])
 	elif run.evolution_ready() and not game.round_result_showing():
+		if not run.offered_mutations.is_empty(): shown.append(compare_button)
 		var first_choice: bool = run.mutations.is_empty() and run.offered_mutations.size() == 2
 		var top := EVOLVE.position.y + 160.0
 		for i in cards.size():
@@ -249,7 +258,7 @@ func refresh_encounter(overlay: bool) -> Array:
 				cards[i].size = Vector2(350, 346) if first_choice else Vector2(236, 346)
 				cards[i].disabled = run.biomass < run.evolution_cost()
 				cards[i].text_multiplier = 1.05 if game.large_text else 1.0
-				cards[i].configure(Mutations.journey_definition(run.offered_mutations[i]), i, run.mutations)
+				cards[i].configure_journey(run, run.offered_mutations[i], i)
 				shown.append(cards[i])
 		var row := EVOLVE.end.y - 128.0 if not run.offered_mutations.is_empty() else REST.end.y - 108.0
 		var span := (EVOLVE if not run.offered_mutations.is_empty() else REST)
@@ -326,6 +335,15 @@ func _draw() -> void:
 		return
 	var run = game.run
 	var topmost: bool = game.settings_open or game.journal_open or game.help_open
+	if game.settings_open or game.comparisons_open:
+		return # Native, scrollable settings own this screen at every size.
+	if game.comfort_layout():
+		if run.state == "active" and not topmost:
+			draw_set_transform(game.dish_offset(), 0.0, Vector2.ONE * game.dish_scale())
+			draw_targets()
+			draw_nudge()
+			draw_set_transform(Vector2.ZERO)
+		return
 	if run.state == "home":
 		draw_home()
 	else:
@@ -451,29 +469,17 @@ func draw_feedback() -> void:
 		return
 	if run.selection.can_close():
 		var preview: Dictionary = run.harvest_preview()
-		var outcomes: Array[String] = []
-		if preview.food > 0:
-			outcomes.append("+%d food" % preview.food)
-		if preview.boss_layers > 0:
-			outcomes.append("1 boss hit, −3 charge")
-		elif preview.get("wardens", 0) > 0:
-			outcomes.append("%d shields broken" % preview.wardens)
-		elif preview.rescued > 0:
-			outcomes.append("%d rescued" % preview.rescued)
-		elif preview.purified > 0:
-			outcomes.append("%d poison cleared" % preview.purified)
-		elif preview.threats > 0:
-			outcomes.append("%d threat%s captured" % [preview.threats, "s" if preview.threats != 1 else ""])
-		if outcomes.is_empty():
-			outcomes.append("No food collected")
-		outcomes.append("−%d health" % preview.poison if preview.poison > 0 else "No health lost")
+		var outcome: String = game.CaptureFeedback.summary(preview)
+		outcome += " · " + game.CaptureFeedback.health_text(preview, run.integrity)
+		if game.capture_feedback.warning_remaining > 0.0 and preview.poison > 0:
+			outcome = "POISON ENTERED · " + outcome
 		var strain: float = LoopStrain.penalty(run.selection.path, run.board.anchors)
 		var return_time: float = Mutations.recovery(run.mutations, run.selection.path.size(), run.board.tuning.recovery_seconds) + strain
 		var benefit := Mutations.food_bonus_text(preview)
 		var timing := "Cells return in %.1fs · long links +%.1fs" % [return_time, strain] if strain >= 0.1 else "Cells return in %.1fs" % return_time
 		# Feedback belongs below the lens: lower cells remain visible and
 		# selectable throughout a gesture, even with a two-line preview.
-		toast_panel("  ·  ".join(outcomes), "Includes " + benefit + "  ·  " + timing if not benefit.is_empty() else timing, UI.DANGER if preview.poison > 0 else CYAN)
+		toast_panel(outcome, "Includes " + benefit + "  ·  " + timing if not benefit.is_empty() else timing, UI.DANGER if preview.poison > 0 else CYAN)
 	elif game.toast_time > 0.0:
 		toast_panel(game.toast, "", CYAN)
 
@@ -517,7 +523,8 @@ func toast_panel(main: String, detail: String, color: Color) -> void:
 		centered(detail, y + 20.0, 12, MUTED)
 
 func visual_box(item: CanvasItem, rect: Rect2) -> Rect2:
-	return (global_transform.affine_inverse()*item.get_global_transform()*rect).grow(6.0)
+	var box: Rect2 = global_transform.affine_inverse()*item.get_global_transform()*rect
+	return Rect2(game.to_dish(box.position), box.size/game.dish_scale()).grow(6.0)
 
 func prepare_labels() -> void:
 	var occupied: Array[Rect2] = []
@@ -549,8 +556,9 @@ func prepare_labels() -> void:
 	marker_boxes = dish_labels.boxes
 
 func water_label(key: String, anchor: Rect2, title: String, color: Color) -> void:
-	var actual := scaled(11)
-	var size := Vector2(measure(title, 11, UI.MEDIUM) + 16.0, actual + 12.0)
+	var point_size := 30 if game.comfort_layout() else 11
+	var actual := scaled(point_size)
+	var size := Vector2(measure(title, point_size, UI.MEDIUM) + 16.0, actual + 12.0)
 	var box: Rect2 = dish_labels.place(key,anchor,size)
 	if not box.has_area(): return
 	var center := anchor.get_center()
@@ -559,7 +567,7 @@ func water_label(key: String, anchor: Rect2, title: String, color: Color) -> voi
 	if dish_labels.clear_leader(from,to):
 		draw_line(from,to,Color(color,0.35),1.0,true)
 	draw_style_box(label_style(color),box)
-	label_at(title, box.position + Vector2(8, actual + 2), 11, color, UI.MEDIUM)
+	label_at(title, box.position + Vector2(8, actual + 2), point_size, color, UI.MEDIUM)
 
 func label_style(color: Color) -> StyleBoxFlat:
 	var key := color.to_html()
@@ -591,7 +599,7 @@ func draw_nudge() -> void:
 			draw_polyline(PackedVector2Array([to-direction.rotated(-0.5)*9.0,to,to-direction.rotated(0.5)*9.0]),CYAN,1.6,true)
 			draw_arc(to,19.0,0,TAU,40,Color(CYAN,0.35),1.0,true)
 		return
-	var hovered = nudge.pick(run,game.get_global_mouse_position())
+	var hovered = nudge.pick(run,game.to_dish(game.get_global_mouse_position()))
 	if hovered!=null:
 		draw_arc(hovered.nucleus,26.0,0,TAU,48,Color(CYAN,0.75 if nudge.cooldown<=0.0 else 0.3),1.2,true)
 	var teach = nudge.teaching_target(run)
@@ -775,7 +783,8 @@ func brief_content(paint: bool, top: float) -> float:
 		y = block(paint, goal, Vector2(left + 232, y), 452, 16, INK) + 38.0
 	y = maxf(y - 4.0, art_bottom + 40.0)
 	var gesture := "Drag through 3-%d blue cells. Return to the first cell, then release to capture what is inside." % run.selection.max_vertices if not game.click_mode else "Click through 3-%d blue cells. Click the first cell again, then press Enter to capture." % run.selection.max_vertices
-	y = block(paint, gesture, Vector2(left, y), width, 14, CYAN)
+	if run.stage_index < 2:
+		y = block(paint, gesture, Vector2(left, y), width, 14, CYAN)
 	if run.stage_index > 0:
 		var detail: String = run.JourneyRoute.FAMILY_DETAILS[spec.featured] if spec.get("generated", false) else run.Mastery.suggestion(run)
 		y = block(paint, detail, Vector2(left, y + 28), width, 13, MUTED)
@@ -892,7 +901,7 @@ func draw_home_pond() -> void:
 	var rare_count := residents.filter(func(r): return r.rare).size()
 	label_at("%d rare visitor%s" % [rare_count, "" if rare_count == 1 else "s"], Vector2(LEFT, 174), 13, MUTED)
 	var y := wrapped("Every resident is a life you rescued. They stay here between journeys.", Vector2(LEFT, 226), COLUMN, 13, MUTED)
-	wrapped("Select a resident to meet it and its companion.", Vector2(LEFT, y + 30), COLUMN, 13, INK)
+	wrapped("Welcome home · %d new lives, safe in your care." % game.home_pond.welcome_tokens.size() if not game.home_pond.welcome_tokens.is_empty() else "Select a resident to meet it and its companion.", Vector2(LEFT, y + 30), COLUMN, 15, CYAN)
 	var unlocked := 0
 	var next_hint := "Pearl nursery, fern meadow and glass garden. Grown from your optional feats."
 	for id in game.run.Mastery.KEEPSAKES:
@@ -919,7 +928,7 @@ func draw_home_pond() -> void:
 		y = wrapped(display_name, Vector2(RIGHT, 112), COLUMN, name_size, INK, UI.SEMIBOLD)
 		if not record.get("nickname", "").is_empty():
 			y = wrapped(definition.get("name", "Pearl spore"), Vector2(RIGHT, y + 24), COLUMN, 12, CYAN)
-		var origin := "From %s, encounter %d." % [Journey.dish(record.stage).name, record.get("encounter", record.stage + 1)]
+		var origin: String = game.journey_profile.origin_text(record)
 		if record.get("story", "") == "hatchling":
 			origin = "Hatched in Glassgarden after you opened its cradle."
 		elif record.get("story", "") == "cradle":
@@ -941,9 +950,10 @@ func draw_lesson() -> void:
 	var step_width := measure(step, 12, UI.MEDIUM)
 	var width := title_width + step_width + 64.0
 	var box := Rect2(640.0 - width * 0.5, 92, width, 46)
-	draw_style_box(UI.toast_box(), box)
-	label_at(guide.title, Vector2(box.position.x + 24, 121), 16, INK, UI.SEMIBOLD)
-	label_at(step, Vector2(box.end.x - 24 - step_width, 121), 12, UI.FAINT, UI.MEDIUM)
+	if not game.comfort_layout():
+		draw_style_box(UI.toast_box(), box)
+		label_at(guide.title, Vector2(box.position.x + 24, 121), 16, INK, UI.SEMIBOLD)
+		label_at(step, Vector2(box.end.x - 24 - step_width, 121), 12, UI.FAINT, UI.MEDIUM)
 	if waiting:
 		return
 	var path: Array = run.Lesson.route(run)
@@ -952,9 +962,10 @@ func draw_lesson() -> void:
 		var next: Vector2 = run.board.anchors[path[(i+1)%path.size()]]
 		var direction := (next-p).normalized()
 		draw_dashed_line(p+direction*29, next-direction*29, Color(0.65, 0.86, 0.86, 0.38), 1.5, 4.0, true, true)
-		draw_circle(p+Vector2(23, -25), 11, UI.RAISED, true, -1, true)
-		draw_circle(p+Vector2(23, -25), 11, Color(CYAN, 0.35), false, 1.0, true)
-		centered(str(i+1), p.y - 20.5, 12, CYAN, UI.SEMIBOLD, p.x + 23)
+		var badge := 25.0 if game.comfort_layout() else 11.0
+		draw_circle(p+Vector2(23, -25), badge, UI.RAISED, true, -1, true)
+		draw_circle(p+Vector2(23, -25), badge, Color(CYAN, 0.35), false, 1.0, true)
+		centered(str(i+1), p.y - (14.0 if game.comfort_layout() else 20.5), 32 if game.comfort_layout() else 12, CYAN, UI.SEMIBOLD, p.x + 23)
 	# A moving point demonstrates the route without moving the actual cells.
 	if not game.reduced_motion and not run.selection.active:
 		var progress: float = fmod(game.visual_time * 0.65, path.size())

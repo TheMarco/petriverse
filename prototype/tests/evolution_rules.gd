@@ -109,8 +109,9 @@ func exercise() -> void:
 	run.step(0.2)
 	expect(is_equal_approx(crossing.slowed, 1.0), "Crossing an active residual boundary starts the one-second slow")
 	var crossing_before: Vector2 = crossing.nucleus
-	run.step(0.25)
-	expect(is_equal_approx(crossing_before.distance_to(crossing.nucleus), 1.5), "Residual slow reduces real displacement by forty percent")
+	# Isolate swimming from the independently tested ambient-water advection.
+	crossing.step(0.25, run.board.center)
+	expect(absf(crossing_before.distance_to(crossing.nucleus)-1.5)<0.001, "Residual slow reduces swimming displacement by forty percent")
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 108
 	var chosen: Array = []
@@ -119,7 +120,7 @@ func exercise() -> void:
 		expect(offers.size() == 3 and not offers.any(func(id): return chosen.has(id)), "Choice %d offers three unchosen mutations" % (i + 1))
 		chosen.append(offers[0])
 	var records := Records.new()
-	records.path = "user://records-test.cfg"
+	records.path = "/tmp/petriverse-evolution-records-test.cfg"
 	run.score = 4125
 	run.best_capture = 3
 	run.state = "success"

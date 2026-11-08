@@ -2,6 +2,12 @@ extends "res://tests/harvest_visual.gd"
 const Geometry = preload("res://scripts/loop_geometry.gd")
 const Resolver = preload("res://scripts/loop_resolver.gd")
 
+func mouse(at: Vector2, pressed: bool) -> void:
+	super.mouse(at*game.dish_scale()+game.dish_offset(),pressed)
+
+func drag(from: Vector2, to: Vector2) -> void:
+	super.drag(from*game.dish_scale()+game.dish_offset(),to*game.dish_scale()+game.dish_offset())
+
 func exercise() -> void:
 	game = Main.new()
 	game.audio_enabled = false
@@ -23,6 +29,7 @@ func exercise() -> void:
 	run.start_stage()
 	run.begin_encounter()
 	run.enemies = [Drifter.new(500,run.board.center+Vector2(65,0),0)]
+	var starting_health: int = run.integrity
 	var ring := [0,1,2,3,4,5,6,7]
 	for reverse in [false,true]:
 		if reverse: ring.reverse()
@@ -37,7 +44,7 @@ func exercise() -> void:
 			game.large_text = true
 			await capture("mother-boundary-preview")
 		mouse(run.board.anchors[ring[0]],false)
-		expect(run.integrity==5 and run.biomass==0 and run.kills==0 and run.enemies.size()==1,"Blocked release costs no health or food and kills nothing")
+		expect(run.integrity==starting_health and run.biomass==0 and run.kills==0 and run.enemies.size()==1,"Blocked release costs no health or food and kills nothing")
 		expect(run.cells.all(func(cell): return cell.is_ready()) and run.clots.is_empty() and run.capture_serial==0,"No recovery, absorption or capture event on rejection")
 		expect(game.toast.begins_with("Keep the mother outside"),"Release explains why the loop was cancelled")
 	expect(not Resolver.commit(ring,run).valid,"Atomic commit also blocks direct or stale invalid input")
@@ -60,7 +67,7 @@ func exercise() -> void:
 		mouse(run.board.anchors[id],false)
 	expect(run.selection.closed and run.preview()==[500],"Free connections around an outside enemy still preview correctly")
 	key(KEY_ENTER)
-	expect(run.kills==1 and run.integrity==5,"Click capture still defends Mother outside the exclusion zone")
+	expect(run.kills==1 and run.integrity==starting_health,"Click capture still defends Mother outside the exclusion zone")
 	game.queue_free()
 	await process_frame
 	print("MOTHER BOUNDARY: %d checks; %d failures" % [checks,failures.size()])

@@ -12,7 +12,7 @@ const AMOEBA_FIELDS := ["phase","target_node","captive_node","site_nodes","desti
 const LIVING_FIELDS := ["destination","target_id","target_node","site_nodes","latched","action_clock","stored_food","daughter","sector","spawning"]
 const RUN_FIELDS := ["rescued_specimens", "mastery_awards", "lesson_step", "lesson_nodes", "stage_index", "state", "score", "integrity", "max_integrity", "growth_roles", "guardian_spent", "guardian_recovery", "guardian_resting", "guardian_block_serial", "last_repair_encounter", "kills", "elapsed", "stage_elapsed", "biomass", "total_food", "total_rescued", "completed_dishes", "colony_id", "retries", "run_seed", "next_enemy_id", "boss_defeated", "mutations", "offered_mutations", "seen_species", "discovery_serial", "last_discovery", "best_capture", "loops_drawn", "capture_serial", "last_capture", "contact_time", "last_contacts", "residuals"]
 const ENEMY_FIELDS := ["cradle_open_age", "story", "gate_ids", "shield_remaining", "cradle", "visitor", "bloom_releases", "hunt_target", "hunt_time", "forage_remaining", "foraging_done", "fed_remaining", "carried_food", "bloom_id", "id", "nucleus", "speed", "heading", "health", "age", "kind", "form", "stunned", "slowed", "hit_flash", "shield_flash", "pair_angle", "pair_span", "lure_vector", "lure_elapsed"]
-const HARVEST_FIELDS := ["visitor_at", "visitor_spawned", "nourishment", "poison_taken", "next_bloom", "next_threat", "blooms", "rotation", "loss_reason", "loss_title", "rescued", "purified", "defended", "hunters_captured", "final_surge_enabled", "final_surge_started", "final_surge_start_time", "final_surge_rapid", "final_surge_needed", "final_surge_captured", "final_surge_ids", "visited", "clean_food", "threats_spawned", "spores_spawned", "next_spore", "tide", "boss_hits", "last_time"]
+const HARVEST_FIELDS := ["last_refill", "visitor_at", "visitor_spawned", "nourishment", "poison_taken", "next_bloom", "next_threat", "blooms", "rotation", "loss_reason", "loss_title", "rescued", "purified", "defended", "hunters_captured", "final_surge_enabled", "final_surge_started", "final_surge_start_time", "final_surge_rapid", "final_surge_needed", "final_surge_captured", "final_surge_ids", "visited", "clean_food", "threats_spawned", "spores_spawned", "next_spore", "tide", "boss_hits", "last_time"]
 
 static func fields(object: RefCounted, names: Array) -> Dictionary:
 	var result := {}
@@ -211,6 +211,39 @@ static func restore(run: RefCounted, data: Dictionary) -> bool:
 	run.journey_serial += 1
 	return true
 
+static func _backup_path(path: String) -> String:
+	return path + ".bak"
+
+static func _remove_file(path: String) -> void:
+	if FileAccess.file_exists(path):
+		DirAccess.remove_absolute(path)
+
+static func _load_file(path: String) -> Dictionary:
+	var config := ConfigFile.new()
+	if config.load(path) != OK:
+		return {}
+	var data: Variant = config.get_value("journey", "snapshot", {})
+	if not data is Dictionary or not valid(data):
+		return {}
+	var checkpoint: Variant = config.get_value("journey", "checkpoint", {})
+	if not checkpoint is Dictionary:
+		return {}
+	return {"snapshot": data, "checkpoint": checkpoint}
+
+static func _replace_file(temporary: String, target: String) -> Error:
+	# If atomic replacement fails, keep the existing file intact.
+	return DirAccess.rename_absolute(temporary, target)
+
+static func _refresh_backup(path: String) -> Error:
+	# Never replace a valid backup with missing or invalid current data.
+	if _load_file(path).is_empty():
+		return OK
+	var backup := _backup_path(path)
+	var backup_temporary := backup + ".tmp"
+	_remove_file(backup_temporary)
+	var error := DirAccess.copy_absolute(path, backup_temporary)
+	return error if error != OK else _replace_file(backup_temporary, backup)
+
 static func write(run: RefCounted, path: String = "user://journey.cfg") -> Error:
 	if not run.journey or run.state == "home":
 		return ERR_INVALID_DATA
@@ -220,14 +253,27 @@ static func write(run: RefCounted, path: String = "user://journey.cfg") -> Error
 	var temporary := path + ".tmp"
 	var error := config.save(temporary)
 	if error != OK:
+		_remove_file(temporary)
 		return error
-	return DirAccess.rename_absolute(temporary, path)
+	if _load_file(temporary).is_empty():
+		_remove_file(temporary)
+		return ERR_INVALID_DATA
+	error = _refresh_backup(path)
+	if error != OK:
+		_remove_file(temporary)
+		return error
+	error = _replace_file(temporary, path)
+	if error != OK:
+		_remove_file(temporary)
+	return error
 
 static func read(path: String = "user://journey.cfg") -> Dictionary:
-	var config := ConfigFile.new()
-	if config.load(path) != OK:
-		return {}
-	var data: Variant = config.get_value("journey", "snapshot", {})
-	if not data is Dictionary or not valid(data):
-		return {}
-	return {"snapshot": data, "checkpoint": config.get_value("journey", "checkpoint", {})}
+	var data := _load_file(path)
+	if not data.is_empty():
+		data["recovered_from_backup"] = false
+		return data
+	var backup := _load_file(_backup_path(path))
+	if not backup.is_empty():
+		backup["recovered_from_backup"] = true
+		return backup
+	return {}

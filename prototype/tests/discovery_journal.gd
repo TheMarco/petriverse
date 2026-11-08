@@ -41,9 +41,14 @@ func exercise() -> void:
 	game.hud.turn_journal(999)
 	await refresh()
 	var last_page := ceili(float(game.hud.Journey.SPECIES.size())/game.hud.JOURNAL_PAGE_SIZE)-1
-	expect(game.hud.journal_page==last_page and not game.hud.journal_next.visible and game.hud.journal_previous.visible,"Every species remains reachable in readable journal pages")
-	mouse(game.hud.journal_previous.get_rect().get_center(),true)
-	mouse(game.hud.journal_previous.get_rect().get_center(),false)
+	var previous: Button = game.readable_ui.controls.filter(func(c): return c is Button and c.text=="Previous")[0]
+	expect(game.hud.journal_page==last_page and not game.readable_ui.controls.any(func(c): return c is Button and c.text=="Next") and previous.visible,"Every species remains reachable in readable journal pages")
+	previous.grab_focus()
+	key(KEY_ENTER)
+	var released := InputEventKey.new()
+	released.keycode = KEY_ENTER
+	released.pressed = false
+	root.push_input(released)
 	await refresh()
 	expect(game.hud.journal_page==last_page-1,"The native previous-page button navigates the expanded journal")
 	key(KEY_J)

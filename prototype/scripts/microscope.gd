@@ -236,8 +236,9 @@ func animate_organism(sprite: Sprite2D, time: float, movement: float, vitality: 
 
 func sync() -> void:
 	var title: bool = game.run.state=="home" and not game.home_pond_open
-	scale = Vector2.ONE*(2.15 if title else 1.0)
-	position = game.run.board.center*(Vector2.ONE-scale)
+	var scene_scale: float = game.dish_scale() if game.has_method("dish_scale") else 1.0
+	scale = Vector2.ONE*(2.15 if title else scene_scale)
+	position = game.run.board.center*(Vector2.ONE-scale) if title else game.dish_offset() if game.has_method("dish_offset") else Vector2.ZERO
 	sync_appearance()
 	var time: float = game.visual_time
 	var movement := 0.0 if game.reduced_motion else 1.0
@@ -249,6 +250,11 @@ func sync() -> void:
 	pond.set_quality(game.visual_quality)
 	pond.sync(time, movement)
 	water_tracers.sync(time,movement,game.run.fluid,appearance,game.visual_quality)
+	# Keep the living water present, while giving actionable organisms priority
+	# during a gesture. Reduced motion uses the same steady contrast treatment.
+	var tracing: bool = game.run.selection.active and game.run.state == "active"
+	pond.modulate.a = 0.42 if tracing else 0.78
+	water_tracers.modulate.a = 0.35 if tracing else 0.7
 	phage_visual.sync(game.run,time,movement)
 	var event: Dictionary = game.run.harvest.HabitatEvents.sample(game.run) if game.run.journey else {}
 	traveller.visible = not event.is_empty() and event.kind=="traveller" and event.age>=0.0 and game.run.state in ["active","paused"]
@@ -306,6 +312,8 @@ func sync() -> void:
 		# Retire the individual skins as the shared surface takes over. Modulate
 		# also fades their cilia/organelles, so no seams survive inside the mass.
 		cells[i].modulate.a = 1.0 - smoothstep(0.24, 0.82, pull) * movement
+		if tracing and not game.run.selection.path.has(i):
+			cells[i].modulate.a *= 0.62
 		var extent: float = cells[i].get_meta("extent")
 		cells[i].scale = Vector2(1.0 + pull * 0.09 * movement, 1.0 - pull * 0.06 * movement) * extent / CELL.get_width()
 

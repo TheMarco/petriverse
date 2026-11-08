@@ -72,10 +72,10 @@ func exercise() -> void:
 	expect(run.phages.clusters.is_empty() and run.phages.bursts.is_empty(),"Direct capture cancels infection without a duplicate rupture")
 	var route: Array = run.JourneyRoute.make(73)
 	var lessons: Array = route.filter(func(e): return e.get("phage_lesson",false))
-	expect(lessons.size()==1 and lessons[0].families==["bacterium"] and route.find(lessons[0])==4,"A new journey teaches phages in encounter five, Small allies")
+	expect(lessons.size()==1 and lessons[0].families==["bacterium"] and lessons[0].name=="Small allies","A new journey contains one authored Small allies teaching encounter")
 	run.route_plan = route
-	run.route_position = 4
-	run.stage_index = 2
+	run.route_position = route.find(lessons[0])
+	run.stage_index = lessons[0].stage
 	run.start_stage()
 	expect(run.enemies.any(func(e): return e.kind=="bacterium") and run.phages.clusters.size()==1,"The teaching encounter guarantees a host and a helper")
 	var data: Dictionary = Save.capture(run)

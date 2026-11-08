@@ -14,6 +14,9 @@ var selected := -1
 var page := 0
 var identity := ""
 var clock := 0.0
+var was_open := false
+var welcome_tokens: Array = []
+var welcome_remaining := 0.0
 
 func _ready() -> void:
 	game = get_parent()
@@ -87,9 +90,28 @@ func showing_epilogue() -> bool:
 func sync(delta: float) -> void:
 	visible = (game.run.state=="home" and game.home_pond_open) or showing_epilogue()
 	if not visible:
+		was_open = false
 		return
+	var compact: bool = game.comfort_layout() and not showing_epilogue()
+	scale = Vector2.ONE * (0.68 if compact else 1.0)
+	position = Vector2(640, 380)-Vector2(640,450)*0.68 if compact else Vector2.ZERO
+	if not was_open and not showing_epilogue():
+		welcome_tokens = game.journey_profile.new_residents().map(func(r): return r.token)
+		welcome_remaining = 6.0 if not welcome_tokens.is_empty() else 0.0
+		if not welcome_tokens.is_empty():
+			for i in game.journey_profile.residents.size():
+				if game.journey_profile.residents[i].token == welcome_tokens[0]: page = i / PAGE_SIZE
+			identity = ""
+	was_open = true
 	if identity!=collection_key():
 		rebuild()
+		for i in specimens.size():
+			if not welcome_tokens.is_empty() and specimens[i].record.token == welcome_tokens[0]: selected = i
+	if welcome_remaining > 0.0 and not (game.settings_open or game.journal_open or game.help_open or game.hud.renaming()):
+		welcome_remaining = maxf(0.0, welcome_remaining-delta)
+		if welcome_remaining == 0.0:
+			game.journey_profile.welcome(welcome_tokens, game.save_records)
+			welcome_tokens.clear()
 	var movement := 0.0 if game.reduced_motion else 1.0
 	if not game.reduced_motion and not game.settings_open and not game.journal_open and not game.help_open and not game.hud.renaming():
 		clock += delta
@@ -135,6 +157,9 @@ func sync(delta: float) -> void:
 			var angle: float = float(i)*2.399+phase*0.06
 			offset = Vector2(cos(angle)*(213.0+i%2*17.0),sin(angle)*(136.0+i%2*11.0))+drift*0.2
 		sprite.position = mother.position+offset.limit_length(332)
+		if not game.reduced_motion and welcome_tokens.has(specimen.record.token):
+			var arrived := smoothstep(0.0, 1.0, (6.0-welcome_remaining)/3.0)
+			sprite.position = (mother.position+home.normalized()*350.0).lerp(sprite.position, arrived)
 		sprite.position += game.run.fluid.displacement(sprite.position)*0.45*movement
 		var previous: Vector2 = specimen.get("water_position",sprite.position)
 		if movement>0.0 and sprite.position.distance_to(previous)<12.0:
@@ -184,6 +209,9 @@ func turn_page(direction: int) -> void:
 	page = clampi(page+direction,0,maxi(0,ceili(game.journey_profile.residents.size()/float(PAGE_SIZE))-1))
 
 func _draw() -> void:
+	for newcomer in specimens:
+		if welcome_tokens.has(newcomer.record.token):
+			draw_circle(newcomer.sprite.position, newcomer.extent*0.6, Color(0.65,0.91,0.80,0.7), false, 2.0, true)
 	if selected<0 or selected>=specimens.size():
 		return
 	var specimen: Dictionary = specimens[selected]

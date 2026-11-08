@@ -4,7 +4,14 @@ const CELL = preload("res://assets/organisms/cell.png")
 const TISSUE = preload("res://shaders/living_tissue.gdshader")
 const Anatomy = preload("res://scripts/evolution_anatomy.gd")
 const UI = preload("res://scripts/ui_style.gd")
+const Mutations = preload("res://scripts/mutations.gd")
+const Comparison = preload("res://scripts/evolution_comparison.gd")
 var data: Dictionary = {}
+## Exact before/after example for journey offers; empty for legacy configure.
+var comparison: Dictionary = {}
+## Full comparison text for a wider panel when the 236px card at large
+## text (text_multiplier 1.25) can only fit the compact numeric lines.
+var detail_summary := ""
 var number := 1
 var text_multiplier := 1.0
 var specimen: Sprite2D
@@ -38,9 +45,18 @@ func _ready() -> void:
 	bud.visible = false
 	add_child(bud)
 
+func configure_journey(run: RefCounted, id: String, index: int) -> void:
+	configure(Mutations.journey_definition(id), index, run.mutations)
+	# configure clears the comparison for legacy callers; restore journey data.
+	comparison = Comparison.compare(run, id)
+	detail_summary = comparison.detail_summary
+	tooltip_text = detail_summary
+
 func configure(definition: Dictionary, index: int, owned: Array = []) -> void:
 	data = definition
 	number = index + 1
+	comparison = {}
+	detail_summary = ""
 	# Every detail is printed on the card itself, so no tooltip repeats it.
 	tooltip_text = ""
 	var preview_traits := owned.duplicate()
@@ -70,12 +86,29 @@ func draw_key() -> void:
 	var width := face.get_string_size(str(number), HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
 	draw_string(face, Vector2(cap.get_center().x - width * 0.5, cap.position.y + 15.5), str(number), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, UI.MUTED)
 
+func draw_comparison() -> void:
+	centered(data.name, 148, 20, UI.INK, UI.SEMIBOLD)
+	centered(comparison.playstyle.capitalize(), 170, 11, UI.ACCENT, UI.MEDIUM)
+	var before: Dictionary = comparison.before
+	var after: Dictionary = comparison.after
+	var sample: Dictionary = Comparison.sample_for(data.id)
+	centered("Example: %d cells · %d organisms" % [sample.loop,sample.bodies.size()],194,11,UI.MUTED)
+	centered("Food %d → %d" % [before.food,after.food],216,13,UI.INK,UI.MEDIUM)
+	centered("Recovery %.1fs → %.1fs" % [before.recovery,after.recovery],238,12,UI.INK)
+	centered("Loop limit %d → %d cells" % [before.capacity,after.capacity],260,12,UI.INK)
+	centered("Poison %d → %d" % [before.poison,after.poison] if after.poison>0 or before.poison>0 else "Short links · see Compare details",282,11,UI.MUTED)
+	draw_line(Vector2(24,304),Vector2(size.x-24,304),UI.LINE,1.0)
+	centered("Need %d more food" % (cost-balance) if disabled else "Evolve for %d food" % cost,330,13,UI.FAINT if disabled else UI.ACCENT,UI.MEDIUM)
+
 func _draw() -> void:
 	if data.is_empty():
 		return
 	draw_key()
 	if guided_choice:
 		draw_guided(UI.INK, UI.MUTED, UI.ACCENT)
+		return
+	if not comparison.is_empty():
+		draw_comparison()
 		return
 	centered(data.name, 148, 20, UI.INK, UI.SEMIBOLD)
 	centered(data.summary, 174, 13, UI.ACCENT, UI.MEDIUM)

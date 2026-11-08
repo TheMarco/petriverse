@@ -2,17 +2,34 @@ extends "res://tests/harvest_visual.gd"
 const Save = preload("res://scripts/journey_save.gd")
 
 func trace(path: Array) -> void:
-	mouse(game.run.board.anchors[path[0]], true)
-	var previous: Vector2 = game.run.board.anchors[path[0]]
+	mouse(screen_point(game.run.board.anchors[path[0]]), true)
+	var previous: Vector2 = screen_point(game.run.board.anchors[path[0]])
 	for id in path.slice(1) + [path[0]]:
-		drag(previous, game.run.board.anchors[id])
-		previous = game.run.board.anchors[id]
+		drag(previous, screen_point(game.run.board.anchors[id]))
+		previous = screen_point(game.run.board.anchors[id])
 	mouse(previous, false)
+
+func screen_point(point: Vector2) -> Vector2:
+	return point * game.dish_scale() + game.dish_offset()
 
 func advance(seconds: float) -> void:
 	for i in ceili(seconds*60):
 		game.run.step(1.0/60.0)
-		game.visual_time += 1.0/60.0
+		game._process(1.0/60.0)
+
+func await_lesson_step(expected: int) -> void:
+	var frames := 0
+	while game.run.lesson_step != expected and frames < 600:
+		advance(1.0/60.0)
+		frames += 1
+	expect(game.run.lesson_step == expected, "Lesson reaches step %d after actual cell recovery" % expected)
+
+func await_evolution_controls() -> void:
+	var frames := 0
+	while (not game.run.evolution_ready() or game.round_result_showing()) and frames < 600:
+		advance(1.0/60.0)
+		frames += 1
+	expect(game.run.evolution_ready() and not game.round_result_showing(), "Evolution becomes actionable after digestion and result reveal")
 
 func exercise() -> void:
 	game = Main.new()
@@ -54,15 +71,17 @@ func exercise() -> void:
 	var snapshot := Save.capture(run)
 	var restored := Run.new(true,81,true,true)
 	expect(Save.restore(restored,snapshot) and restored.lesson_step == 1, "Save preserves the recovery teaching step")
-	restored.step(3.1)
+	var remaining: float = restored.cells.map(func(cell): return cell.remaining).max()
+	restored.step(remaining + 0.05)
 	expect(restored.lesson_step == 2 and restored.enemies.size() == 6, "Resumed lesson advances to the wide capture")
 	restored.dispose()
-	advance(3.1)
+	await_lesson_step(2)
 	await capture("onboarding-wide-loop")
 	expect(run.lesson_step == 2 and run.enemies.size() == 6, "Second teaching situation supplies two food clusters")
 	trace(run.Lesson.WIDE)
 	expect(run.lesson_step == 3 and run.biomass == 9, "Six-cell capture collects both clusters using real geometry")
-	advance(3.1)
+	await_lesson_step(4)
+	await_evolution_controls()
 	await capture("onboarding-first-upgrade")
 	expect(run.state == Run.EVOLVE and run.offered_mutations == ["fission","elastic"], "Both captures and recovery precede the two understandable upgrades")
 	expect(game.hud.cards[0].guided_choice and game.hud.cards[1].visible and not game.hud.cards[2].visible, "Only the two taught choices appear, with animated examples")
@@ -127,8 +146,8 @@ func exercise() -> void:
 	game.click_mode = true
 	await refresh()
 	for id in run.Lesson.SMALL + [run.Lesson.SMALL[0]]:
-		mouse(run.board.anchors[id],true)
-		mouse(run.board.anchors[id],false)
+		mouse(screen_point(run.board.anchors[id]),true)
+		mouse(screen_point(run.board.anchors[id]),false)
 	key(KEY_ENTER)
 	expect(run.lesson_step == 1 and run.biomass == 3, "Click input completes the same lesson without requiring a drag")
 	game.return_home()

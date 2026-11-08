@@ -183,7 +183,7 @@ func payoff_example() -> void:
 	await capture("journey-evolution-payoff-preview-large")
 	game.large_text = text_preference
 	game.commit_selection()
-	expect(game.toast.contains("Rapid Fission +1") and game.toast.contains("other upgrades +1") and run.last_capture.food==4,"Capture feedback names real upgrade contributions without awarding them twice")
+	expect(game.toast.contains("Rapid Fission +1") and game.toast.contains("other bonuses +1") and run.last_capture.food==4,"Capture feedback names real upgrade contributions without awarding them twice")
 	run.step(0.5)
 	game._process(0.5)
 	await capture("journey-evolution-payoff-capture")

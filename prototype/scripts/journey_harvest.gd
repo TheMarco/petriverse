@@ -28,6 +28,7 @@ var next_spore := 14.0
 var tide := 0
 var boss_hits := 0
 var last_time := 0.0
+var last_refill := 0.0
 var visitor_at := -1.0
 var visitor_spawned := false
 
@@ -95,6 +96,13 @@ func step(run: RefCounted) -> void:
 	var delta := now - last_time
 	last_time = now
 	run.enemies = run.enemies.filter(func(body): return body.kind not in ["food", "cyst", "spore"] or body.age < body.lifetime())
+	# A depleted dish advances its next food bloom; warning and hunter clocks
+	# keep their original timing. The saved timestamp prevents reload farming.
+	var needs_food: bool = nourishment < (3 if spec.mode == "boss" else int(spec.food))
+	var food_left: int = run.enemies.filter(func(body): return body.kind == "food").size()
+	if needs_food and food_left < 2 and now-last_refill >= 18.0 and next_bloom-now > 8.0 and now < float(spec.duration)-18.0:
+		next_bloom = now
+		last_refill = now
 	# Quiet replenishment fills the space between structured bloom encounters.
 	# The director supplies the overlapping threat/rescue opportunities.
 	while now >= next_bloom and next_bloom < float(spec.duration)-18.0:

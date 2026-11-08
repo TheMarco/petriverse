@@ -21,9 +21,9 @@ func configure(hud: Node2D) -> void:
 	var residents: int = game.journey_profile.residents.size()
 	hud.place(hud.pond_button, Vector2(480, y), Vector2(320, 40), "quiet", "Visit your home pond" if residents == 0 else "Home pond  ·  %d resident%s" % [residents, "" if residents == 1 else "s"], "", 15)
 	hud.place(hud.advanced_button, Vector2(480, y + 44), Vector2(320, 40), "quiet", "Advanced starting colonies", "", 15)
-	var footer := [hud.help_button, hud.journal_button, hud.sound_button]
-	var captions := ["How to play", "Field journal", "Settings"]
-	var hints := ["H", "J", "V"]
+	var footer := [hud.help_button, hud.journal_button, hud.experiments_button, hud.sound_button]
+	var captions := ["How to play", "Field journal", "Experiments", "Settings"]
+	var hints := ["H", "J", "", "V"]
 	var widths: Array[float] = []
 	var total := 0.0
 	for i in footer.size():
@@ -44,3 +44,5 @@ func draw(hud: Node2D) -> void:
 	hud.centered("A small life. A whole world.", 500, 19, Color("b9d2d0"))
 	if game.resume_data.is_empty():
 		hud.centered("Begins with a short, playable lesson.", STACK_TOP + 76, 13, UI.FAINT)
+	if not game.recovery_notice().is_empty():
+		hud.wrapped_centered(game.recovery_notice(), 870, 1000, 13, UI.ACCENT)

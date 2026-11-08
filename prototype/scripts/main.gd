@@ -14,6 +14,7 @@ const HomePond = preload("res://scripts/home_pond.gd")
 const EvolutionReveal = preload("res://scripts/evolution_reveal.gd")
 const CreatureCinema = preload("res://scripts/creature_cinema.gd")
 const UI = preload("res://scripts/ui_style.gd")
+const CaptureFeedback = preload("res://scripts/capture_feedback.gd")
 const PEARL := Color("c7eee4")
 const CYAN := Color("86cbc5")
 const WARM := Color("edb184")
@@ -54,6 +55,27 @@ var click_mode := false
 var reduced_motion := false
 var high_contrast := false
 var large_text := false
+var assisted_closure := false
+var deliberate_capture := false
+var capture_feedback := CaptureFeedback.new()
+var last_capture_warning := 0
+var replacement_dialog: ConfirmationDialog
+var pending_new_colony := ""
+var readable_ui: CanvasLayer
+var comparisons_open := false
+
+func comfort_layout() -> bool:
+	var pixels := get_window().size if is_inside_tree() else Vector2i(1280, 900)
+	return run.journey and (large_text or pixels.x < 1024 or pixels.y < 700)
+
+func dish_scale() -> float:
+	return 0.66 if comfort_layout() and run.state != Run.HOME else 1.0
+
+func dish_offset() -> Vector2:
+	return run.board.center * (1.0 - dish_scale()) + (Vector2(0, -12) if dish_scale() < 1.0 else Vector2.ZERO)
+
+func to_dish(point: Vector2) -> Vector2:
+	return (point - dish_offset()) / dish_scale()
 var preferences_enabled := true
 var preferences_path := "user://preferences.cfg"
 var visual_quality := 2 # 0 Light, 1 Balanced, 2 Full; gameplay detail is unchanged.
@@ -109,6 +131,19 @@ func _ready() -> void:
 		add_child(creature_cinema)
 	for error in run.board.validate_board():
 		push_error(error)
+	replacement_dialog = ConfirmationDialog.new()
+	replacement_dialog.title = "Replace your unfinished journey?"
+	replacement_dialog.dialog_text = "Your current encounter and evolution will be replaced.\nRescued residents, discoveries and unlocked colonies stay with you."
+	replacement_dialog.ok_button_text = "Replace journey"
+	replacement_dialog.cancel_button_text = "Keep playing"
+	replacement_dialog.theme = UI.theme()
+	replacement_dialog.add_theme_font_size_override("font_size", 20)
+	replacement_dialog.confirmed.connect(confirm_new_journey)
+	replacement_dialog.canceled.connect(func(): pending_new_colony = "")
+	add_child(replacement_dialog)
+	if run.journey:
+		readable_ui = load("res://scripts/readable_ui.gd").new()
+		add_child(readable_ui)
 
 func _exit_tree() -> void:
 	if run.journey and save_records and run.state != Run.HOME:
@@ -120,7 +155,10 @@ func _notification(what: int) -> void:
 		pause()
 
 func _physics_process(delta: float) -> void:
-	run.step(delta)
+	run.selection.assisted_closure = assisted_closure
+	var pace := 0.35 if deliberate_capture and run.selection.closed and run.state == Run.ACTIVE else 1.0
+	run.step(delta * pace)
+	capture_feedback.observe(run, delta)
 
 func _process(delta: float) -> void:
 	if creature_cinema!=null:
@@ -129,7 +167,11 @@ func _process(delta: float) -> void:
 		if creature_cinema.active:
 			soundscape.sync(run,delta)
 			return
+	if run.state != Run.EVOLVE: comparisons_open = false
 	advance_result_reveal(delta)
+	if capture_feedback.warning_serial != last_capture_warning:
+		last_capture_warning = capture_feedback.warning_serial
+		soundscape.play_effect("warning", 0.35)
 	big_capture_remaining = maxf(0.0, big_capture_remaining - delta)
 	guard_flash_remaining = maxf(0.0, guard_flash_remaining - delta)
 	if run.state!=Run.ACTIVE:
@@ -138,7 +180,7 @@ func _process(delta: float) -> void:
 		visual_time += delta
 		toast_time = maxf(0.0, toast_time - delta)
 		reject_time = maxf(0.0, reject_time - delta)
-	hovered = run.board.hit_test(get_global_mouse_position())
+	hovered = run.board.hit_test(to_dish(get_global_mouse_position()))
 	if run.discovery_serial != last_discovery:
 		last_discovery = run.discovery_serial
 		toast = "Shellback · crack its armor, then capture again." if run.last_discovery == "shellback" else "Twinspore · fit both glowing nuclei inside one loop."
@@ -177,6 +219,8 @@ func _process(delta: float) -> void:
 	if evolution_reveal != null:
 		evolution_reveal.sync()
 	hud.refresh()
+	if readable_ui != null:
+		readable_ui.sync()
 	queue_redraw()
 
 func round_result_showing() -> bool:
@@ -187,7 +231,7 @@ func advance_result_reveal(delta: float) -> void:
 		return
 	if run.state != result_reveal_state:
 		result_reveal_state = run.state
-		result_reveal_remaining = RESULT_REVEAL_SECONDS if run.state in [Run.EVOLVE, Run.LOSS, Run.SUCCESS] else 0.0
+		result_reveal_remaining = (1.6 if run.state == Run.EVOLVE else RESULT_REVEAL_SECONDS) if run.state in [Run.EVOLVE, Run.LOSS, Run.SUCCESS] else 0.0
 	else:
 		result_reveal_remaining = maxf(0.0, result_reveal_remaining - delta)
 	if run.state == Run.EVOLVE and not round_result_showing() and run.evolution_ready() and not (journal_open or settings_open or help_open):
@@ -286,6 +330,15 @@ func toggle_text() -> void:
 	large_text = not large_text
 	save_preferences()
 
+func toggle_assistance() -> void:
+	assisted_closure = not assisted_closure
+	run.selection.assisted_closure = assisted_closure
+	save_preferences()
+
+func toggle_deliberation() -> void:
+	deliberate_capture = not deliberate_capture
+	save_preferences()
+
 func toggle_quality() -> void:
 	visual_quality = (visual_quality + 2) % 3
 	save_preferences()
@@ -298,6 +351,8 @@ func load_preferences() -> void:
 		reduced_motion = bool(config.get_value("comfort", "reduced_motion", false))
 		high_contrast = bool(config.get_value("comfort", "high_contrast", false))
 		large_text = bool(config.get_value("comfort", "large_text", false))
+		assisted_closure = bool(config.get_value("comfort", "assisted_closure", false))
+		deliberate_capture = bool(config.get_value("comfort", "deliberate_capture", false))
 		click_mode = bool(config.get_value("comfort", "click_mode", false))
 		visual_quality = clampi(int(config.get_value("comfort", "visual_quality", 2)), 0, 2)
 
@@ -309,6 +364,8 @@ func save_preferences() -> void:
 	config.set_value("comfort", "reduced_motion", reduced_motion)
 	config.set_value("comfort", "high_contrast", high_contrast)
 	config.set_value("comfort", "large_text", large_text)
+	config.set_value("comfort", "assisted_closure", assisted_closure)
+	config.set_value("comfort", "deliberate_capture", deliberate_capture)
 	config.set_value("comfort", "click_mode", click_mode)
 	config.set_value("comfort", "visual_quality", visual_quality)
 	config.save(preferences_path)
@@ -326,6 +383,9 @@ func choose_evolution(index: int) -> void:
 				save_journey()
 
 func _unhandled_input(event: InputEvent) -> void:
+	if comparisons_open and event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		comparisons_open = false
+		return
 	if creature_cinema!=null and creature_cinema.active: return
 	if hud!=null and run.journey and hud.renaming():
 		if event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:
@@ -333,7 +393,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if run.state==Run.HOME and home_pond_open and not settings_open and not journal_open and not help_open:
 		if event is InputEventMouseButton and event.pressed and event.button_index==MOUSE_BUTTON_LEFT:
-			home_pond.pick(event.position)
+			home_pond.pick(home_pond.to_local(event.position))
 			return
 		if event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:
 			toggle_home_pond()
@@ -372,8 +432,13 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_2: choose_evolution(1)
 			KEY_3: choose_evolution(2)
 			KEY_ESCAPE:
-				run.selection.cancel()
-				run.nudge.cancel()
+				if run.selection.active or run.nudge.target_id >= 0:
+					run.selection.cancel()
+					run.nudge.cancel()
+					toast = "Capture cancelled · all cells remain ready"
+					toast_time = 2.0
+				elif run.state in [Run.ACTIVE, Run.PAUSED]:
+					pause()
 			KEY_ENTER:
 				if run.nudge.target_id>=0 and run.state==Run.ACTIVE:
 					commit_nudge(last_pointer)
@@ -384,8 +449,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if run.state != Run.ACTIVE or journal_open or help_open:
 		return
+	if event is InputEventMouse:
+		event = event.duplicate()
+		event.position = to_dish(event.position)
+		if event is InputEventMouseMotion:
+			event.relative /= dish_scale()
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			if run.selection.active or run.nudge.target_id >= 0:
+				toast = "Capture cancelled · all cells remain ready"
+				toast_time = 2.0
 			run.selection.cancel()
 			run.nudge.cancel()
 		elif event.button_index == MOUSE_BUTTON_LEFT:
@@ -407,6 +480,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			elif not click_mode:
 				microscope.disturb_water(last_pointer,event.position)
 				run.selection.drag(last_pointer, event.position)
+				run.selection.assisted_closure = assisted_closure
+				run.selection.close_near_start(event.position)
 				commit_selection()
 	elif event is InputEventMouseMotion:
 		if run.nudge.target_id>=0:
@@ -440,26 +515,17 @@ func commit_selection() -> void:
 		toast = blocked_reason if not blocked_reason.is_empty() else "Loop unfinished · return to START before releasing."
 		toast_time = 3.0
 	if result.valid:
-		if run.harvest != null:
-			toast = ("+%d food" if run.journey else "+%d nourishment") % result.food
-			if run.journey and result.boss_layers > 0:
-				toast = "Boss hit · %d hit%s left · −3 charge" % [3-run.harvest.boss_hits, "" if run.harvest.boss_hits == 2 else "s"]
-			elif run.journey and result.get("wardens",0)>0:
-				toast = run.harvest.ecology.notice
-			elif run.journey and result.armor_hits > 0:
-				toast = "Shell fractured · capture again"
-			elif run.journey and result.get("cells_rescued",0)>0:
-				toast = "Blue cell rescued · returning to your colony"
-			elif run.journey and result.get("rescued", 0) > 0:
-				toast += " · %d spores rescued" % result.rescued
-			elif run.journey and result.get("purified", 0) > 0:
-				toast = "%d cysts safely neutralized" % result.purified
-			elif result.poison > 0:
-				toast += " · %d health lost" % result.poison
-			elif result.threats > 0:
-				toast += " · mother defended"
-			elif result.food == 0:
-				toast = "Empty loop · cells returning" if advice.is_empty() or advice.title == "Nothing useful inside" else advice.title + " · no capture"
+		if run.journey:
+			toast = CaptureFeedback.summary(result)
+			if toast == "Nothing captured" and not advice.is_empty():
+				toast = advice.title + " · no capture"
+			if result.poison > 0:
+				toast += " · −%d health · %d remaining" % [result.poison, run.integrity]
+			if result.boss_layers > 0:
+				toast += " · %d boss hits left" % (3-run.harvest.boss_hits)
+		elif run.harvest != null:
+			toast = "+%d nourishment" % result.food
+			if result.poison > 0: toast += " · %d health lost" % result.poison
 		elif result.boss_layers > 0:
 			toast = "Protection dissolved"
 		elif result.armor_hits > 0 and result.points == 0:
@@ -494,6 +560,7 @@ func commit_selection() -> void:
 
 func _draw() -> void:
 	if run.state==Run.HOME: return
+	draw_set_transform(dish_offset(), 0.0, Vector2.ONE * dish_scale())
 	draw_dish()
 	if (run.state==Run.HOME and home_pond_open) or (home_pond!=null and home_pond.showing_epilogue()):
 		return
@@ -580,9 +647,15 @@ func draw_cell(id: int, legal_cells: Array) -> void:
 	if high_contrast or legal or (hovered == id and ready):
 		draw_arc(p, 32.0, 0.2, 1.1, 18, PEARL, 1.2, true)
 		draw_arc(p, 32.0, PI + 0.2, PI + 1.1, 18, PEARL, 1.2, true)
-	if selected and id == run.selection.path[0]:
-		draw_circle(p, 34.0, PEARL, false, 1.6 if run.selection.can_close() else 1.0, true)
-		draw_string(font, p + Vector2(-17, -41), "START", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, PEARL)
+	if selected:
+		draw_circle(p, 31.0, Color("06171c"), false, 5.0, true)
+		draw_circle(p, 31.0, PEARL, false, 2.0, true)
+		if id == run.selection.path[0]:
+			var radius: float = run.board.hit_radius + 12.0 if assisted_closure else 35.0
+			draw_circle(p, radius, PEARL, false, 2.2 if run.selection.can_close() else 1.2, true)
+			var label := "RELEASE" if run.selection.closed and not click_mode else "ENTER" if run.selection.closed else "CLOSE HERE" if run.selection.can_close() else "START"
+			var label_size := 17 if comfort_layout() else 13
+			draw_string(font, p + Vector2(-font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size).x * 0.5, -radius-8), label, HORIZONTAL_ALIGNMENT_LEFT, -1, label_size, PEARL)
 	if reject_time > 0.0 and id == run.selection.rejected_id:
 		draw_line(p + Vector2(-8, -8), p + Vector2(8, 8), WARM, 2.0, true)
 		draw_line(p + Vector2(8, -8), p + Vector2(-8, 8), WARM, 2.0, true)
@@ -636,7 +709,11 @@ func draw_nucleus(enemy: RefCounted, p: Vector2, targeted: bool) -> void:
 		var marker := WARM if enemy.kind == "shellback" and enemy.health > Run.Mutations.damage(run.mutations, run.selection.path.size()) else PEARL
 		if enemy.kind == "cyst":
 			marker = Color("f3a8c5")
-		draw_circle(p, 11, marker, false, 1.2, true)
+		draw_circle(p, 13, Color("06171c"), false, 5.0, true)
+		draw_circle(p, 13, marker, false, 2.3, true)
+		if enemy.kind == "food":
+			draw_line(p + Vector2(-4, 0), p + Vector2(4, 0), marker, 2.0, true)
+			draw_line(p + Vector2(0, -4), p + Vector2(0, 4), marker, 2.0, true)
 		for offset in [Vector2(-15, 0), Vector2(15, 0), Vector2(0, -15), Vector2(0, 15)]:
 			draw_line(p + offset, p + offset * 1.2, PEARL, 1.0, true)
 	if debug_mode:
@@ -654,6 +731,8 @@ func save_journey() -> void:
 		autosave_elapsed = 0.0
 
 func reset_presentation() -> void:
+	comparisons_open = false
+	capture_feedback.clear()
 	home_pond_open = false
 	microscope.finish_growth()
 	if evolution_reveal != null:
@@ -701,6 +780,27 @@ func new_journey(id: String) -> void:
 	reset_presentation()
 	save_journey()
 
+func request_new_journey(id: String) -> void:
+	if not journey_profile.unlocked(id):
+		return
+	if not resume_data.is_empty() and resume_data.snapshot.run.state != Run.SUCCESS:
+		pending_new_colony = id
+		replacement_dialog.popup_centered(Vector2i(640, 230))
+		replacement_dialog.get_cancel_button().grab_focus()
+		return
+	new_journey(id)
+
+func confirm_new_journey() -> void:
+	var id := pending_new_colony
+	pending_new_colony = ""
+	if not id.is_empty():
+		new_journey(id)
+
+func recovery_notice() -> String:
+	if resume_data.get("recovered_from_backup", false) or journey_profile.recovered_from_backup:
+		return "Recovered your previous save from backup. A little recent progress may be missing."
+	return ""
+
 func resume_journey() -> void:
 	if resume_data.is_empty():
 		return
@@ -709,6 +809,9 @@ func resume_journey() -> void:
 		if run.state == Run.ACTIVE:
 			run.state = Run.PAUSED
 		reset_presentation()
+		if not recovery_notice().is_empty():
+			toast = recovery_notice()
+			toast_time = 10.0
 
 func toggle_home_pond() -> void:
 	if run.state==Run.HOME:
@@ -767,3 +870,9 @@ func toggle_help() -> void:
 	elif resume_after_help and run.state == Run.PAUSED:
 		run.toggle_pause()
 		resume_after_help = false
+
+func open_experiments() -> void:
+	get_tree().change_scene_to_file("res://playtests/producer_lab.tscn")
+
+func toggle_comparisons() -> void:
+	comparisons_open = not comparisons_open

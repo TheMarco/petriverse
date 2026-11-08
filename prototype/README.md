@@ -1,5 +1,19 @@
 # MICROVERSE — A living journey
 
+## Producer improvements (source build)
+
+- Live loops show all simultaneous gains, poison damage, and remaining health. Entering poison triggers a fresh visual and sound cue. START, closure, cancellation and targeted nuclei are clearer; background tissue quiets while drawing.
+- Settings includes optional closure assistance and 35% speed while holding a closed loop. Larger text and windows below 1024×700 use scrollable menus and a reflowed dish. Tab navigates controls; Escape cancels a gesture or pauses.
+- Starting over asks before replacing an unfinished journey. Journey and permanent-pond files retain validated backups; corrupt primary files recover automatically and the title explains that recovery.
+- Evolution cards show exact before/after examples including owned traits. **Compare details** explains sample contents, synergy and tradeoffs. Examples assume short links; the actual capture preview includes link strain.
+- Empty dishes needing food can bring the next bloom forward after 18 seconds. Hunter warnings keep their timing. Evolution settling is shorter, and later briefs omit the repeated drawing lesson.
+- New rescues arrive in the home pond with a welcome and selection highlight. Their origin, companion, growth and earned gardens remain inspectable. Welcoming persists across sessions; older residents remain settled.
+
+**Experiments** on the title screen opens three isolated playable prototypes: Safe passage (moving brood escort), Choose the current (fast channel versus sheltered eddies), and The Regent breaks (a new spatial phase after its first hit). Each has a brief, pause, retry and result. Q returns to the title. Experiment state never replaces a campaign or pond save; these scenarios are not part of the campaign route.
+
+Run `./test.sh` for the regression fixtures, including capture confidence, save recovery, evolution comparisons, producer improvements and the experiments. The game remains version 0.2.3 until a release is packaged; the changes above are source-only.
+
+
 The default game is a connected journey through **Stillwater, Glassgarden, and the Blue Deep**: fifteen encounters, three bosses, twelve available mutations, and three starting colonies. Only the final Conjoined victory ends the journey. Existing saves retain their original twelve- or thirty-encounter route.
 
 Your colony carries its health, mutations, stored nourishment, and discoveries forward. The mother begins with three health organelles and grows to seven. Capture green desmids for food; violet spiked cysts poison mixed meals. Hunters threaten the mother, while pearl spores are young colonies to rescue. Every encounter begins with its own paused briefing.

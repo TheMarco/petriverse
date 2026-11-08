@@ -144,7 +144,10 @@ func exercise() -> void:
 	mouse_button(board.anchors[8], false)
 	expect(game.run.is_ready(0) and not game.run.selection.active, "Right-click cancels without spending")
 	key(KEY_D)
-	expect(game.debug_mode, "Debug key shows inspection overlay")
+	expect(not game.debug_mode, "Inspection stays hidden without developer tools")
+	game.developer_tools = true
+	key(KEY_D)
+	expect(game.debug_mode, "Debug key shows inspection overlay with developer tools enabled")
 	await capture("04-inspection")
 	key(KEY_D)
 	game.run.integrity = 1

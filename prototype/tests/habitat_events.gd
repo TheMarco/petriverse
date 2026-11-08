@@ -5,6 +5,7 @@ func quiet(run: RefCounted, stage: int, time: float) -> void:
 	run.harvest.ecology.next_wave = 9999.0
 	run.harvest.ecology.pending.clear()
 	run.harvest.next_bloom = 9999.0
+	run.harvest.last_refill = 9999.0
 	run.harvest.visitor_at = -1.0
 	run.enemies.clear()
 	run.stage_elapsed = time
@@ -51,10 +52,11 @@ func exercise() -> void:
 	var food = run.Harvest.Organism.new(990,"food",at,Vector2.ZERO,0.0)
 	var cyst = run.Harvest.Organism.new(991,"cyst",at,Vector2.ZERO,0.0)
 	run.enemies.append_array([food,cyst])
+	var health_before: int = run.integrity
 	for i in 90:
 		run.step(1.0/60.0)
 	expect(cyst.nucleus.y-food.nucleus.y>7.0,"The giant's wake actually opens a gap between food and poison")
-	expect(run.enemies.size()==2 and run.integrity==5,"The distant traveller is harmless and is not an uncatchable gameplay enemy")
+	expect(run.enemies.size()==2 and run.integrity==health_before,"The distant traveller is harmless and is not an uncatchable gameplay enemy")
 	run.toggle_pause()
 	var position: Vector2 = food.nucleus
 	var sample: Dictionary = events.sample(run)

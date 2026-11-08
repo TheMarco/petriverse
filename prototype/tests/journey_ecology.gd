@@ -3,6 +3,7 @@ extends "res://tests/journey_rules.gd"
 func quiet(run: RefCounted, index: int) -> void:
 	fixture_stage(run,index)
 	run.harvest.next_bloom = 9999.0
+	run.harvest.last_refill = 9999.0
 	run.harvest.ecology.next_wave = 9999.0
 	run.harvest.ecology.pending.clear()
 	run.harvest.spec.food = 999
