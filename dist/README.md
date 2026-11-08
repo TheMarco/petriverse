@@ -2,9 +2,9 @@
 
 - **Mac, Apple Silicon + Intel:** [Petriverse-0.3.0-macos-universal.zip](Petriverse-0.3.0-macos-universal.zip). Developer ID signed, Apple notarized, and ticket stapled.
 - **Windows x86-64:** [Petriverse-0.3.0-windows-x86_64.zip](Petriverse-0.3.0-windows-x86_64.zip). Extract everything and run `Petriverse.exe`; keep `Petriverse.pck` beside it. Not Authenticode signed.
-- **Linux:** no 0.3.0 build; the 0.2.3 Linux archives below remain.
+- **Linux x86-64:** [Petriverse-0.3.0-linux-x86_64.zip](Petriverse-0.3.0-linux-x86_64.zip) or [tar.gz](Petriverse-0.3.0-linux-x86_64.tar.gz). Extract and run `./Petriverse.x86_64`; keep `Petriverse.pck` beside it. Executable permissions are preserved.
 
-Both builds contain version **0.3.0** internally and the same game pack. Artwork, music, effects, creature-film narration, subtitles and license notices are bundled. No Godot installation, network connection or API key is needed to play. Existing saves remain compatible.
+All three builds contain version **0.3.0** internally and the same game pack. Artwork, music, effects, creature-film narration, subtitles and license notices are bundled. No Godot installation, network connection or API key is needed to play. Existing saves remain compatible.
 
 ## New in 0.3.0
 
@@ -14,7 +14,7 @@ Settings has Sound, Play and Display sections, adds full screen (F11 or Alt+Ente
 
 ## Verification (0.3.0)
 
-The exported game pack passed **113 native Mac smoke checks** with Godot 4.7.2 (version, startup, journey length, film voiceovers, Mother textures, art, music, capture, recovery, fluid rendering, pause; no shader errors). Mac and Windows share one pack (SHA-256 `65f5d208...dbc38e`). The Mac app is Developer ID signed with the hardened runtime; Apple notarization submission `5145dda7-e59c-4491-9022-b0ad4f24fd1f` was Accepted, the ticket is stapled, and an app extracted from the release ZIP passes `codesign --verify --deep --strict`, `stapler validate` and Gatekeeper (`spctl`: Notarized Developer ID). The Windows executable reports file and product version 0.3.0.0 and its ZIP passes an integrity test; it has not been run on Windows. See [release checksums](SHA256SUMS.txt).
+The exported game pack passed **113 native Mac smoke checks** with Godot 4.7.2 (version, startup, journey length, film voiceovers, Mother textures, art, music, capture, recovery, fluid rendering, pause; no shader errors). Mac, Windows and Linux share one pack (SHA-256 `65f5d208...dbc38e`). The Mac app is Developer ID signed with the hardened runtime; Apple notarization submission `5145dda7-e59c-4491-9022-b0ad4f24fd1f` was Accepted, the ticket is stapled, and an app extracted from the release ZIP passes `codesign --verify --deep --strict`, `stapler validate` and Gatekeeper (`spctl`: Notarized Developer ID). The Windows executable reports file and product version 0.3.0.0; the Linux executable keeps its executable permission in both archives. All four archives pass integrity tests. Windows and Linux have not been run on their target operating systems. See [release checksums](SHA256SUMS.txt).
 
 # Petriverse 0.2.3
 
