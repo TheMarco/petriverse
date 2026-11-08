@@ -57,7 +57,8 @@ var pending_discovery := "" # a species named before its organism has surfaced
 
 func _ready() -> void:
 	game = get_parent()
-	z_index = 20
+	# Above the lens pass (z 8), below the interface (z 10): dialogs cover it.
+	z_index = 9
 	dot = radial_texture(64, [0.0, 0.22, 0.55, 1.0], [Color(1, 1, 1, 1), Color(1, 1, 1, 0.72), Color(1, 1, 1, 0.16), Color(1, 1, 1, 0)])
 	rim = radial_texture(256, [0.0, 0.80, 0.93, 0.985, 1.0], [Color(1, 1, 1, 0), Color(1, 1, 1, 0), Color(1, 1, 1, 0.45), Color(1, 1, 1, 1), Color(1, 1, 1, 0)])
 	glow = Node2D.new()
@@ -90,8 +91,11 @@ static func radial_texture(size_px: int, offsets: Array, colors: Array) -> Gradi
 ## Screen position of a point in dish coordinates, including the comfort reflow.
 func screen(point: Vector2) -> Vector2:
 	if game.has_method("dish_scale"):
-		return point * game.dish_scale() + game.dish_offset() + shake
+		return point * dish_scale() + game.dish_offset() + shake
 	return point + shake
+
+func dish_scale() -> float:
+	return game.dish_scale() if game.has_method("dish_scale") else 1.0
 
 func motion() -> bool:
 	return not game.reduced_motion
@@ -145,6 +149,8 @@ func update(delta: float) -> void:
 	if last_integrity < 0:
 		reset()
 	var paused: bool = run.state == "paused" or game.help_open or game.journal_open or game.settings_open
+	# Nothing frozen mid-flight shows through a menu; it resumes with play.
+	visible = not (paused or game.comparisons_open)
 	if run.capture_serial != last_capture:
 		if run.capture_serial > last_capture and not run.last_capture.is_empty():
 			on_capture(run.last_capture)
@@ -566,8 +572,10 @@ func burst(at: Vector2, count: int, color: Color, speed: float, life: float, sma
 		var direction := Vector2.from_angle(TAU * i / float(count) + randf() * 0.4)
 		sparks.append({"at": at, "velocity": direction * speed * randf_range(0.5, 1.0), "age": 0.0, "life": life * randf_range(0.7, 1.0), "size": 1.6 if small else randf_range(2.0, 3.4), "color": color, "screen": true})
 
-func mote_position(mote: Dictionary) -> Vector2:
-	var t: float = clampf((mote.age - mote.delay) / MOTE_FLIGHT, 0.0, 1.0)
+func mote_position(mote: Dictionary, age: float = -1.0) -> Vector2:
+	if age < 0.0:
+		age = mote.age
+	var t: float = clampf((age - mote.delay) / MOTE_FLIGHT, 0.0, 1.0)
 	# Ease in, then accelerate into the counter along a gentle arc.
 	var eased := t * t * (3.0 - 2.0 * t)
 	eased = lerpf(eased, t * t, 0.45)
@@ -582,7 +590,7 @@ func mote_position(mote: Dictionary) -> Vector2:
 func draw_glow() -> void:
 	var run = game.run
 	var lens_center: Vector2 = screen(run.board.center)
-	var lens_radius: float = 404.0 * (game.dish_scale() if game.has_method("dish_scale") else 1.0)
+	var lens_radius: float = 404.0 * dish_scale()
 	if run.state != "home":
 		# Critical health: a slow warm pulse inside the lens edge.
 		var pulse := critical * 0.09 + beat() * 0.16
@@ -599,7 +607,7 @@ func draw_glow() -> void:
 			continue # a staggered wave that has not started yet
 		var t: float = ring.age / ring.life
 		var eased := 1.0 - pow(1.0 - t, 3.0)
-		var radius: float = lerpf(ring.from, ring.to, eased if motion() else 0.0) * (game.dish_scale() if game.has_method("dish_scale") else 1.0)
+		var radius: float = lerpf(ring.from, ring.to, eased if motion() else 0.0) * dish_scale()
 		glow.draw_arc(screen(ring.at), radius, 0.0, TAU, 48, Color(ring.color, 0.55 * (1.0 - t)), ring.width, true)
 	draw_membrane_light()
 	for flash in flashes:
@@ -633,9 +641,7 @@ func draw_glow() -> void:
 		var t: float = clampf((mote.age - mote.delay) / MOTE_FLIGHT, 0.0, 1.0)
 		# A short luminous trail reads as motion even at low frame rates.
 		for k in 4:
-			var back: Dictionary = mote.duplicate()
-			back.age = maxf(mote.delay, mote.age - 0.018 * (k + 1))
-			var q := mote_position(back)
+			var q := mote_position(mote, maxf(mote.delay, mote.age - 0.018 * (k + 1)))
 			var r := 9.0 - k * 1.8
 			glow.draw_texture_rect(dot, Rect2(q - Vector2.ONE * r, Vector2.ONE * r * 2.0), false, Color(mote.color, 0.32 - k * 0.07))
 		var size := lerpf(13.0, 9.0, t)
@@ -653,7 +659,7 @@ func draw_membrane_light() -> void:
 		points.append(run.board.anchors[id])
 	if selection.closed:
 		points.append(points[0])
-	var scale_factor: float = game.dish_scale() if game.has_method("dish_scale") else 1.0
+	var scale_factor: float = dish_scale()
 	# The light takes the membrane's own warning colors.
 	var tint := PEARL
 	if selection.mother_blocked():
@@ -711,13 +717,13 @@ func draw_card() -> void:
 	var alpha: float = smoothstep(0.0, 0.35, t) * (1.0 - smoothstep(life - 0.8, life, t))
 	if alpha <= 0.0:
 		return
-	var center := screen(game.run.board.center) + Vector2(0, -150.0 * (game.dish_scale() if game.has_method("dish_scale") else 1.0))
+	var center := screen(game.run.board.center) + Vector2(0, -150.0 * dish_scale())
 	var drift := 0.0 if not motion() else (1.0 - smoothstep(0.0, 0.6, t)) * 10.0
 	# A soft dark well keeps the words legible over living tissue.
 	var well := Color(0.004, 0.02, 0.026, 0.55 * alpha)
 	ink.draw_texture_rect(dot, Rect2(center - Vector2(330, 120), Vector2(660, 240)), false, well)
 	if card.boss:
-		ink.draw_texture_rect(rim, Rect2(screen(game.run.board.center) - Vector2.ONE * 404.0 * game.dish_scale(), Vector2.ONE * 808.0 * game.dish_scale()), false, Color(0.0, 0.0, 0.0, 0.35 * alpha))
+		ink.draw_texture_rect(rim, Rect2(screen(game.run.board.center) - Vector2.ONE * 404.0 * dish_scale(), Vector2.ONE * 808.0 * dish_scale()), false, Color(0.0, 0.0, 0.0, 0.35 * alpha))
 	var caption: String = card.caption
 	var caption_width := tracked.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
 	ink.draw_string(tracked, center + Vector2(-caption_width * 0.5, -34 + drift), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(card.color, 0.9 * alpha))

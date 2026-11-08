@@ -6,6 +6,7 @@ extends SceneTree
 
 const Run = preload("res://scripts/run_controller.gd")
 const Geometry = preload("res://scripts/loop_geometry.gd")
+const LoopRoutes = preload("res://tests/loop_routes.gd")
 const STEP := 1.0 / 60.0
 const LIMIT := 360.0
 var failures: Array[String] = []
@@ -68,47 +69,16 @@ func choose_route(run: RefCounted, candidates: Array, observed: Dictionary, prof
 			return best.duplicate()
 	return []
 
-## Simple four- and five-cell loops beside Mother, for targets no triangle holds.
-func medium_loops(board: RefCounted) -> Array:
-	var found: Array = []
-	var walk := func(walk: Callable, path: Array) -> void:
-		if path.size() >= 4 and board.neighbors[path[-1]].has(path[0]) and path[1] < path[-1]:
-			if Geometry.capture_valid(path, board, func(_id): return true):
-				found.append(path.duplicate())
-		if path.size() >= 5:
-			return
-		for id in board.neighbors[path[-1]]:
-			if id > path[0] and not path.has(id):
-				walk.call(walk, path + [id])
-	for start in board.anchors.size():
-		walk.call(walk, [start])
-	return found
-
-## Simple six-to-eight cell loops that keep Mother outside at the rest layout.
-func large_loops(board: RefCounted) -> Array:
-	var found: Array = []
-	var walk := func(walk: Callable, path: Array) -> void:
-		if path.size() >= 6 and board.neighbors[path[-1]].has(path[0]) and path[1] < path[-1]:
-			if Geometry.capture_valid(path, board, func(_id): return true):
-				found.append(path.duplicate())
-		if path.size() >= 8 or found.size() >= 400:
-			return
-		for id in board.neighbors[path[-1]]:
-			if id > path[0] and not path.has(id):
-				walk.call(walk, path + [id])
-	for start in board.anchors.size():
-		walk.call(walk, [start])
-	return found
-
 func simulate(profile: Dictionary, overrides: Dictionary = {}) -> Dictionary:
 	var run = Run.new(false, int(profile.get("seed", 0)))
 	for setting in overrides:
 		run.board.tuning[setting] = overrides[setting]
 	run.restart()
-	var candidates: Array = run.board.triangles.duplicate() + medium_loops(run.board)
+	# Triangles, plus four- and five-cell loops beside Mother for targets no triangle holds.
+	var candidates: Array = run.board.triangles.duplicate() + LoopRoutes.loops(run.board, 4, 5)
 	if profile.get("large_loops", false):
 		# The inner ring always enclosed Mother; wide loops now sit beside her.
-		candidates = large_loops(run.board)
+		candidates = LoopRoutes.loops(run.board, 6, 8, true, 400)
 	var path: Array = []
 	var stage := "idle"
 	var timer := 0.0

@@ -248,6 +248,34 @@ func exercise() -> void:
 	live.state = Run.LOSS
 	frames(game, 2.0)
 	expect(game.optics.saturation < 0.5, "A loss drains color from the dish")
+	# Layering: the lens pass, then effects, then the interface, for any HUD.
+	expect(game.optics.z_index == 8 and game.feel.z_index == 9 and game.hud.z_index == 10, "Effects sit above the lens pass and below the interface")
+	var standalone := preload("res://scripts/hud.gd").new()
+	expect(standalone.z_index == 10, "A HUD created by any host draws above the lens pass")
+	standalone.free()
+	live.state = Run.PAUSED
+	game._process(1.0 / 60.0)
+	expect(not game.feel.visible, "Effects hide under the pause menu instead of freezing over it")
+	live.state = Run.ACTIVE
+	game._process(1.0 / 60.0)
+	expect(game.feel.visible, "Effects return with play")
+	# Full screen is read before the interface, so a focused button cannot take it.
+	var was_full: bool = game.fullscreen
+	var f11 := InputEventKey.new()
+	f11.keycode = KEY_F11
+	f11.pressed = true
+	root.push_input(f11)
+	expect(game.fullscreen != was_full, "F11 toggles full screen through the input pass")
+	root.push_input(f11)
+	# The title's choices take no input until they can be seen.
+	game.return_home()
+	game.home_pond_open = false
+	game.hud.title_screen.introduced = false
+	game._process(1.0 / 60.0)
+	game._process(1.0 / 60.0)
+	expect(game.hud.new_button.mouse_filter == Control.MOUSE_FILTER_IGNORE, "An invisible title choice cannot be clicked during the introduction")
+	game._process(0.0)
+	expect(game.hud.new_button.mouse_filter == Control.MOUSE_FILTER_STOP and game.hud.journal_button.focus_mode == Control.FOCUS_ALL, "Title choices take input once shown")
 	game.queue_free()
 	await process_frame
 	for file in ["/tmp/petriverse-feel-journey.cfg", "/tmp/petriverse-feel-profile.cfg"]:

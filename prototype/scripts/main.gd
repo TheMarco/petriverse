@@ -143,7 +143,6 @@ func _ready() -> void:
 	optics.backbuffer = copy
 	add_child(optics)
 	hud = JourneyHud.new() if run.journey else Hud.new()
-	hud.z_index = 10
 	add_child(hud)
 	feel = GameFeel.new()
 	add_child(feel)
@@ -292,6 +291,8 @@ func restart() -> void:
 	results_saved = false
 	last_discovery = 0
 	run.restart()
+	if feel != null:
+		feel.reset()
 	if is_instance_valid(soundscape):
 		soundscape.reset_run()
 	visual_time = 0.0
@@ -424,6 +425,13 @@ func choose_evolution(index: int) -> void:
 				evolution_reveal.present(id)
 				save_journey()
 
+func _input(event: InputEvent) -> void:
+	# Before the interface: a focused button would otherwise take Alt+Enter as accept.
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F11 or (event.keycode in [KEY_ENTER, KEY_KP_ENTER] and event.alt_pressed):
+			toggle_fullscreen()
+			get_viewport().set_input_as_handled()
+
 func _unhandled_input(event: InputEvent) -> void:
 	if comparisons_open and event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		comparisons_open = false
@@ -445,9 +453,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			evolution_reveal.dismiss()
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_F11 or (event.keycode in [KEY_ENTER, KEY_KP_ENTER] and event.alt_pressed):
-			toggle_fullscreen()
-			return
 		if run.journey and help_open:
 			if event.keycode in [KEY_ESCAPE, KEY_H]:
 				toggle_help()

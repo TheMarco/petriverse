@@ -51,6 +51,8 @@ class HudButton extends Button:
 
 func _init() -> void:
 	canvas = self
+	# Above the lens pass (z 8) and the feel layer (z 9), whichever host adds it.
+	z_index = 10
 
 func _ready() -> void:
 	game = get_parent()

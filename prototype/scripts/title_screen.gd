@@ -12,10 +12,16 @@ static func stage(age: float, from: float, length: float) -> float:
 	return 1.0 - pow(1.0 - t, 3.0)
 
 func intro_age(hud: Node2D) -> float:
-	return INTRO if introduced else hud.overlay_age
+	# Reduced motion shows the finished title at once.
+	return INTRO if introduced or hud.game.reduced_motion else hud.overlay_age
 
 func configure(hud: Node2D) -> void:
 	var game = hud.game
+	# These buttons also serve other screens; they take input everywhere but
+	# during the title's own introduction below.
+	for control in [hud.continue_button, hud.new_button, hud.pond_button, hud.advanced_button, hud.help_button, hud.journal_button, hud.experiments_button, hud.sound_button]:
+		control.mouse_filter = Control.MOUSE_FILTER_STOP
+		control.focus_mode = Control.FOCUS_ALL
 	if game.run.state != "home" or game.home_pond_open or hud.advanced_open:
 		return
 	var age := intro_age(hud)
@@ -56,6 +62,11 @@ func configure(hud: Node2D) -> void:
 		order[i].modulate.a = stage(age, 1.15 + i * 0.09, 0.5) * fade
 	for control in footer:
 		control.modulate.a = stage(age, 1.65, 0.6) * fade
+	# A choice cannot be clicked or focused before it can be seen.
+	for control in order + footer:
+		var shown_enough: bool = control.modulate.a >= 0.6
+		control.mouse_filter = Control.MOUSE_FILTER_STOP if shown_enough else Control.MOUSE_FILTER_IGNORE
+		control.focus_mode = Control.FOCUS_ALL if shown_enough else Control.FOCUS_NONE
 
 func draw(hud: Node2D) -> void:
 	var game = hud.game

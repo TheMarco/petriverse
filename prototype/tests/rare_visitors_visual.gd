@@ -1,19 +1,5 @@
 extends "res://tests/boss_patterns_visual.gd"
-
-## Simple loops of exactly `size` neighboring cells.
-func loops(board: RefCounted, size: int) -> Array:
-	var found: Array = []
-	var walk := func(walk: Callable, path: Array) -> void:
-		if path.size() == size:
-			if board.neighbors[path[-1]].has(path[0]) and path[1] < path[-1]:
-				found.append(path.duplicate())
-			return
-		for id in board.neighbors[path[-1]]:
-			if id > path[0] and not path.has(id):
-				walk.call(walk, path + [id])
-	for start in board.anchors.size():
-		walk.call(walk, [start])
-	return found
+const LoopRoutes = preload("res://tests/loop_routes.gd")
 
 func exercise() -> void:
 	game = Main.new()
@@ -49,7 +35,9 @@ func exercise() -> void:
 	# Any loop a player could draw counts: three to five ready cells with
 	# Mother outside, preferring the smallest.
 	var chosen: Array = []
-	for path in game.run.board.triangles + loops(game.run.board, 4) + loops(game.run.board, 5):
+	var wider: Array = LoopRoutes.loops(game.run.board, 4, 5, false)
+	wider.sort_custom(func(a, b): return a.size() < b.size())
+	for path in game.run.board.triangles + wider:
 		if game.run.Geometry.capture_valid(path,game.run.board,game.run.is_ready) and game.run.Geometry.contains(harp.nucleus,game.run.Geometry.polygon_for(path,game.run.board.anchors)):
 			chosen = path
 			break

@@ -183,6 +183,8 @@ func refresh() -> void:
 			control.hide()
 	var key := overlay_key()
 	if key != overlay_shown:
+		if overlay_shown == "title":
+			title_screen.introduced = true # once per session, even if left early
 		# The title's own longer introduction plays once per session.
 		var boot: bool = key == "title" and not title_screen.introduced
 		overlay_shown = key
@@ -203,6 +205,8 @@ func tick(delta: float) -> void:
 	overlay_age = overlay_age + delta if delta > 0.0 else maxf(overlay_age, title_screen.INTRO)
 
 func entrance() -> float:
+	if game.reduced_motion:
+		return 1.0
 	var t := clampf(overlay_age / ENTRANCE, 0.0, 1.0)
 	return 1.0 - pow(1.0 - t, 3.0)
 
@@ -325,12 +329,16 @@ func refresh_encounter(overlay: bool) -> Array:
 		shown.append_array([center_button, journal_button])
 	return shown
 
+## The presentation layer, when the host has one.
+func feel() -> Node2D:
+	return game.get("feel")
+
 ## Displayed value from the presentation layer: rewards arrive, then count.
 func feel_value(name: String, actual: int) -> int:
-	return game.feel.shown(name, actual) if game.get("feel") != null else actual
+	return feel().shown(name, actual) if feel() != null else actual
 
 func feel_pop(name: String) -> float:
-	return game.feel.pop(name) if game.get("feel") != null else 0.0
+	return feel().pop(name) if feel() != null else 0.0
 
 ## A label that briefly swells and brightens when its value changes.
 func popped(value: String, at: Vector2, size_px: int, color: Color, weight: int, amount: float) -> void:
@@ -394,7 +402,7 @@ func _draw() -> void:
 		return # Native, scrollable settings own this screen at every size.
 	if game.comfort_layout():
 		if run.state == "active" and not topmost:
-			canvas.draw_set_transform(game.dish_offset(), 0.0, Vector2.ONE * game.dish_scale())
+			canvas.draw_set_transform(game.view_offset(), 0.0, Vector2.ONE * game.dish_scale())
 			draw_targets()
 			draw_nudge()
 			draw_start_caption()
@@ -403,7 +411,7 @@ func _draw() -> void:
 	if run.state != "home":
 		draw_status()
 		if run.state == "active" and not topmost:
-			var shake: Vector2 = game.feel.shake if game.get("feel") != null else Vector2.ZERO
+			var shake: Vector2 = feel().shake if feel() != null else Vector2.ZERO
 			canvas.draw_set_transform(shake)
 			draw_targets()
 			draw_nudge()
@@ -510,8 +518,8 @@ func draw_status() -> void:
 	label_at("Mother", Vector2(LEFT, 152), 13, MUTED)
 	right_at("%d of %d" % [run.integrity,run.max_integrity], Vector2(LEFT + COLUMN, 152), 13, UI.DANGER if low else INK, UI.MEDIUM)
 	var pip_step: float = minf(35.5,COLUMN / float(run.max_integrity))
-	var hurt: float = game.feel.hurt if game.get("feel") != null else 0.0
-	var critical: float = game.feel.critical if game.get("feel") != null else 0.0
+	var hurt: float = feel().hurt if feel() != null else 0.0
+	var critical: float = feel().critical if feel() != null else 0.0
 	var jolt := 0.0 if game.reduced_motion else sin(hurt * 38.0) * 4.0 * hurt * hurt
 	for i in run.max_integrity:
 		var pip := Rect2(LEFT + i * pip_step + jolt, 164, pip_step - 5.0, 6)
@@ -901,7 +909,7 @@ func brief_content(paint: bool, top: float) -> float:
 		var texture: Texture2D = game.microscope.enemy_texture(featured)
 		var art := Rect2(left, section + 28, 125, 49) if featured == "bacterium" else Rect2(left + 10, section, 105, 105)
 		# The specimen breathes and sways slightly, as it does in the dish.
-		var t: float = 0.0 if game.reduced_motion else game.feel.clock if game.get("feel") != null else 0.0
+		var t: float = 0.0 if game.reduced_motion or feel() == null else feel().clock
 		var pivot := art.get_center()
 		canvas.draw_set_transform(pivot, sin(t * 0.7) * 0.05, Vector2.ONE * (1.0 + sin(t * 1.3) * 0.025))
 		canvas.draw_texture_rect(texture, Rect2(art.position - pivot, art.size), false)
