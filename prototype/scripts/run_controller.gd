@@ -57,6 +57,8 @@ var elapsed := 0.0
 var last_contacts: Array = []
 var contact_time := -100.0
 var last_capture: Dictionary = {}
+## Presentation summary of the last finished encounter's score bonuses.
+var stage_bonus: Dictionary = {}
 var capture_serial := 0
 var clots: Array = []
 var mother_damage: RefCounted
@@ -618,6 +620,12 @@ func finish_journey_stage() -> void:
 	amoebas.release_all(self)
 	Mastery.complete(self)
 	score += integrity * 50
+	# A swift finish converts unused time into score (two points per second).
+	var swift := 0
+	if stage_index > 0 and harvest != null and harvest.spec.mode != "boss":
+		swift = int(maxf(0.0, harvest.deadline() - stage_elapsed)) * 2
+	score += swift
+	stage_bonus = {"health": integrity * 50, "swift": swift, "flow": harvest.best_flow if harvest != null and harvest.get("best_flow") != null else 0}
 	if stage_index % 4 == 3:
 		completed_dishes = maxi(completed_dishes, stage_index / 4 + 1)
 	if stage_index == JourneyPlan.STAGES.size() - 1:

@@ -2,7 +2,10 @@ extends Node
 ## User-supplied scores and baked ElevenLabs effects; all playback stays offline.
 
 const ROOT := "res://assets/audio/"
-const EFFECTS := ["connect", "close", "absorb", "injury", "fracture", "evolve", "warning", "victory", "loss", "mastery"]
+const EFFECTS := ["connect", "close", "absorb", "injury", "fracture", "evolve", "warning", "victory", "loss", "mastery", "heartbeat", "swell"]
+## Presentation cues that reuse an existing recording under their own name,
+## so their counts and rate limits stay separate from the original cue.
+const ALIASES := {"mote": "connect"}
 const TRACKS := ["stillwater", "glassgarden", "deepwater"]
 const TRACK_FILES := {"stillwater":"petriverse-stillwater", "glassgarden":"petriverse-glassgarden", "deepwater":"petriverse-blue-deep"}
 # These complete scores replace the original fixed-key adaptive music beds.
@@ -58,6 +61,9 @@ func _ready() -> void:
 			if name in TRACKS:
 				streams[name] = streams[name].duplicate()
 				streams[name].loop = false # The two-player crossfader owns each loop.
+	for alias in ALIASES:
+		if streams.has(ALIASES[alias]):
+			streams[alias] = streams[ALIASES[alias]]
 	for i in 2:
 		var player := AudioStreamPlayer.new()
 		player.volume_db = -80.0

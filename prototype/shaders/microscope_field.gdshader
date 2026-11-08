@@ -81,7 +81,25 @@ void fragment() {
 	if (dish > 1.5) { water *= vec3(0.90,0.92,1.0); }
 	water *= water_grade;
 	vec3 outside = vec3(0.011, 0.022, 0.028);
-	vec3 color = mix(water, outside, smoothstep(1.005, 1.035, r));
+	// Eyepiece: water light spills a little into the barrel, then a machined
+	// retaining ring catches the same light as the specimens. Everything is
+	// flat again by r = 1.14 so the reduced comfort layout shows no seam.
+	vec2 around = normalize(q + vec2(0.0001));
+	vec2 light = normalize(light_direction);
+	float facing = dot(around, light);
+	vec3 spill = water_grade * water_base * 1.2 * exp(-max(r - 1.0, 0.0) * 30.0) * 0.55;
+	vec3 barrel = outside + spill * (1.0 - smoothstep(1.06, 1.14, r));
+	float ring = smoothstep(1.014, 1.019, r) * (1.0 - smoothstep(1.040, 1.046, r));
+	float striation = sin(r * 2600.0) * 0.5 + 0.5;
+	vec3 metal = vec3(0.034, 0.050, 0.056) + vec3(0.020, 0.026, 0.028) * striation * 0.35;
+	metal += vec3(0.26, 0.31, 0.32) * pow(max(facing, 0.0), 5.0) * (0.55 + 0.45 * striation);
+	metal += vec3(0.05, 0.065, 0.07) * pow(max(-facing, 0.0), 10.0);
+	float chamfer = exp(-pow((r - 1.0185) * 900.0, 2.0)) * (0.35 + 0.65 * max(facing, 0.0));
+	float gap = exp(-pow((r - 1.047) * 700.0, 2.0));
+	barrel = mix(barrel, metal, ring);
+	barrel += vec3(0.30, 0.37, 0.38) * chamfer;
+	barrel *= 1.0 - gap * 0.6;
+	vec3 color = mix(water, barrel, smoothstep(1.003, 1.016, r));
 	color += (hash(floor(px * 1.4)) - 0.5) * 0.002;
 	COLOR = vec4(color, 1.0);
 }

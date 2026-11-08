@@ -15,6 +15,9 @@ const EvolutionReveal = preload("res://scripts/evolution_reveal.gd")
 const CreatureCinema = preload("res://scripts/creature_cinema.gd")
 const UI = preload("res://scripts/ui_style.gd")
 const CaptureFeedback = preload("res://scripts/capture_feedback.gd")
+const GameFeel = preload("res://scripts/game_feel.gd")
+const LensOptics = preload("res://scripts/lens_optics.gd")
+const ReticleCursor = preload("res://scripts/reticle_cursor.gd")
 const PEARL := Color("c7eee4")
 const CYAN := Color("86cbc5")
 const WARM := Color("edb184")
@@ -62,6 +65,9 @@ var last_capture_warning := 0
 var replacement_dialog: ConfirmationDialog
 var pending_new_colony := ""
 var readable_ui: CanvasLayer
+var feel: Node2D
+var optics: ColorRect
+var cursor = ReticleCursor.new()
 var comparisons_open := false
 
 func comfort_layout() -> bool:
@@ -76,6 +82,10 @@ func dish_offset() -> Vector2:
 
 func to_dish(point: Vector2) -> Vector2:
 	return (point - dish_offset()) / dish_scale()
+
+## Drawing offset only. Impact shake never moves input or capture geometry.
+func view_offset() -> Vector2:
+	return dish_offset() + (feel.shake if feel != null else Vector2.ZERO)
 var preferences_enabled := true
 var preferences_path := "user://preferences.cfg"
 var visual_quality := 2 # 0 Light, 1 Balanced, 2 Full; gameplay detail is unchanged.
@@ -121,8 +131,19 @@ func _ready() -> void:
 	if run.journey:
 		home_pond = HomePond.new()
 		add_child(home_pond)
+	# The optical pass treats the dish and its markers; the interface stays above.
+	# Tissue shaders already sampled the screen, so take a fresh copy first.
+	var copy := BackBufferCopy.new()
+	copy.copy_mode = BackBufferCopy.COPY_MODE_VIEWPORT
+	copy.z_index = 8
+	add_child(copy)
+	optics = LensOptics.new()
+	add_child(optics)
 	hud = JourneyHud.new() if run.journey else Hud.new()
+	hud.z_index = 10
 	add_child(hud)
+	feel = GameFeel.new()
+	add_child(feel)
 	if run.journey:
 		evolution_reveal = EvolutionReveal.new()
 		add_child(evolution_reveal)
@@ -146,6 +167,7 @@ func _ready() -> void:
 		add_child(readable_ui)
 
 func _exit_tree() -> void:
+	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
 	if run.journey and save_records and run.state != Run.HOME:
 		save_journey()
 	run.dispose()
@@ -166,6 +188,7 @@ func _process(delta: float) -> void:
 		if is_processing() and is_physics_processing(): creature_cinema.poll(delta)
 		if creature_cinema.active:
 			soundscape.sync(run,delta)
+			cursor.update(self)
 			return
 	if run.state != Run.EVOLVE: comparisons_open = false
 	advance_result_reveal(delta)
@@ -209,6 +232,9 @@ func _process(delta: float) -> void:
 			journey_profile.observe(run)
 			save_journey()
 	soundscape.sync(run, delta)
+	feel.update(delta)
+	optics.sync(delta)
+	cursor.update(self)
 	if run.full_run and not run.journey and run.state in [Run.SUCCESS, Run.LOSS] and not results_saved:
 		results_saved = true
 		if save_records:
@@ -218,6 +244,8 @@ func _process(delta: float) -> void:
 		home_pond.sync(delta)
 	if evolution_reveal != null:
 		evolution_reveal.sync()
+	if hud.has_method("tick"):
+		hud.tick(delta)
 	hud.refresh()
 	if readable_ui != null:
 		readable_ui.sync()
@@ -560,7 +588,7 @@ func commit_selection() -> void:
 
 func _draw() -> void:
 	if run.state==Run.HOME: return
-	draw_set_transform(dish_offset(), 0.0, Vector2.ONE * dish_scale())
+	draw_set_transform(view_offset(), 0.0, Vector2.ONE * dish_scale())
 	draw_dish()
 	if (run.state==Run.HOME and home_pond_open) or (home_pond!=null and home_pond.showing_epilogue()):
 		return
@@ -755,6 +783,8 @@ func reset_presentation() -> void:
 	soundscape.last_mastery_count = last_mastery_count
 	soundscape.last_guard_block = run.guardian_block_serial
 	soundscape.last_integrity = run.integrity
+	if feel != null:
+		feel.reset()
 	# IDs restart with a new colony; discard old sprite and effect identities.
 	for body in microscope.enemies.values():
 		body.queue_free()

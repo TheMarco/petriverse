@@ -9,6 +9,8 @@ const Plan = preload("res://scripts/run_plan.gd")
 const MutationCard = preload("res://scripts/mutation_card.gd")
 const SETTINGS := Rect2(350, 130, 580, 640)
 var game: Node2D
+## Draw target for every HUD helper. Overlays redirect it to their own layer.
+var canvas: CanvasItem
 var font: Font = UI.font(UI.REGULAR)
 var pause_button: Button
 var restart_button: Button
@@ -46,6 +48,9 @@ class HudButton extends Button:
 		if alignment == HORIZONTAL_ALIGNMENT_CENTER and (size.x + label_width) * 0.5 + 14.0 > size.x - 16.0 - hint_width:
 			return
 		draw_string(hint_font, Vector2(size.x - 16.0 - hint_width, size.y * 0.5 + 4.5), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(ink, 0.55))
+
+func _init() -> void:
+	canvas = self
 
 func _ready() -> void:
 	game = get_parent()
@@ -195,7 +200,7 @@ func measure(value: String, size_px: int, weight: int = 0) -> float:
 
 func label_at(value: String, at: Vector2, size_px: int = 16, color: Color = INK, weight: int = 0) -> void:
 	var actual := scaled(size_px)
-	draw_string(UI.text_font(actual, weight), at, value, HORIZONTAL_ALIGNMENT_LEFT, -1, actual, color)
+	canvas.draw_string(UI.text_font(actual, weight), at, value, HORIZONTAL_ALIGNMENT_LEFT, -1, actual, color)
 
 func right_at(value: String, at: Vector2, size_px: int = 16, color: Color = INK, weight: int = 0) -> void:
 	label_at(value, Vector2(at.x - measure(value, size_px, weight), at.y), size_px, color, weight)
@@ -234,7 +239,7 @@ func wrapped(value: String, at: Vector2, width: float, size_px: int = 14, color:
 	var lines := lines_for(value, width, actual, weight)
 	var y := at.y
 	for i in lines.size():
-		draw_string(UI.text_font(actual, weight), Vector2(at.x, y), lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, actual, color)
+		canvas.draw_string(UI.text_font(actual, weight), Vector2(at.x, y), lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, actual, color)
 		if i < lines.size() - 1:
 			y += line_step(actual)
 	return y
@@ -245,16 +250,16 @@ func wrapped_centered(value: String, y: float, width: float, size_px: int = 14, 
 	var lines := lines_for(value, width, actual, weight)
 	for i in lines.size():
 		var line_width := face.get_string_size(lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, actual).x
-		draw_string(face, Vector2(middle - line_width * 0.5, y), lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, actual, color)
+		canvas.draw_string(face, Vector2(middle - line_width * 0.5, y), lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, actual, color)
 		if i < lines.size() - 1:
 			y += line_step(actual)
 	return y
 
 func dialog(rect: Rect2) -> void:
-	draw_style_box(UI.dialog_box(), rect)
+	canvas.draw_style_box(UI.dialog_box(), rect)
 
 func scrim() -> void:
-	draw_rect(Rect2(0, 0, 1280, 900), UI.SCRIM)
+	canvas.draw_rect(Rect2(0, 0, 1280, 900), UI.SCRIM)
 
 func _draw() -> void:
 	if game == null:
@@ -267,13 +272,13 @@ func _draw() -> void:
 	label_at("ENCLOSE. ABSORB. EVOLVE.", Vector2(37, 80), 11, MUTED)
 	label_at("01 / STILLWATER", Vector2(1080, 52), 14, CYAN)
 	label_at(Plan.TITLES[run.stage_index] if run.full_run else "Enclosure study", Vector2(1080, 75), 13, MUTED)
-	draw_line(Vector2(36, 134), Vector2(204, 134), Color("294148"), 1.0)
+	canvas.draw_line(Vector2(36, 134), Vector2(204, 134), Color("294148"), 1.0)
 	label_at("MOTHER INTEGRITY", Vector2(36, 168), 12, MUTED)
 	for i in run.max_integrity:
 		var box := Rect2(36 + i * 33, 184, 25, 8)
-		draw_rect(box, CYAN if i < run.integrity else Color("26393e"))
+		canvas.draw_rect(box, CYAN if i < run.integrity else Color("26393e"))
 		if i >= run.integrity:
-			draw_line(box.position, box.end, MUTED, 1.0)
+			canvas.draw_line(box.position, box.end, MUTED, 1.0)
 	label_at("%d / %d" % [run.integrity,run.max_integrity], Vector2(36, 218), 14)
 	if not run.critical_nuclei().is_empty():
 		label_at("MOTHER UNDER THREAT", Vector2(36, 245), 12, Color("edb184"))
@@ -293,9 +298,9 @@ func _draw() -> void:
 	label_at("TWO HEARTS / ONE BODY" if run.stage_index == 3 else ("ENCOUNTER %d / 3" % (run.stage_index + 1) if run.full_run else "ENCOUNTER"), Vector2(1080, 167), 11, MUTED)
 	label_at("%d / 3" % (predator.health if predator != null else 0) if run.stage_index == 3 else "%02d / %02d" % [run.encounter.resolved, run.encounter.budget], Vector2(1078, 207), 30)
 	label_at("Protection layers" if run.stage_index == 3 else "Organisms resolved", Vector2(1080, 234), 13, MUTED)
-	draw_rect(Rect2(1080, 251, 164, 3), Color("263d43"))
+	canvas.draw_rect(Rect2(1080, 251, 164, 3), Color("263d43"))
 	var growth: float = 1.0 - predator.health / 3.0 if predator != null else float(run.encounter.resolved) / maxf(1.0, run.encounter.budget)
-	draw_rect(Rect2(1080, 251, 164.0 * growth, 3), CYAN)
+	canvas.draw_rect(Rect2(1080, 251, 164.0 * growth, 3), CYAN)
 	label_at("%d in the dish" % run.enemies.size(), Vector2(1080, 282), 14)
 	if predator != null:
 		label_at("Enclose both hearts" if predator.can_take_pulse() else "Reforming · guard mother", Vector2(1080, 305), 12, MUTED)
@@ -361,7 +366,7 @@ func draw_sound_settings() -> void:
 	for i in SETTING_ROWS.size():
 		var y := setting_row(i)
 		if i in [2, 3]:
-			draw_line(Vector2(left, y - 30.0), Vector2(right, y - 30.0), UI.LINE, 1.0)
+			canvas.draw_line(Vector2(left, y - 30.0), Vector2(right, y - 30.0), UI.LINE, 1.0)
 		label_at(SETTING_ROWS[i], Vector2(left, y + 5.0), 15, INK)
 		if not SETTING_KEYS[i].is_empty():
 			label_at(SETTING_KEYS[i], Vector2(left + measure(SETTING_ROWS[i], 15) + 10.0, y + 5.0), 12, UI.FAINT, UI.MEDIUM)
@@ -377,28 +382,28 @@ func draw_harvest() -> void:
 	label_at("A LIVING DISH / RISKY HARVEST", Vector2(37, 80), 11, MUTED)
 	label_at("STILLWATER", Vector2(1080, 52), 14, CYAN)
 	label_at("Feed in %d:%02d" % [int(harvest.DURATION) / 60, int(harvest.DURATION) % 60], Vector2(1080, 75), 13, MUTED)
-	draw_line(Vector2(36, 134), Vector2(204, 134), Color("294148"), 1.0)
+	canvas.draw_line(Vector2(36, 134), Vector2(204, 134), Color("294148"), 1.0)
 	label_at("MOTHER INTEGRITY", Vector2(36, 168), 12, MUTED)
 	for i in run.max_integrity:
 		var box := Rect2(36 + i * 33, 184, 25, 8)
-		draw_rect(box, CYAN if i < run.integrity else Color("26393e"))
+		canvas.draw_rect(box, CYAN if i < run.integrity else Color("26393e"))
 		if i >= run.integrity:
-			draw_line(box.position, box.end, MUTED, 1.0)
+			canvas.draw_line(box.position, box.end, MUTED, 1.0)
 	label_at("%d / %d organelles" % [run.integrity,run.max_integrity], Vector2(36, 218), 14)
 	if not run.critical_nuclei().is_empty():
 		label_at("MOTHER UNDER THREAT", Vector2(36, 245), 12, poison)
 	label_at("NOURISH THE MOTHER", Vector2(36, 277), 12, green)
 	label_at("%02d" % harvest.nourishment, Vector2(33, 325), 43, green)
 	label_at("/ %d" % harvest.GOAL, Vector2(95, 323), 24, MUTED)
-	draw_rect(Rect2(36, 349, 164, 4), Color("263d43"))
-	draw_rect(Rect2(36, 349, 164.0 * harvest.nourishment / harvest.GOAL, 4), green)
+	canvas.draw_rect(Rect2(36, 349, 164, 4), Color("263d43"))
+	canvas.draw_rect(Rect2(36, 349, 164.0 * harvest.nourishment / harvest.GOAL, 4), green)
 	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	var textures := [game.microscope.FOOD, game.microscope.CYST, game.microscope.DRIFTER]
 	var names := ["Desmid · +1 food", "Cyst · −1 organelle", "Drifter · defend"]
 	var colors := [green, poison, CYAN]
 	for i in 3:
 		var y := 398.0 + i * 51.0
-		draw_texture_rect(textures[i], Rect2(30, y - 29, 43, 43), false)
+		canvas.draw_texture_rect(textures[i], Rect2(30, y - 29, 43, 43), false)
 		label_at(names[i], Vector2(78, y), 12, colors[i])
 	label_at("DRAW A MEMBRANE", Vector2(36, 550), 12, CYAN)
 	label_at("Start on a pale cell.", Vector2(36, 576), 13)

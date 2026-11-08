@@ -31,6 +31,14 @@ var last_time := 0.0
 var last_refill := 0.0
 var visitor_at := -1.0
 var visitor_spawned := false
+## Flow: meaningful, poison-free captures in quick succession earn bonus score.
+## Score only; food, health and timing are unchanged. Not saved: a resumed
+## encounter simply starts a new chain.
+const FLOW_WINDOW := 3.0
+const FLOW_STEP := 40
+var flow := 0
+var best_flow := 0
+var last_flow_time := -100.0
 
 func begin(run: RefCounted) -> void:
 	final_surge_enabled = run.encounter_total()==30 and run.stage_index>=8 and run.route_position%2==0 and spec.mode!="boss"
@@ -302,6 +310,16 @@ func commit(path: Array, polygon: PackedVector2Array, ids: Array, recovery: floa
 		capture_grade = "Balanced harvest"
 		capture_bonus = 75
 	var earned_points: int = result.food * 25 + result.threats * 100 + result.rescued * 150 + result.purified * 30 + boss_layers * 300 + capture_bonus
+	var flow_bonus := 0
+	var meaningful: bool = result.food > 0 or result.threats > 0 or result.rescued > 0 or result.purified > 0 or boss_layers > 0
+	if meaningful and result.poison == 0:
+		flow = flow + 1 if run.stage_elapsed - last_flow_time <= FLOW_WINDOW else 1
+		last_flow_time = run.stage_elapsed
+		best_flow = maxi(best_flow, flow)
+		flow_bonus = FLOW_STEP * mini(flow - 1, 5)
+	else:
+		flow = 0
+	earned_points += flow_bonus
 	run.score += earned_points
 	if run.mutations.has("nursery") and result.poison == 0:
 		clean_food += result.raw_food
@@ -326,7 +344,7 @@ func commit(path: Array, polygon: PackedVector2Array, ids: Array, recovery: floa
 					break
 	if run.mutations.has("residual"):
 		run.residuals.append({"polygon": polygon.duplicate(), "remaining": 4.0})
-	result.merge({"valid": true, "ids": ids, "points": earned_points, "capture_grade": capture_grade, "capture_bonus": capture_bonus, "polygon": polygon, "positions": positions,
+	result.merge({"valid": true, "ids": ids, "points": earned_points, "capture_grade": capture_grade, "capture_bonus": capture_bonus, "flow": flow, "flow_bonus": flow_bonus, "polygon": polygon, "positions": positions,
 		"prey_kinds": kinds, "prey_forms": forms, "nodes": path.duplicate(), "kills": result.raw_food + result.threats,
 		"bodies": positions.size(), "armor_hits": armor, "restored_node": restored, "recovery": recovery}, true)
 	result.boss_layers = boss_layers

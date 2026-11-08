@@ -1,0 +1,23 @@
+{
+  "provider": "Synthesized locally with SoX 14.4 and encoded with FFmpeg libvorbis (q 5). No external service or sample library.",
+  "assets": {
+    "heartbeat.ogg": {
+      "use": "Critical health: a slow two-beat pulse while the Mother has one organelle left.",
+      "commands": [
+        "sox -n -r 44100 -c 1 lub.wav synth 0.20 sine 62:44 fade q 0.008 0.20 0.16 gain -2",
+        "sox -n -r 44100 -c 1 dub.wav synth 0.17 sine 54:40 fade q 0.008 0.17 0.14 gain -5",
+        "sox -n -r 44100 -c 1 gap.wav trim 0 0.13",
+        "sox -n -r 44100 -c 1 tail.wav trim 0 0.55",
+        "sox lub.wav gap.wav dub.wav tail.wav beat-dry.wav",
+        "sox beat-dry.wav -c 2 heartbeat.wav gain -8 lowpass 180 reverb 18 50 60 gain -n -3"
+      ]
+    },
+    "swell.ogg": {
+      "use": "A soft water swell when an encounter opens and when a new dish or boss is introduced.",
+      "commands": [
+        "sox -n -r 44100 -c 2 swell-dry.wav synth 2.2 brownnoise synth 2.2 sine amod 0.35 0",
+        "sox swell-dry.wav swell.wav sinc 140-1100 fade q 0.9 2.2 1.1 reverb 40 60 80 gain -n -6"
+      ]
+    }
+  }
+}

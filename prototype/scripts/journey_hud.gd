@@ -60,8 +60,19 @@ var rename_token := ""
 var name_error := ""
 var label_styles := {}
 var pip_styles := {}
+## Live screen positions of counters, so reward motes land on what they fill.
+var anchors := {}
+var overlay_layer: Node2D
+var overlay_shown := ""
+var overlay_age := 0.0
+var last_tick := -1.0 # -1 until the first frame
+const ENTRANCE := 0.26
 
 func _ready() -> void:
+	# Created before any control, so dialog panels draw beneath their buttons.
+	overlay_layer = Node2D.new()
+	overlay_layer.draw.connect(draw_overlay_layer)
+	add_child(overlay_layer)
 	super._ready()
 	journal_button = button("Field journal", Vector2.ZERO, Vector2(172, 40), game.toggle_journal, "J")
 	film_watch_button = button("Watch film", Vector2(RIGHT, 660), Vector2(COLUMN, 38), watch_new_film)
@@ -168,8 +179,30 @@ func refresh() -> void:
 	if game.settings_open or game.comfort_layout():
 		for control in [sound_close, mute_button, music_slider, effects_slider, comfort_motion_button, contrast_button, text_button, quality_button, mode_button]:
 			control.hide()
+	var key := overlay_key()
+	if key != overlay_shown:
+		# The title's own longer introduction plays once per session.
+		var boot: bool = key == "title" and not title_screen.introduced
+		overlay_shown = key
+		# Before the first frame (or on a zero step) nothing animates.
+		overlay_age = 0.0 if last_tick != 0.0 else (ENTRANCE if not boot else title_screen.INTRO)
+	var appear := entrance()
+	var introducing: bool = key == "title" and not title_screen.introduced
+	overlay_layer.modulate.a = 1.0 if introducing else appear
+	for control in shown:
+		control.modulate.a = 1.0 if key == "active" or key == "title" else appear
 	title_screen.configure(self)
 	queue_redraw()
+
+## Advances entrances with the frame clock. A zero step (a direct refresh,
+## as in fixtures and screenshots) shows the finished state.
+func tick(delta: float) -> void:
+	last_tick = delta
+	overlay_age = overlay_age + delta if delta > 0.0 else maxf(overlay_age, title_screen.INTRO)
+
+func entrance() -> float:
+	var t := clampf(overlay_age / ENTRANCE, 0.0, 1.0)
+	return 1.0 - pow(1.0 - t, 3.0)
 
 func refresh_home(habitat: bool) -> Array:
 	var shown: Array = []
@@ -290,6 +323,25 @@ func refresh_encounter(overlay: bool) -> Array:
 		shown.append_array([center_button, journal_button])
 	return shown
 
+## Displayed value from the presentation layer: rewards arrive, then count.
+func feel_value(name: String, actual: int) -> int:
+	return game.feel.shown(name, actual) if game.get("feel") != null else actual
+
+func feel_pop(name: String) -> float:
+	return game.feel.pop(name) if game.get("feel") != null else 0.0
+
+## A label that briefly swells and brightens when its value changes.
+func popped(value: String, at: Vector2, size_px: int, color: Color, weight: int, amount: float) -> void:
+	if amount <= 0.01 or game.reduced_motion:
+		label_at(value, at, size_px, color.lerp(Color.WHITE, 0.3 * amount), weight)
+		return
+	var actual := scaled(size_px)
+	var pivot := at + Vector2(measure(value, size_px, weight) * 0.5, -actual * 0.35)
+	var eased := sin(minf(1.0, amount) * PI * 0.5)
+	canvas.draw_set_transform(pivot, 0.0, Vector2.ONE * (1.0 + 0.2 * eased))
+	label_at(value, at - pivot, size_px, color.lerp(Color.WHITE, 0.45 * eased), weight)
+	canvas.draw_set_transform(Vector2.ZERO)
+
 func trait_y(index: int) -> float:
 	return TRAIT_TOP + index * TRAIT_STEP
 
@@ -313,15 +365,15 @@ func route_map(origin: Vector2, width: float) -> void:
 		var destination: String = run.habitat_history.get("route:%d" % i if not run.route_plan.is_empty() else str(i), "")
 		points.append(origin + Vector2(i * spacing, 5.0 if destination == "refuge" else -5.0 if destination == "bloom" else 0.0))
 	for i in total - 1:
-		draw_line(points[i], points[i + 1], Color(1, 1, 1, 0.1), 1.0, true)
+		canvas.draw_line(points[i], points[i + 1], Color(1, 1, 1, 0.1), 1.0, true)
 	for i in total:
 		var stage: int = int(run.route_plan[i].stage) if not run.route_plan.is_empty() else i
 		var dish: Dictionary = Journey.DISHES[stage / 4]
 		var reached: bool = i <= run.encounter_index()
 		var color: Color = dish.color if reached else Color(1, 1, 1, 0.2)
-		draw_circle(points[i], 4.5 if stage % 4 == 3 else 2.5, color, true, -1, true)
+		canvas.draw_circle(points[i], 4.5 if stage % 4 == 3 else 2.5, color, true, -1, true)
 		if i == run.encounter_index():
-			draw_arc(points[i], 8.5, 0, TAU, 40, color, 1.2, true)
+			canvas.draw_arc(points[i], 8.5, 0, TAU, 40, color, 1.2, true)
 		centers[stage / 4] += points[i].x
 		counts[stage / 4] += 1
 	for i in 3:
@@ -331,6 +383,7 @@ func route_map(origin: Vector2, width: float) -> void:
 func _draw() -> void:
 	if game == null or help_button == null:
 		return
+	overlay_layer.queue_redraw()
 	if game.evolution_reveal != null and game.evolution_reveal.visible:
 		return
 	var run = game.run
@@ -339,41 +392,61 @@ func _draw() -> void:
 		return # Native, scrollable settings own this screen at every size.
 	if game.comfort_layout():
 		if run.state == "active" and not topmost:
-			draw_set_transform(game.dish_offset(), 0.0, Vector2.ONE * game.dish_scale())
+			canvas.draw_set_transform(game.dish_offset(), 0.0, Vector2.ONE * game.dish_scale())
 			draw_targets()
 			draw_nudge()
-			draw_set_transform(Vector2.ZERO)
+			canvas.draw_set_transform(Vector2.ZERO)
 		return
-	if run.state == "home":
-		draw_home()
-	else:
+	if run.state != "home":
 		draw_status()
 		if run.state == "active" and not topmost:
+			var shake: Vector2 = game.feel.shake if game.get("feel") != null else Vector2.ZERO
+			canvas.draw_set_transform(shake)
 			draw_targets()
 			draw_nudge()
 			draw_big_capture()
 			if run.selection.mother_blocked():
 				# HUD draws above the living tissue, keeping the warning visible.
-				draw_circle(run.board.center, 58.0, Color("d9b58b"), false, 1.5, true)
-		if not topmost:
-			if run.state == "brief":
-				scrim()
-				if run.growth_slot() >= 0:
-					draw_growth_choice()
-				elif run.Habitats.pending(run):
-					draw_habitats()
-				else:
-					draw_brief()
-			elif game.round_result_showing():
-				draw_round_result_cue()
-			elif run.evolution_ready() and run.offered_mutations.is_empty():
-				scrim()
-				draw_rest()
-			elif run.evolution_ready():
-				scrim()
-				draw_evolution()
-			elif run.state in ["paused", "loss", "success"] and overlay_visible():
-				draw_result()
+				canvas.draw_circle(run.board.center, 58.0, Color("d9b58b"), false, 1.5, true)
+			canvas.draw_set_transform(Vector2.ZERO)
+
+## Screens that cover play draw on their own layer, so they can arrive
+## (fade in) without disturbing the persistent columns beneath them.
+func draw_overlay_layer() -> void:
+	canvas = overlay_layer
+	draw_overlays()
+	canvas = self
+
+func draw_overlays() -> void:
+	if game == null or help_button == null:
+		return
+	if game.evolution_reveal != null and game.evolution_reveal.visible:
+		return
+	var run = game.run
+	var topmost: bool = game.settings_open or game.journal_open or game.help_open
+	if game.settings_open or game.comparisons_open or game.comfort_layout():
+		return
+	if run.state == "home":
+		draw_home()
+	elif not topmost:
+		if run.state == "brief":
+			scrim()
+			if run.growth_slot() >= 0:
+				draw_growth_choice()
+			elif run.Habitats.pending(run):
+				draw_habitats()
+			else:
+				draw_brief()
+		elif game.round_result_showing():
+			draw_round_result_cue()
+		elif run.evolution_ready() and run.offered_mutations.is_empty():
+			scrim()
+			draw_rest()
+		elif run.evolution_ready():
+			scrim()
+			draw_evolution()
+		elif run.state in ["paused", "loss", "success"] and overlay_visible():
+			draw_result()
 	if game.settings_open:
 		draw_sound_settings()
 	elif game.journal_open:
@@ -382,6 +455,22 @@ func _draw() -> void:
 		draw_help()
 	if renaming():
 		draw_rename()
+
+## A short name for what currently covers the dish. A change starts an entrance.
+func overlay_key() -> String:
+	var run = game.run
+	if renaming(): return "rename"
+	if game.settings_open: return "settings"
+	if game.journal_open: return "journal"
+	if game.help_open: return "help"
+	if game.comparisons_open: return "compare"
+	if run.state == "home":
+		return "pond" if game.home_pond_open else "colonies" if advanced_open else "title"
+	if run.state == "brief":
+		return "growth" if run.growth_slot() >= 0 else "habitat" if run.Habitats.pending(run) else "brief:%d" % run.stage_index
+	if game.round_result_showing(): return "result:" + run.state
+	if run.evolution_ready(): return "rest" if run.offered_mutations.is_empty() else "evolve"
+	return run.state
 
 func draw_status() -> void:
 	var run = game.run
@@ -400,8 +489,18 @@ func draw_status() -> void:
 	label_at("Mother", Vector2(LEFT, 152), 13, MUTED)
 	right_at("%d of %d" % [run.integrity,run.max_integrity], Vector2(LEFT + COLUMN, 152), 13, UI.DANGER if low else INK, UI.MEDIUM)
 	var pip_step: float = minf(35.5,COLUMN / float(run.max_integrity))
+	var hurt: float = game.feel.hurt if game.get("feel") != null else 0.0
+	var critical: float = game.feel.critical if game.get("feel") != null else 0.0
+	var jolt := 0.0 if game.reduced_motion else sin(hurt * 38.0) * 4.0 * hurt * hurt
 	for i in run.max_integrity:
-		draw_style_box(pip_box(i < run.integrity, low), Rect2(LEFT + i * pip_step, 164, pip_step - 5.0, 6))
+		var pip := Rect2(LEFT + i * pip_step + jolt, 164, pip_step - 5.0, 6)
+		canvas.draw_style_box(pip_box(i < run.integrity, low), pip)
+		if hurt > 0.0 and i == game.feel.hurt_pip:
+			# The lost organelle flashes, then empties.
+			canvas.draw_rect(pip.grow(1.0 + 2.0 * hurt), Color(UI.DANGER, 0.85 * hurt), true)
+		if critical > 0.0 and i < run.integrity:
+			var beat: float = game.feel.beat()
+			canvas.draw_rect(pip.grow(2.0 + 2.0 * beat), Color(UI.DANGER, 0.12 * critical + 0.25 * beat), true)
 	var organelle_status: Array[String] = []
 	if run.growth_roles.values().has("guard"):
 		var ready_guards: int = maxi(0,run.growth_active("guard")-run.guardian_spent)
@@ -413,10 +512,12 @@ func draw_status() -> void:
 	if not organelle_status.is_empty():
 		wrapped(" · ".join(organelle_status),Vector2(LEFT,190),COLUMN,11,CYAN)
 	label_at("Food saved", Vector2(LEFT, 214), 13, MUTED)
-	label_at(str(run.biomass), Vector2(LEFT - 1, 254), 32, UI.FOOD, UI.SEMIBOLD)
+	var banked := feel_value("biomass", run.biomass)
+	popped(str(banked), Vector2(LEFT - 1, 254), 32, UI.FOOD, UI.SEMIBOLD, feel_pop("biomass"))
+	anchors["biomass"] = Vector2(LEFT + 12, 242)
 	if run.biomass >= 30:
 		label_at("Stores full", Vector2(LEFT + measure(str(run.biomass), 32, UI.SEMIBOLD) + 10, 254), 12, MUTED)
-	label_at("Score  %d" % run.score, Vector2(LEFT, 281), 13, CYAN, UI.MEDIUM)
+	popped("Score  %d" % feel_value("score", run.score), Vector2(LEFT, 281), 13, CYAN, UI.MEDIUM, feel_pop("score") * 0.6)
 	label_at(UI.sentence(Mutations.build_name(run.mutations)), Vector2(LEFT, 304), 13, CYAN, UI.SEMIBOLD)
 	if run.mutations.is_empty():
 		wrapped("Choose your first upgrade." if run.evolution_ready() else "Your first upgrade comes after this encounter.", Vector2(LEFT, trait_y(0)), COLUMN, 13, MUTED)
@@ -439,9 +540,13 @@ func draw_status() -> void:
 		y += 26.0
 		label_at("%d attack%s charged" % [attacks, "" if attacks == 1 else "s"], Vector2(RIGHT, y), 13, UI.FOOD, UI.MEDIUM)
 		y += 21.0
-		label_at("%d of 6 charge, 3 per hit" % harvest.nourishment, Vector2(RIGHT, y), 12, MUTED)
+		var charge := "%d of 6 charge, 3 per hit" % feel_value("objective", harvest.nourishment)
+		popped(charge, Vector2(RIGHT, y), 12, MUTED, 0, feel_pop("objective"))
+		anchors["objective"] = Vector2(RIGHT + 12, y - 5)
 	else:
-		label_at("%d / %d food" % [harvest.nourishment, spec.food], Vector2(RIGHT, y), 24, UI.FOOD, UI.SEMIBOLD)
+		var gathered := "%d / %d food" % [feel_value("objective", harvest.nourishment), spec.food]
+		popped(gathered, Vector2(RIGHT, y), 24, UI.FOOD, UI.SEMIBOLD, feel_pop("objective"))
+		anchors["objective"] = Vector2(RIGHT + 16, y - 9)
 		var objective := Guidance.objective_text(run)
 		if not objective.is_empty():
 			y += 25.0
@@ -457,7 +562,7 @@ func draw_status() -> void:
 			draw_nudge_meter()
 	if run.state == "active" and game.creature_cinema != null and not game.creature_cinema.pending_ids.is_empty():
 		var count: int = game.creature_cinema.pending_ids.size()
-		draw_style_box(UI.toast_box(), Rect2(RIGHT - 10, 598, COLUMN + 20, 154))
+		canvas.draw_style_box(UI.toast_box(), Rect2(RIGHT - 10, 598, COLUMN + 20, 154))
 		label_at("NEW DISCOVERY", Vector2(RIGHT, 620), 11, CYAN, UI.SEMIBOLD)
 		wrapped("%d new film%s" % [count, "s" if count != 1 else ""], Vector2(RIGHT, 639), COLUMN, 13, INK, UI.MEDIUM)
 	draw_feedback()
@@ -498,10 +603,10 @@ func draw_nudge_meter() -> void:
 	var y := 790.0
 	label_at("Nudge", Vector2(RIGHT, y), 13, MUTED)
 	right_at("Ready" if recharge <= 0.0 else "%ds" % ceili(recharge), Vector2(RIGHT + COLUMN, y), 13, CYAN if recharge <= 0.0 else MUTED, UI.MEDIUM)
-	draw_style_box(pip_box(false, false), Rect2(RIGHT, y + 10, COLUMN, 3))
+	canvas.draw_style_box(pip_box(false, false), Rect2(RIGHT, y + 10, COLUMN, 3))
 	var fill: float = COLUMN * (1.0 - recharge / run.nudge.COOLDOWN)
 	if fill > 2.0:
-		draw_rect(Rect2(RIGHT, y + 10, fill, 3), Color(CYAN, 0.75 if recharge <= 0.0 else 0.4))
+		canvas.draw_rect(Rect2(RIGHT, y + 10, fill, 3), Color(CYAN, 0.75 if recharge <= 0.0 else 0.4))
 	wrapped("Guide silver phages to copper rods" if run.phages.free_cluster() != null else "Click a cyst, then clear water" if game.click_mode else "Drag a purple cyst aside", Vector2(RIGHT, y + 34), COLUMN, 12, UI.FAINT)
 
 ## Feedback below the lens, sized to its text and growing upward if needed.
@@ -517,7 +622,7 @@ func toast_panel(main: String, detail: String, color: Color) -> void:
 	width = minf(760.0, width + 44.0)
 	var height := 22.0 + lines.size() * line_step(actual) + (18.0 if not detail.is_empty() else 0.0)
 	var box := Rect2(640.0 - width * 0.5, 894.0 - height, width, height)
-	draw_style_box(UI.toast_box(), box)
+	canvas.draw_style_box(UI.toast_box(), box)
 	var y := wrapped_centered(main, box.position.y + 10.0 + actual, 700.0, size_px, color, UI.MEDIUM)
 	if not detail.is_empty():
 		centered(detail, y + 20.0, 12, MUTED)
@@ -565,8 +670,8 @@ func water_label(key: String, anchor: Rect2, title: String, color: Color) -> voi
 	var from := Vector2(clampf(center.x,box.position.x,box.end.x),clampf(center.y,box.position.y,box.end.y))
 	var to := Vector2(clampf(from.x,anchor.position.x,anchor.end.x),clampf(from.y,anchor.position.y,anchor.end.y))
 	if dish_labels.clear_leader(from,to):
-		draw_line(from,to,Color(color,0.35),1.0,true)
-	draw_style_box(label_style(color),box)
+		canvas.draw_line(from,to,Color(color,0.35),1.0,true)
+	canvas.draw_style_box(label_style(color),box)
 	label_at(title, box.position + Vector2(8, actual + 2), point_size, color, UI.MEDIUM)
 
 func label_style(color: Color) -> StyleBoxFlat:
@@ -582,7 +687,7 @@ func marker(body: RefCounted, title: String, color: Color) -> void:
 	for point in body.nuclei():
 		for quadrant in 4:
 			var angle := quadrant * PI/2.0 + 0.15
-			draw_arc(point,13.0,angle,angle+0.7,9,Color(color,0.7),1.0,true)
+			canvas.draw_arc(point,13.0,angle,angle+0.7,9,Color(color,0.7),1.0,true)
 
 func draw_nudge() -> void:
 	var run = game.run
@@ -592,16 +697,16 @@ func draw_nudge() -> void:
 		var from: Vector2 = body.nucleus
 		var move: Vector2 = nudge.displacement(run)
 		var to := from+move
-		draw_arc(from,26.0,0,TAU,48,Color(CYAN,0.75),1.2,true)
+		canvas.draw_arc(from,26.0,0,TAU,48,Color(CYAN,0.75),1.2,true)
 		if move.length()>=nudge.MIN_DRAG:
 			var direction := move.normalized()
-			draw_line(from+direction*18.0,to,CYAN,1.6,true)
-			draw_polyline(PackedVector2Array([to-direction.rotated(-0.5)*9.0,to,to-direction.rotated(0.5)*9.0]),CYAN,1.6,true)
-			draw_arc(to,19.0,0,TAU,40,Color(CYAN,0.35),1.0,true)
+			canvas.draw_line(from+direction*18.0,to,CYAN,1.6,true)
+			canvas.draw_polyline(PackedVector2Array([to-direction.rotated(-0.5)*9.0,to,to-direction.rotated(0.5)*9.0]),CYAN,1.6,true)
+			canvas.draw_arc(to,19.0,0,TAU,40,Color(CYAN,0.35),1.0,true)
 		return
 	var hovered = nudge.pick(run,game.to_dish(game.get_global_mouse_position()))
 	if hovered!=null:
-		draw_arc(hovered.nucleus,26.0,0,TAU,48,Color(CYAN,0.75 if nudge.cooldown<=0.0 else 0.3),1.2,true)
+		canvas.draw_arc(hovered.nucleus,26.0,0,TAU,48,Color(CYAN,0.75 if nudge.cooldown<=0.0 else 0.3),1.2,true)
 	var teach = nudge.teaching_target(run)
 	if teach!=null and not Guidance.next_action(run,game.click_mode).urgent:
 		marker(teach,"CLICK CYST TO NUDGE" if game.click_mode else "DRAG CYST TO NUDGE",CYAN)
@@ -633,9 +738,9 @@ func draw_targets() -> void:
 			var start := i*TAU/8.0 - TAU/16.0 + 0.025
 			var finish := start + TAU/8.0 - 0.05
 			var edge := Vector2.from_angle(start-0.025)
-			draw_line(run.board.center+edge*80.0, run.board.center+edge*387.0, Color(0.35,0.58,0.62,0.12), 1.0, true)
+			canvas.draw_line(run.board.center+edge*80.0, run.board.center+edge*387.0, Color(0.35,0.58,0.62,0.12), 1.0, true)
 			var visited: bool = run.harvest.visited.has(i)
-			draw_arc(run.board.center, 387, start, finish, 28, CYAN if visited else Color("3f5c63"), 3.0 if visited else 1.5, true)
+			canvas.draw_arc(run.board.center, 387, start, finish, 28, CYAN if visited else Color("3f5c63"), 3.0 if visited else 1.5, true)
 	var boss = run.boss()
 	if boss != null:
 		marker(boss, boss.status_text(), CYAN if boss.can_take_pulse() else Color("c4be9d"))
@@ -656,7 +761,7 @@ func draw_targets() -> void:
 			if guide.urgent and Guidance.contact_seconds(run, body) < 20.0:
 				caption = "MOTHER IN ~%ds" % ceili(Guidance.contact_seconds(run, body))
 				var end: Vector2 = run.board.center + (body.nucleus-run.board.center).normalized()*62.0
-				draw_dashed_line(body.nucleus,end,Color(0.94,0.66,0.77,0.32),1.0,5.0,true,true)
+				canvas.draw_dashed_line(body.nucleus,end,Color(0.94,0.66,0.77,0.32),1.0,5.0,true,true)
 			marker(body, caption, Color("efa8c5") if guide.urgent else CYAN)
 			break
 
@@ -666,12 +771,12 @@ func draw_approaching_life() -> void:
 	if not event.is_empty() and event.kind=="hatching" and event.age>=0.0 and event.age<22.0:
 		for at in run.harvest.event_state.sites:
 			var color := Color("ba9cab") if event.age<14.0 else Color("efa8c5")
-			draw_arc(at,24,0.3,5.8,32,Color(color,0.5),1.0,true)
+			canvas.draw_arc(at,24,0.3,5.8,32,Color(color,0.5),1.0,true)
 			water_label("cyst-site:%s" % at,Rect2(at-Vector2.ONE*24.0,Vector2.ONE*48.0),"CYSTS IN %ds" % ceili(22.0-event.age),color)
 	var visitor_in: float = run.harvest.visitor_at-run.stage_elapsed
 	if not run.harvest.visitor_spawned and visitor_in>0.0 and visitor_in<=8.0:
 		var at: Vector2 = run.harvest.Discoveries.site(run)
-		draw_arc(at,34,0.3,4.9,32,Color(0.76,0.82,0.96,0.35),1.0,true)
+		canvas.draw_arc(at,34,0.3,4.9,32,Color(0.76,0.82,0.96,0.35),1.0,true)
 		water_label("visitor-site",Rect2(at-Vector2.ONE*34.0,Vector2.ONE*68.0),"VISITOR · %ds" % ceili(visitor_in),Color("c7caea"))
 	for site in Rhythm.warning_sites(run):
 		var p: Vector2 = site.position
@@ -681,7 +786,7 @@ func draw_approaching_life() -> void:
 		# Irregular broken arcs read as a disturbance below the focal plane.
 		for i in 3:
 			var angle: float = TAU*i/3.0 + (0.0 if game.reduced_motion else game.visual_time*0.09)
-			draw_arc(p,radius,angle,angle+1.1,20,Color(color,0.18+amount*0.2),1.0,true)
+			canvas.draw_arc(p,radius,angle,angle+1.1,20,Color(color,0.18+amount*0.2),1.0,true)
 		water_label("arrival:%s" % p,Rect2(p-Vector2.ONE*radius,Vector2.ONE*radius*2.0),"%s · %ds" % [{"bacterium":"BACTERIUM", "amoeba":"AMOEBA", "hunter":"HUNTER", "grazer":"FOOD THIEF", "parasite":"PARASITE", "divider":"DIVIDER"}.get(site.kind,"ARRIVAL"), ceili(site.remaining)],color)
 
 func draw_growth_choice() -> void:
@@ -692,7 +797,7 @@ func draw_growth_choice() -> void:
 	for i in 2:
 		var x := CHOICE.position.x+32+i*366.0
 		var card := Rect2(x,CHOICE.position.y+192,320,208)
-		draw_style_box(UI.card_box(),card)
+		canvas.draw_style_box(UI.card_box(),card)
 		label_at("GUARD" if i==0 else "FEEDER",Vector2(x+22,card.position.y+42),13,CYAN,UI.SEMIBOLD)
 		label_at("A safer center" if i==0 else "More from a wide meal",Vector2(x+22,card.position.y+79),19,INK,UI.SEMIBOLD)
 		wrapped("Blocks one hunter, then rests through two encounters." if i==0 and run.encounter_total()==30 else "Blocks one hunter that reaches Mother each encounter." if i==0 else "Clean loops with four or more food gain one extra food.",Vector2(x+22,card.position.y+111),276,15,MUTED)
@@ -710,14 +815,14 @@ func draw_habitats() -> void:
 		var x := CHOICE.position.x + 16 + i * 366.0 + 16
 		var card := Rect2(x - 16, CHOICE.position.y + 176, 352, 306)
 		var tint := Color("b8dc9f") if i == 0 else Color("a2ccde")
-		draw_style_box(UI.card_box(), card)
+		canvas.draw_style_box(UI.card_box(), card)
 		label_at(run.Habitats.name_for(run.stage_index, "bloom" if i == 0 else "refuge"), Vector2(x + 8, card.position.y + 44), 20, tint, UI.SEMIBOLD)
 		var texture: Texture2D = game.microscope.enemy_texture("food" if i == 0 else "spore", "" if i == 0 else run.harvest.Discoveries.form_for(run))
-		draw_texture_rect(texture, Rect2(card.end.x - 92, card.position.y + 18, 68, 68), false)
+		canvas.draw_texture_rect(texture, Rect2(card.end.x - 92, card.position.y + 18, 68, 68), false)
 		var lines: Array = ["Abundant algae: 5 food per bloom.", "More hunters compete for your food.", "Rare visitors in some encounters."] if i == 0 else ["Smaller blooms: 4 food per bloom.", "Half as many hunter arrivals.", "A %s will visit." % run.harvest.Discoveries.name_for(run)]
 		var y := card.position.y + 120.0
 		for j in lines.size():
-			draw_circle(Vector2(x + 11, y - 5), 2.5, tint if j != 1 else Color(tint, 0.6), true, -1, true)
+			canvas.draw_circle(Vector2(x + 11, y - 5), 2.5, tint if j != 1 else Color(tint, 0.6), true, -1, true)
 			y = wrapped(lines[j], Vector2(x + 26, y), 290, 15, INK) + 36.0
 	if run.harvest.final_surge_enabled:
 		centered("Final hunter wave after the goal · a swift clear draws more.", CHOICE.end.y - 62, 13, CYAN)
@@ -764,7 +869,7 @@ func brief_content(paint: bool, top: float) -> float:
 	var art_bottom := section + 112.0
 	if paint:
 		var texture: Texture2D = game.microscope.enemy_texture(featured)
-		draw_texture_rect(texture, Rect2(left, section + 28, 125, 49) if featured == "bacterium" else Rect2(left + 10, section, 105, 105), false)
+		canvas.draw_texture_rect(texture, Rect2(left, section + 28, 125, 49) if featured == "bacterium" else Rect2(left + 10, section, 105, 105), false)
 	if captioned:
 		if paint:
 			label_at({"bacterium":"A bacterial food thief", "amoeba":"Swallows a cell", "grazer":"Steals food", "parasite":"Blocks a cell", "divider":"Splits into two"}[featured], Vector2(left, section + 136), 13, CYAN, UI.SEMIBOLD)
@@ -779,7 +884,7 @@ func brief_content(paint: bool, top: float) -> float:
 	var y := section + 14.0
 	for goal in goals:
 		if paint:
-			draw_circle(Vector2(left + 214, y - 6), 3.0, CYAN, true, -1, true)
+			canvas.draw_circle(Vector2(left + 214, y - 6), 3.0, CYAN, true, -1, true)
 		y = block(paint, goal, Vector2(left + 232, y), 452, 16, INK) + 38.0
 	y = maxf(y - 4.0, art_bottom + 40.0)
 	var gesture := "Drag through 3-%d blue cells. Return to the first cell, then release to capture what is inside." % run.selection.max_vertices if not game.click_mode else "Click through 3-%d blue cells. Click the first cell again, then press Enter to capture." % run.selection.max_vertices
@@ -825,7 +930,7 @@ func draw_rest() -> void:
 	centered("A moment to recover", REST.position.y + 66, 30)
 	centered("%s complete." % run.harvest.spec.name, REST.position.y + 94, 14, CYAN, UI.MEDIUM)
 	var texture: Texture2D = game.microscope.enemy_texture("spore")
-	draw_texture_rect(texture, Rect2(590, REST.position.y + 118, 100, 100), false)
+	canvas.draw_texture_rect(texture, Rect2(590, REST.position.y + 118, 100, 100), false)
 	centered("Next: " + run.next_encounter_name(), REST.position.y + 262, 20)
 	centered("%d food saved  ·  mother has %d of %d health" % [run.biomass, run.integrity,run.max_integrity], REST.position.y + 292, 14, CYAN)
 	var note := "Your six evolutions define this colony. Try a different combination next journey." if run.mutations.size() >= run.JourneyRoute.MAX_TRAITS else "Evolution choices return at the next milestone. Your food and colony travel with you."
@@ -837,33 +942,33 @@ func draw_help() -> void:
 	centered("Make a loop. Capture what's inside.", 154, 28)
 	centered("The dish is paused while you read.", 182, 13, MUTED)
 	var points := PackedVector2Array([Vector2(340,262), Vector2(487,327), Vector2(337,410), Vector2(340,262)])
-	draw_colored_polygon(PackedVector2Array([points[0],points[1],points[2]]), Color(0.35,0.7,0.65,0.09))
-	draw_polyline(points, CYAN, 2.0, true)
+	canvas.draw_colored_polygon(PackedVector2Array([points[0],points[1],points[2]]), Color(0.35,0.7,0.65,0.09))
+	canvas.draw_polyline(points, CYAN, 2.0, true)
 	for i in 3:
-		draw_texture_rect(game.microscope.CELL, Rect2(points[i]-Vector2(24,24), Vector2(48,48)), false)
+		canvas.draw_texture_rect(game.microscope.CELL, Rect2(points[i]-Vector2(24,24), Vector2(48,48)), false)
 	label_at("Start and finish", Vector2(292,226), 12, CYAN, UI.MEDIUM)
-	draw_texture_rect(game.microscope.FOOD, Rect2(358,312,46,46), false)
-	draw_texture_rect(game.microscope.CYST, Rect2(476,420,37,37), false)
+	canvas.draw_texture_rect(game.microscope.FOOD, Rect2(358,312,46,46), false)
+	canvas.draw_texture_rect(game.microscope.CYST, Rect2(476,420,37,37), false)
 	label_at("Keep poison outside", Vector2(300,480), 13, UI.DANGER, UI.MEDIUM)
 	var steps := ["Start on a blue cell.", "Drag through any ready blue cells.", "Return to your first cell.", "Release to capture the organisms inside."]
 	if game.click_mode:
 		steps = ["Click a blue cell to start.", "Click any ready blue cells.", "Click your first cell again.", "Press Enter to capture the organisms inside."]
 	for i in steps.size():
-		draw_circle(Vector2(571, 245 + i * 54), 12.0, Color(CYAN, 0.12), true, -1, true)
+		canvas.draw_circle(Vector2(571, 245 + i * 54), 12.0, Color(CYAN, 0.12), true, -1, true)
 		centered(str(i + 1), 250 + i * 54, 13, CYAN, UI.SEMIBOLD, 571.0)
 		wrapped(steps[i], Vector2(594, 251 + i * 54), 400, 16, INK)
 	wrapped("Use 3-%d cells. Keep the mother outside; avoid crossing her or your loop. Right-click cancels for free. Used cells absorb, then return." % game.run.selection.max_vertices, Vector2(559, 477), 425, 13, MUTED)
-	draw_line(Vector2(HELP.position.x + 44, 528), Vector2(HELP.end.x - 44, 528), UI.LINE)
+	canvas.draw_line(Vector2(HELP.position.x + 44, 528), Vector2(HELP.end.x - 44, 528), UI.LINE)
 	label_at("This encounter", Vector2(278, 566), 15, INK, UI.SEMIBOLD)
 	var y := 596.0
 	for goal in Guidance.goals(game.run):
-		draw_circle(Vector2(282, y - 5), 2.5, CYAN, true, -1, true)
+		canvas.draw_circle(Vector2(282, y - 5), 2.5, CYAN, true, -1, true)
 		y = wrapped(goal, Vector2(294, y), 380, 14, INK) + 28.0
 	label_at("Specimens", Vector2(718, 566), 15, INK, UI.SEMIBOLD)
 	var icons := [game.microscope.FOOD, game.microscope.CYST, game.microscope.SPORE, game.microscope.DRIFTER]
 	var captions := ["Green: food", "Purple spikes: lose health", "Pearl buds: rescue", "Amber hunters: defend"]
 	for i in 4:
-		draw_texture_rect(icons[i], Rect2(714, 578 + i * 29, 26, 26), false)
+		canvas.draw_texture_rect(icons[i], Rect2(714, 578 + i * 29, 26, 26), false)
 		label_at(captions[i], Vector2(750, 597 + i * 29), 13, INK)
 	wrapped("Nudge: click a cyst, then clear water. Free every 6 seconds." if game.click_mode else "Nudge: drag a purple cyst into clear water. Free every 6 seconds.", Vector2(718, 708), 290, 12, CYAN)
 	centered("Space pause   ·   Esc cancel   ·   J journal   ·   V settings   ·   C input mode   ·   M motion", HELP.end.y - 96, 12, UI.FAINT, UI.MEDIUM)
@@ -885,9 +990,9 @@ func draw_home() -> void:
 	centered("Optional starting traits for players who know the pond.", COLONIES.position.y + 100, 15, MUTED)
 	for i in 3:
 		var x := COLONIES.position.x + 153.0 + i * 248.0
-		draw_texture_rect(MotherAppearance.SYMBIOSIS_YOUNG if i == 2 else game.microscope.CELL, Rect2(x - 40, COLONIES.position.y + 140, 80, 80), false, [Color("c7eee4"), Color("b0dcd8"), Color("d6d0b7")][i])
+		canvas.draw_texture_rect(MotherAppearance.SYMBIOSIS_YOUNG if i == 2 else game.microscope.CELL, Rect2(x - 40, COLONIES.position.y + 140, 80, 80), false, [Color("c7eee4"), Color("b0dcd8"), Color("d6d0b7")][i])
 		if i == 1:
-			draw_texture_rect(game.microscope.CELL, Rect2(x + 20, COLONIES.position.y + 187, 24, 24), false)
+			canvas.draw_texture_rect(game.microscope.CELL, Rect2(x + 20, COLONIES.position.y + 187, 24, 24), false)
 		var colony: Dictionary = Journey.COLONIES[i]
 		var unlocked: bool = game.journey_profile.unlocked(colony.id)
 		wrapped_centered(colony.detail if unlocked else colony.unlock, COLONIES.position.y + 330, 200, 14, MUTED if unlocked else UI.FAINT, 0, x)
@@ -951,7 +1056,7 @@ func draw_lesson() -> void:
 	var width := title_width + step_width + 64.0
 	var box := Rect2(640.0 - width * 0.5, 92, width, 46)
 	if not game.comfort_layout():
-		draw_style_box(UI.toast_box(), box)
+		canvas.draw_style_box(UI.toast_box(), box)
 		label_at(guide.title, Vector2(box.position.x + 24, 121), 16, INK, UI.SEMIBOLD)
 		label_at(step, Vector2(box.end.x - 24 - step_width, 121), 12, UI.FAINT, UI.MEDIUM)
 	if waiting:
@@ -961,10 +1066,10 @@ func draw_lesson() -> void:
 		var p: Vector2 = run.board.anchors[path[i]]
 		var next: Vector2 = run.board.anchors[path[(i+1)%path.size()]]
 		var direction := (next-p).normalized()
-		draw_dashed_line(p+direction*29, next-direction*29, Color(0.65, 0.86, 0.86, 0.38), 1.5, 4.0, true, true)
+		canvas.draw_dashed_line(p+direction*29, next-direction*29, Color(0.65, 0.86, 0.86, 0.38), 1.5, 4.0, true, true)
 		var badge := 25.0 if game.comfort_layout() else 11.0
-		draw_circle(p+Vector2(23, -25), badge, UI.RAISED, true, -1, true)
-		draw_circle(p+Vector2(23, -25), badge, Color(CYAN, 0.35), false, 1.0, true)
+		canvas.draw_circle(p+Vector2(23, -25), badge, UI.RAISED, true, -1, true)
+		canvas.draw_circle(p+Vector2(23, -25), badge, Color(CYAN, 0.35), false, 1.0, true)
 		centered(str(i+1), p.y - (14.0 if game.comfort_layout() else 20.5), 32 if game.comfort_layout() else 12, CYAN, UI.SEMIBOLD, p.x + 23)
 	# A moving point demonstrates the route without moving the actual cells.
 	if not game.reduced_motion and not run.selection.active:
@@ -972,7 +1077,7 @@ func draw_lesson() -> void:
 		var i := int(progress)
 		var a: Vector2 = run.board.anchors[path[i]]
 		var b: Vector2 = run.board.anchors[path[(i+1)%path.size()]]
-		draw_circle(a.lerp(b, fmod(progress, 1.0)), 3.0, CYAN, true, -1, true)
+		canvas.draw_circle(a.lerp(b, fmod(progress, 1.0)), 3.0, CYAN, true, -1, true)
 
 func draw_result() -> void:
 	var run = game.run
@@ -990,7 +1095,7 @@ func draw_result() -> void:
 			context += "  ·  %d:%02d left" % [remaining / 60, remaining % 60]
 		centered(context, MENU.position.y + 90, 13, MUTED)
 		route_map(Vector2(MENU.position.x + 48, MENU.position.y + 128), MENU.size.x - 96)
-		draw_line(Vector2(MENU.position.x + 40, MENU.position.y + 386), Vector2(MENU.end.x - 40, MENU.position.y + 386), UI.LINE)
+		canvas.draw_line(Vector2(MENU.position.x + 40, MENU.position.y + 386), Vector2(MENU.end.x - 40, MENU.position.y + 386), UI.LINE)
 		return
 	var rect := loss_rect()
 	dialog(rect)
@@ -1002,15 +1107,23 @@ func draw_round_result_cue() -> void:
 	var color: Color = CYAN if won else UI.DANGER
 	if won:
 		var pulse: float = 0.0 if game.reduced_motion else 1.0 - game.result_reveal_remaining / game.RESULT_REVEAL_SECONDS
-		draw_arc(run.board.center, 76.0 + pulse * 34.0, 0.0, TAU, 64, Color(color, 0.55 * (1.0 - pulse * 0.7)), 2.0, true)
+		canvas.draw_arc(run.board.center, 76.0 + pulse * 34.0, 0.0, TAU, 64, Color(color, 0.55 * (1.0 - pulse * 0.7)), 2.0, true)
 	var title := "Journey complete" if run.state == "success" else "Boss defeated" if run.harvest.spec.mode == "boss" else "Encounter complete"
 	if not won:
 		title = run.harvest.loss_title
-	var detail := "Mother survived with %d health   ·   Score %d" % [run.integrity, run.score] if won else "Mother lost · retry this encounter" if run.integrity == 0 else "Goal unfinished · retry this encounter"
-	var rect := Rect2(400, 695, 480, 88)
-	draw_style_box(UI.toast_box(), rect)
+	var detail := "Mother survived with %d health   ·   Score %d" % [run.integrity, feel_value("score", run.score)] if won else "Mother lost · retry this encounter" if run.integrity == 0 else "Goal unfinished · retry this encounter"
+	# The bonuses that make up the finish, each counted into the score.
+	var parts: Array[String] = []
+	var bonus: Dictionary = run.stage_bonus if won else {}
+	if int(bonus.get("health", 0)) > 0: parts.append("Health +%d" % bonus.health)
+	if int(bonus.get("swift", 0)) > 0: parts.append("Swift finish +%d" % bonus.swift)
+	if int(bonus.get("flow", 0)) >= 2: parts.append("Best flow ×%d" % bonus.flow)
+	var rect := Rect2(400, 695, 480, 88 if parts.is_empty() else 112)
+	canvas.draw_style_box(UI.toast_box(), rect)
 	centered(title, rect.position.y + 36, 25, color, UI.SEMIBOLD)
 	centered(detail, rect.position.y + 64, 14, INK)
+	if not parts.is_empty():
+		centered("   ·   ".join(parts), rect.position.y + 90, 12, Color(UI.FOOD, 0.85), UI.MEDIUM)
 
 func draw_big_capture() -> void:
 	if game.big_capture_remaining <= 0.0:
@@ -1018,10 +1131,10 @@ func draw_big_capture() -> void:
 	var progress: float = 1.0 - game.big_capture_remaining / 2.0
 	var opacity: float = 0.5 * (1.0 - progress)
 	var radius: float = 32.0 if game.reduced_motion else 32.0 + 118.0 * progress
-	draw_arc(game.big_capture_center, radius, 0.0, TAU, 48, Color(CYAN, opacity), 2.0, true)
+	canvas.draw_arc(game.big_capture_center, radius, 0.0, TAU, 48, Color(CYAN, opacity), 2.0, true)
 	if not game.reduced_motion:
-		draw_arc(game.big_capture_center, radius * 0.72, 0.0, TAU, 48, Color(UI.FOOD, opacity * 0.55), 1.0, true)
-		draw_arc(game.big_capture_center, radius * 1.18, 0.0, TAU, 48, Color(CYAN, opacity * 0.25), 1.0, true)
+		canvas.draw_arc(game.big_capture_center, radius * 0.72, 0.0, TAU, 48, Color(UI.FOOD, opacity * 0.55), 1.0, true)
+		canvas.draw_arc(game.big_capture_center, radius * 1.18, 0.0, TAU, 48, Color(CYAN, opacity * 0.25), 1.0, true)
 
 func loss_rect() -> Rect2:
 	var height := loss_content(false, 0.0) + 120.0
@@ -1052,7 +1165,7 @@ func draw_epilogue() -> void:
 			undiscovered += 1
 	var note := "%d species still undiscovered. Another current is waiting." % undiscovered if undiscovered > 0 else "Every known species discovered. A different colony is waiting."
 	var width := maxf(measure(stats, 15, UI.MEDIUM), measure(note, 13)) + 64.0
-	draw_style_box(UI.toast_box(), Rect2(640.0 - width * 0.5, 666, width, 76))
+	canvas.draw_style_box(UI.toast_box(), Rect2(640.0 - width * 0.5, 666, width, 76))
 	centered(stats, 698, 15, CYAN, UI.MEDIUM)
 	centered(note, 724, 13, MUTED)
 
@@ -1081,12 +1194,12 @@ func draw_journal() -> void:
 		var entry: Dictionary = Journey.SPECIES[i]
 		var known: bool = game.journey_profile.discovered.has(entry.id) or game.run.seen_species.has(entry.id)
 		var cell := Rect2(JOURNAL.position.x + 40 + (slot % 2) * 388, JOURNAL.position.y + 124 + (slot / 2) * 248, 368, 232)
-		draw_style_box(UI.card_box(), cell)
+		canvas.draw_style_box(UI.card_box(), cell)
 		var origin := cell.position + Vector2(24, 24)
 		if entry.id=="phage":
-			game.microscope.PhageVisual.specimen(self,origin+Vector2(28,28),0.25,2.1,0.0,0.0,0.95 if known else 0.15)
+			game.microscope.PhageVisual.specimen(canvas,origin+Vector2(28,28),0.25,2.1,0.0,0.0,0.95 if known else 0.15)
 		else:
-			draw_texture_rect(game.microscope.enemy_texture(entry.id),Rect2(origin+Vector2(0,15),Vector2(57,23)) if entry.id=="bacterium" else Rect2(origin,Vector2(57,57)),false,Color(1,1,1,0.95 if known else 0.15))
+			canvas.draw_texture_rect(game.microscope.enemy_texture(entry.id),Rect2(origin+Vector2(0,15),Vector2(57,23)) if entry.id=="bacterium" else Rect2(origin,Vector2(57,57)),false,Color(1,1,1,0.95 if known else 0.15))
 		label_at(entry.name if known else "Undiscovered", origin + Vector2(76, 34), 17, INK if known else MUTED, UI.SEMIBOLD)
 		wrapped(entry.detail if known else Journey.search_hint(entry), origin + Vector2(0, 92), cell.size.x - 48, 13, MUTED if known else UI.FAINT)
 	centered("Page %d of %d" % [journal_page + 1, ceili(Journey.SPECIES.size() / float(JOURNAL_PAGE_SIZE))], JOURNAL.end.y - 44, 13, MUTED)
@@ -1140,20 +1253,20 @@ func draw_ecology(highlighted: int = -1) -> void:
 			"warden":
 				for holder in run.enemies:
 					if holder.gate_ids.has(body.id):
-						draw_line(p,holder.nucleus,Color(0.75,0.85,0.67,0.24),1.2,true)
-						draw_arc(p,24,0,TAU,36,Color("b9d399"),1.0,true)
+						canvas.draw_line(p,holder.nucleus,Color(0.75,0.85,0.67,0.24),1.2,true)
+						canvas.draw_arc(p,24,0,TAU,36,Color("b9d399"),1.0,true)
 			"parasite":
 				var node: Vector2 = run.board.anchors[body.target_node]
-				draw_dashed_line(p,node,Color(pink,0.75 if body.latched else 0.35),1.2,4.0,true,true)
+				canvas.draw_dashed_line(p,node,Color(pink,0.75 if body.latched else 0.35),1.2,4.0,true,true)
 				if body.latched:
-					draw_arc(node,28,0,TAU,36,pink,1.4,true)
+					canvas.draw_arc(node,28,0,TAU,36,pink,1.4,true)
 					water_label("blocked:%d" % body.id,Rect2(node-Vector2.ONE*35.0,Vector2.ONE*70.0),"BLOCKED",pink)
 				else:
 					marker(body,"LATCHING",pink)
-					draw_arc(node,28,-PI/2,-PI/2+TAU*minf(1,body.action_clock/7.0),36,Color(pink,0.6),1.2,true)
+					canvas.draw_arc(node,28,-PI/2,-PI/2+TAU*minf(1,body.action_clock/7.0),36,Color(pink,0.6),1.2,true)
 			"grazer":
 				if body.action_clock>0.1:
-					draw_arc(p,36,-PI/2,-PI/2+TAU*minf(1,body.action_clock/4.0),30,Color("d6c79c"),1.1,true)
+					canvas.draw_arc(p,36,-PI/2,-PI/2+TAU*minf(1,body.action_clock/4.0),30,Color("d6c79c"),1.1,true)
 				if body.stored_food>0 and body.id!=highlighted:
 					marker(body,"%d FOOD STOLEN" % body.stored_food,Color("d6c79c"))
 			"divider":

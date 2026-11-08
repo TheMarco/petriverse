@@ -15,6 +15,8 @@ class LabHud:
 		queue_redraw()
 	func _draw() -> void:
 		if game != null and game.has_method("draw_lab_hud"): game.draw_lab_hud(self)
+	func draw_overlays() -> void:
+		pass # The lab draws its own screens.
 
 var lab_phase := "menu" # menu, choice, brief, playing, won, lost
 var experiment := 0 # 1 Safe passage, 2 Choose the current, 3 The Regent breaks

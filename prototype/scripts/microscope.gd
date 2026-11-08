@@ -238,7 +238,7 @@ func sync() -> void:
 	var title: bool = game.run.state=="home" and not game.home_pond_open
 	var scene_scale: float = game.dish_scale() if game.has_method("dish_scale") else 1.0
 	scale = Vector2.ONE*(2.15 if title else scene_scale)
-	position = game.run.board.center*(Vector2.ONE-scale) if title else game.dish_offset() if game.has_method("dish_offset") else Vector2.ZERO
+	position = game.run.board.center*(Vector2.ONE-scale) if title else game.view_offset() if game.has_method("view_offset") else Vector2.ZERO
 	sync_appearance()
 	var time: float = game.visual_time
 	var movement := 0.0 if game.reduced_motion else 1.0
