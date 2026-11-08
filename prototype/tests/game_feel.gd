@@ -159,6 +159,21 @@ func exercise() -> void:
 	live.selection.cancel()
 	game._process(1.0 / 60.0)
 	expect(game.feel.sparks.size() > sparks_before, "An abandoned loop dissolves with a fizzle")
+	# The first flow chain of a session names the mechanic once, through real releases.
+	frames(game, 3.5)
+	used.clear()
+	var hints := 0
+	for i in 3:
+		var loop := ready_triangle(live, used)
+		used.append_array(loop)
+		meal(live, ["food"], loop)
+		live.selection.start(live.board.anchors[loop[0]])
+		for id in loop.slice(1) + [loop[0]]:
+			live.selection.visit(id)
+		game.commit_selection()
+		hints += 1 if game.toast.contains("Flow: clean captures") else 0
+		wait(live, 0.5)
+	expect(hints == 1 and game.flow_explained, "The first flow chain of a session explains flow exactly once")
 	# A first sighting is marked on the organism itself, once.
 	live.next_enemy_id += 1
 	live.enemies.append(live.Drifter.new(live.next_enemy_id, live.board.center + Vector2(220, 0), 0.0, "shellback"))
@@ -225,6 +240,10 @@ func exercise() -> void:
 		if boss.can_take_pulse():
 			break
 	expect(boss.can_take_pulse() and announced == 1 and game.feel.boss_open, "Its open window is announced exactly once")
+	# The final victory sends three staggered waves of light from Mother.
+	live.state = Run.SUCCESS
+	game._process(1.0 / 60.0)
+	expect(game.feel.rings.filter(func(r): return r.life == 1.6).size() == 3, "A completed journey releases three waves of light")
 	# Loss drains the dish.
 	live.state = Run.LOSS
 	frames(game, 2.0)

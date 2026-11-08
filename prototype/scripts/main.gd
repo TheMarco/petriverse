@@ -90,6 +90,7 @@ var preferences_enabled := true
 var preferences_path := "user://preferences.cfg"
 var visual_quality := 2 # 0 Light, 1 Balanced, 2 Full; gameplay detail is unchanged.
 var fullscreen := false
+var flow_explained := false # the first chain of a session names the mechanic once
 var pause_on_focus_loss := true
 var last_pointer := Vector2.ZERO
 var hovered := -1
@@ -580,6 +581,9 @@ func commit_selection() -> void:
 			toast = "Empty loop · cells returning"
 		if run.journey and result.boss_layers == 0 and result.food > 0 and advice.get("title", "") == "The boss is protected":
 			toast += " · boss still protected"
+		if run.journey and int(result.get("flow", 0)) >= 2 and not flow_explained:
+			flow_explained = true
+			toast += " · Flow: clean captures in quick succession add score"
 		if run.journey:
 			var benefit: String = run.Mutations.food_bonus_text(result)
 			if not benefit.is_empty():

@@ -492,6 +492,13 @@ func on_injury(amount: int) -> void:
 
 func on_state(previous: String, current: String) -> void:
 	var run = game.run
+	if current == "success" and previous == "active" and motion():
+		# The whole journey is complete: three slow waves of light leave Mother.
+		for wave in 3:
+			rings.append({"at": run.board.center, "age": -0.45 * wave, "life": 1.6, "from": 70.0, "to": 380.0, "color": PEARL if wave != 1 else FOOD, "width": 2.6 - wave * 0.5})
+		for i in 48 if detail() == 2 else 20:
+			var direction := Vector2.from_angle(randf() * TAU)
+			spark_at(run.board.center + direction * randf_range(60.0, 140.0), direction * randf_range(30.0, 90.0) + Vector2(0, -35), randf_range(1.6, 2.6), randf_range(2.0, 3.6), Color("f3dca2") if i % 4 == 0 else PEARL)
 	if current in ["evolve", "success"] and previous == "active":
 		celebration = 1.0
 		if motion():
@@ -588,6 +595,8 @@ func draw_glow() -> void:
 			var radius := 80.0 + (1.0 - celebration) * 260.0
 			glow.draw_texture_rect(dot, Rect2(lens_center - Vector2.ONE * radius, Vector2.ONE * radius * 2.0), false, Color(PEARL, celebration * celebration * 0.16))
 	for ring in rings:
+		if ring.age < 0.0:
+			continue # a staggered wave that has not started yet
 		var t: float = ring.age / ring.life
 		var eased := 1.0 - pow(1.0 - t, 3.0)
 		var radius: float = lerpf(ring.from, ring.to, eased if motion() else 0.0) * (game.dish_scale() if game.has_method("dish_scale") else 1.0)
