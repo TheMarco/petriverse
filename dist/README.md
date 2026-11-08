@@ -1,3 +1,21 @@
+# Petriverse 0.3.0
+
+- **Mac, Apple Silicon + Intel:** [Petriverse-0.3.0-macos-universal.zip](Petriverse-0.3.0-macos-universal.zip). Developer ID signed, Apple notarized, and ticket stapled.
+- **Windows x86-64:** [Petriverse-0.3.0-windows-x86_64.zip](Petriverse-0.3.0-windows-x86_64.zip). Extract everything and run `Petriverse.exe`; keep `Petriverse.pck` beside it. Not Authenticode signed.
+- **Linux:** no 0.3.0 build; the 0.2.3 Linux archives below remain.
+
+Both builds contain version **0.3.0** internally and the same game pack. Artwork, music, effects, creature-film narration, subtitles and license notices are bundled. No Godot installation, network connection or API key is needed to play. Existing saves remain compatible.
+
+## New in 0.3.0
+
+Captures snap shut with a flash and sparks, food flies into the counters, and the dish shakes when Mother is hurt; a heartbeat warns at her last organelle. A microscope lens pass, encounter title cards and fading screens give the dish a new look, with new interface and heartbeat sounds. Quick chains of clean captures build flow and fast clears earn a swift bonus; both add score only. The title shows the best journey score.
+
+Settings has Sound, Play and Display sections, adds full screen (F11 or Alt+Enter) and explains each option on hover. Tooltips wrap. Starting a new journey over an unfinished one asks first and shows what would be lost. Compare details turns the evolution cards over. Rare visitors can no longer drift beyond the reach of any loop.
+
+## Verification (0.3.0)
+
+The exported game pack passed **113 native Mac smoke checks** with Godot 4.7.2 (version, startup, journey length, film voiceovers, Mother textures, art, music, capture, recovery, fluid rendering, pause; no shader errors). Mac and Windows share one pack (SHA-256 `65f5d208...dbc38e`). The Mac app is Developer ID signed with the hardened runtime; Apple notarization submission `5145dda7-e59c-4491-9022-b0ad4f24fd1f` was Accepted, the ticket is stapled, and an app extracted from the release ZIP passes `codesign --verify --deep --strict`, `stapler validate` and Gatekeeper (`spctl`: Notarized Developer ID). The Windows executable reports file and product version 0.3.0.0 and its ZIP passes an integrity test; it has not been run on Windows. See [release checksums](SHA256SUMS.txt).
+
 # Petriverse 0.2.3
 
 - **Mac, Apple Silicon + Intel:** [Petriverse-0.2.3-macos-universal.zip](Petriverse-0.2.3-macos-universal.zip). Developer ID signed, Apple notarized, and ticket stapled.

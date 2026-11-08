@@ -4,7 +4,7 @@
 
 A living strategy game in a drop of water. You guide a microscopic colony through three petri dishes by drawing membranes between its cells: enclose food to feed, enclose threats to stop them, and keep the mother cell alive long enough to evolve.
 
-Version 0.2.3. Single player, mouse driven, built with Godot 4.7 for macOS, Windows and Linux. [Watch the 90-second trailer](trailer/Petriverse-trailer-0.2.3.mp4).
+Version 0.3.0. Single player, mouse driven, built with Godot 4.7 for macOS, Windows and Linux. [Watch the 90-second trailer](trailer/Petriverse-trailer-0.2.3.mp4) (recorded with 0.2.3).
 
 The game was developed under the working title Microverse, which still appears in some file names. The Godot project lives in `prototype/`.
 
@@ -74,7 +74,7 @@ Saves, unlocks and preferences are stored in Godot's user data folder, in `Godot
 
 ## Building releases
 
-`prototype/export_presets.cfg` has `macOS`, `Windows` and `Linux` presets that write to `dist/0.2.3/`. Install the Godot 4.7.2 export templates, then run:
+`prototype/export_presets.cfg` has `macOS`, `Windows` and `Linux` presets that write to `dist/0.3.0/`. Install the Godot 4.7.2 export templates, then run:
 
 ```sh
 godot --headless --path prototype --export-release macOS
@@ -82,7 +82,7 @@ godot --headless --path prototype --export-release Windows
 godot --headless --path prototype --export-release Linux
 ```
 
-The macOS preset signs with a Developer ID identity from the Keychain; change its signing options to export without one. Build archives are not tracked in Git. [dist/README.md](dist/README.md) has the 0.2.3 release notes and verification summary, and [dist/SHA256SUMS.txt](dist/SHA256SUMS.txt) has the archive checksums.
+The macOS preset signs with a Developer ID identity from the Keychain; change its signing options to export without one. Build archives are not tracked in Git. [dist/README.md](dist/README.md) has the 0.3.0 release notes and verification summary, and [dist/SHA256SUMS.txt](dist/SHA256SUMS.txt) has the archive checksums.
 
 ## Development
 
