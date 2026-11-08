@@ -65,6 +65,7 @@ Choose **New journey** on the title screen. The first encounter is a guided less
 | Settings | V |
 | Switch to click input | C |
 | Reduced motion | M |
+| Full screen | F11 or Alt+Enter |
 | Retry a failed encounter | R |
 
 Settings cover music and effect volume, input mode, motion, text size and visual detail. Losing window focus pauses the game.

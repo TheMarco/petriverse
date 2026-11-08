@@ -58,8 +58,10 @@ func sync(delta: float) -> void:
 	mat.set_shader_parameter("defocus", defocus)
 	mat.set_shader_parameter("clock", clock if not game.reduced_motion else 0.0)
 	var full: bool = game.visual_quality >= 2
-	mat.set_shader_parameter("bloom", 1.0 if full else 0.0)
-	mat.set_shader_parameter("grain", 1.0 if full else 0.0)
+	# High contrast keeps edges crisp: no glow, grain or color fringing.
+	var crisp: bool = game.high_contrast
+	mat.set_shader_parameter("bloom", 1.0 if full and not crisp else 0.0)
+	mat.set_shader_parameter("grain", 1.0 if full and not crisp else 0.0)
 	# Outcome grading: a loss drains the dish, a win lifts it for a moment.
 	var drain := 0.0
 	var lift := 0.0
@@ -71,5 +73,5 @@ func sync(delta: float) -> void:
 	exposure = lerpf(exposure, 1.0 - drain * 0.16 + lift * 0.07, 1.0 - exp(-delta * 2.0)) if delta > 0.0 else 1.0 - drain * 0.16
 	mat.set_shader_parameter("saturation", saturation)
 	mat.set_shader_parameter("exposure", exposure)
-	mat.set_shader_parameter("aberration", 1.0)
-	mat.set_shader_parameter("softness", 1.0)
+	mat.set_shader_parameter("aberration", 0.0 if crisp else 1.0)
+	mat.set_shader_parameter("softness", 0.0 if crisp else 1.0)

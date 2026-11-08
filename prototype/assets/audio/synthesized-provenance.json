@@ -1,22 +1,28 @@
 {
-  "provider": "Synthesized locally with SoX 14.4 and encoded with FFmpeg libvorbis (q 5). No external service or sample library.",
+  "provider": "Synthesized locally with SoX 14.4 and encoded with FFmpeg libvorbis (q 5). No external service or sample library. Loudness measured with FFmpeg ebur128: heartbeat and swell are normalized to -23 LUFS integrated like the other cues; the two interface droplets, too short for integrated loudness, peak at -25 and -29 LUFS momentary so they sit under gameplay cues.",
   "assets": {
     "heartbeat.ogg": {
-      "use": "Critical health: a slow two-beat pulse while the Mother has one organelle left.",
+      "use": "Critical health: a slow two-beat pulse while the Mother has one organelle left. Harmonics at about 116 and 174 Hz and a soft attack keep it audible on laptop speakers (25% of RMS above 150 Hz, versus 13% for the first version).",
       "commands": [
-        "sox -n -r 44100 -c 1 lub.wav synth 0.20 sine 62:44 fade q 0.008 0.20 0.16 gain -2",
-        "sox -n -r 44100 -c 1 dub.wav synth 0.17 sine 54:40 fade q 0.008 0.17 0.14 gain -5",
-        "sox -n -r 44100 -c 1 gap.wav trim 0 0.13",
-        "sox -n -r 44100 -c 1 tail.wav trim 0 0.55",
-        "sox lub.wav gap.wav dub.wav tail.wav beat-dry.wav",
-        "sox beat-dry.wav -c 2 heartbeat.wav gain -8 lowpass 180 reverb 18 50 60 gain -n -3"
+        "sox -n -r 44100 -c 1 lub-f.wav synth 0.22 sine 58:46 fade q 0.006 0.22 0.19",
+        "sox -n -r 44100 -c 1 lub-h2.wav synth 0.16 sine 116:92 fade q 0.004 0.16 0.14 gain -5",
+        "sox -n -r 44100 -c 1 lub-h3.wav synth 0.10 sine 174:138 fade q 0.003 0.10 0.09 gain -10",
+        "sox -n -r 44100 -c 1 lub-click.wav synth 0.018 pinknoise fade q 0.001 0.018 0.016 lowpass 900 gain -14",
+        "sox -m lub-f.wav lub-h2.wav lub-h3.wav lub-click.wav lub2.wav",
+        "sox lub2.wav dub2.wav pitch -180 gain -4",
+        "sox -n -r 44100 -c 1 gap2.wav trim 0 0.11",
+        "sox -n -r 44100 -c 1 tail2.wav trim 0 0.55",
+        "sox lub2.wav gap2.wav dub2.wav tail2.wav beat2-dry.wav",
+        "sox beat2-dry.wav -c 2 heartbeat2.wav gain -10 lowpass 1200 reverb 15 50 50",
+        "sox heartbeat2.wav heartbeat-final.wav gain 9.0   # to -23 LUFS integrated"
       ]
     },
     "swell.ogg": {
       "use": "A soft water swell when an encounter opens and when a new dish or boss is introduced.",
       "commands": [
         "sox -n -r 44100 -c 2 swell-dry.wav synth 2.2 brownnoise synth 2.2 sine amod 0.35 0",
-        "sox swell-dry.wav swell.wav sinc 140-1100 fade q 0.9 2.2 1.1 reverb 40 60 80 gain -n -6"
+        "sox swell-dry.wav swell.wav sinc 140-1100 fade q 0.9 2.2 1.1 reverb 40 60 80 gain -n -6",
+        "sox swell.wav swell-final.wav gain -0.8   # to -23 LUFS integrated"
       ]
     },
     "ui_press.ogg": {
@@ -25,14 +31,16 @@
         "sox -n -r 44100 -c 1 press-a.wav synth 0.11 sine 480:1250 fade q 0.002 0.11 0.10",
         "sox -n -r 44100 -c 1 press-b.wav synth 0.11 sine 960:2500 fade q 0.002 0.11 0.10 gain -12",
         "sox -m press-a.wav press-b.wav press-dry.wav",
-        "sox press-dry.wav -c 2 ui_press.wav gain -10 pad 0 0.10 lowpass 4200 reverb 20 40 50 gain -n -9"
+        "sox press-dry.wav -c 2 ui_press.wav gain -10 pad 0 0.10 lowpass 4200 reverb 20 40 50 gain -n -9",
+        "sox ui_press.wav ui_press-final.wav gain -6.2   # to -25 LUFS peak momentary"
       ]
     },
     "ui_hover.ogg": {
       "use": "A very quiet, higher droplet when the pointer reaches an enabled button or evolution card.",
       "commands": [
         "sox -n -r 44100 -c 1 hover-dry.wav synth 0.06 sine 1400:1750 fade q 0.002 0.06 0.055",
-        "sox hover-dry.wav -c 2 ui_hover.wav gain -10 pad 0 0.06 lowpass 5000 reverb 15 40 40 gain -n -18"
+        "sox hover-dry.wav -c 2 ui_hover.wav gain -10 pad 0 0.06 lowpass 5000 reverb 15 40 40 gain -n -18",
+        "sox ui_hover.wav ui_hover-final.wav gain -1.8   # to -29 LUFS peak momentary"
       ]
     }
   }

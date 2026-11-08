@@ -29,43 +29,63 @@ func meal(run: RefCounted, food: int, cysts: int) -> void:
 
 func observed_meal(run: RefCounted) -> Array:
 	# Once cells wander freely, the authored bloom triangle is not a permanent
-	# route. Choose a clear three-cell enclosure from the positions visible now.
-	# No future positions are consulted; the subsequent slow gesture is real.
+	# route. Choose a clear enclosure from the positions visible now, preferring
+	# three cells and using four when no triangle is clear. No future positions
+	# are consulted; the subsequent slow gesture is real.
+	var best := best_meal(run, 3)
+	return best if not best.is_empty() else best_meal(run, 4)
+
+func best_meal(run: RefCounted, size: int) -> Array:
 	var best: Array = []
 	var best_clearance := 12.0
-	for a in 22:
-		for b in range(a+1,23):
-			for c in range(b+1,24):
-				var path: Array = [a,b,c]
-				var polygon := Geometry.polygon_for(path,run.board.anchors)
-				if not Geometry.validate(path,run.board.anchors,run.is_ready):
-					continue
-				var food_clearance: Array[float] = []
-				var poison_clearance := INF
-				for body in run.enemies:
-					var inside := Geometry.contains(body.nucleus,polygon)
-					var margin := INF
-					for edge in 3:
-						margin = minf(margin,Geometry.distance_to_segment(body.nucleus,polygon[edge],polygon[(edge+1)%3]))
-					if body.kind=="cyst":
-						poison_clearance = minf(poison_clearance,0.0 if inside else margin)
-					elif body.kind=="food" and inside:
-						food_clearance.append(margin)
-				if food_clearance.size()<2:
-					continue
-				food_clearance.sort()
-				var clearance := minf(poison_clearance,food_clearance[-2])
-				if clearance>best_clearance:
-					best_clearance = clearance
-					best = path
+	var ids: Array = range(run.board.anchors.size())
+	for path in combinations(ids, size):
+		if size > 3:
+			# Trace the four cells around their centroid, as a player would.
+			var middle := Vector2.ZERO
+			for id in path:
+				middle += run.board.anchors[id] / float(size)
+			path.sort_custom(func(a, b): return (run.board.anchors[a] - middle).angle() < (run.board.anchors[b] - middle).angle())
+		if not Geometry.capture_valid(path,run.board,run.is_ready):
+			continue
+		var polygon := Geometry.polygon_for(path,run.board.anchors)
+		var count: int = path.size()
+		var food_clearance: Array[float] = []
+		var poison_clearance := INF
+		for body in run.enemies:
+			var inside := Geometry.contains(body.nucleus,polygon)
+			var margin := INF
+			for edge in count:
+				margin = minf(margin,Geometry.distance_to_segment(body.nucleus,polygon[edge],polygon[(edge+1)%count]))
+			if body.kind=="cyst":
+				poison_clearance = minf(poison_clearance,0.0 if inside else margin)
+			elif body.kind=="food" and inside:
+				food_clearance.append(margin)
+		if food_clearance.size()<2:
+			continue
+		food_clearance.sort()
+		var clearance := minf(poison_clearance,food_clearance[-2])
+		if clearance>best_clearance:
+			best_clearance = clearance
+			best = path
 	return best
+
+func combinations(items: Array, size: int) -> Array:
+	if size == 0:
+		return [[]]
+	var result: Array = []
+	for i in items.size() - size + 1:
+		for rest in combinations(items.slice(i + 1), size - 1):
+			result.append([items[i]] + rest)
+	return result
 
 func exercise() -> void:
 	var run := Run.new(false, 73, true)
 	expect(run.harvest != null and not run.full_run and run.enemies.size() == 21, "Experiment begins directly with three mixed blooms")
 	expect(run.enemies.filter(func(e): return e.kind == "food").size() == 15, "Fifteen edible organisms are visible initially")
 	select(run, [16,17,18,19,20,21,22,23])
-	expect(run.harvest_preview().poison >= run.integrity, "One giant outer ring is visibly lethal, not a dominant harvest strategy")
+	# Since Mother must stay outside every membrane, the giant ring cannot even close.
+	expect(not run.selection.closed and run.selection.mother_blocked(), "One giant outer ring cannot close around Mother, so it is not a dominant harvest strategy")
 	run.selection.cancel()
 	var initial: Vector2 = run.enemies[0].nucleus
 	run.step(2.0)
@@ -151,16 +171,17 @@ func exercise() -> void:
 			expect(false,"A safe meal is visible after inspection in sector %d" % sector)
 			trial.dispose()
 			continue
+		# Click input at 1.5 cells/sec, including the closing click. Clicks
+		# visit exactly the chosen cells; straight drags would also collect any
+		# cell the pointer sweeps across, which a player steers around.
 		trial.selection.start(trial.board.anchors[route[0]])
-		var pointer: Vector2 = trial.board.anchors[route[0]]
-		for id in [route[1], route[2], route[0]]:
-			var origin := pointer
-			for frame in 40: # 1.5 segments/sec, including the closing edge
+		for id in route.slice(1) + [route[0]]:
+			for frame in 40:
 				trial.step(1.0 / 60.0)
-				var next_pointer: Vector2 = origin.lerp(trial.board.anchors[id], (frame + 1) / 40.0)
-				trial.selection.drag(pointer, next_pointer)
-				pointer = next_pointer
+			trial.selection.visit(id)
 		var meal_preview: Dictionary = trial.harvest_preview()
+		if OS.get_cmdline_user_args().has("--debug-meals"):
+			print("SECTOR ", sector, " route ", route, " path ", trial.selection.path, " closed ", trial.selection.closed, " active ", trial.selection.active, " mother ", trial.selection.mother_blocked(), " reason ", trial.selection.rejection_reason)
 		expect(trial.selection.closed and meal_preview.food >= 2 and meal_preview.poison == 0, "Observed safe meal survives slow drawing in sector %d (route %s; meal %s)" % [sector,route,meal_preview])
 		trial.dispose()
 	var other := Run.new(false, 73, true)

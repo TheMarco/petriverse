@@ -50,6 +50,8 @@ var last_closed := false
 var last_second := -1
 var boss_open := false
 var ready_cells: Array = []
+var drawn_points: PackedVector2Array = PackedVector2Array() # the loop being drawn, for a fizzle if abandoned
+var drawn_serial := 0
 
 func _ready() -> void:
 	game = get_parent()
@@ -120,6 +122,7 @@ func reset() -> void:
 	numbers.clear()
 	rings.clear()
 	ready_cells.clear()
+	drawn_points = PackedVector2Array()
 	counters.clear()
 	trauma = 0.0
 	shake = Vector2.ZERO
@@ -171,6 +174,16 @@ func observe_selection() -> void:
 	if game.run.state == "active" and size > last_path_size and size > 0:
 		var id: int = selection.path[-1]
 		rings.append({"at": game.run.board.anchors[id], "age": 0.0, "life": 0.38, "from": 26.0, "to": 44.0, "color": PEARL, "width": 1.6})
+	if size >= 2:
+		drawn_points = PackedVector2Array()
+		for id in selection.path:
+			drawn_points.append(game.run.board.anchors[id])
+		drawn_serial = game.run.capture_serial
+	elif size == 0 and drawn_points.size() >= 2:
+		# The gesture ended without a capture: the membrane dissolves quietly.
+		if game.run.capture_serial == drawn_serial and game.run.state == "active":
+			fizzle(drawn_points)
+		drawn_points = PackedVector2Array()
 	var closed: bool = selection.active and selection.closed
 	if closed and not last_closed and size > 0:
 		var first: int = selection.path[0]
@@ -288,7 +301,7 @@ func advance(delta: float) -> void:
 		var before := beat_clock
 		beat_clock = fmod(beat_clock + delta, HEARTBEAT)
 		if beat_clock < before and critical > 0.4 and game.soundscape != null:
-			game.soundscape.play_effect("heartbeat", 0.55 * critical)
+			game.soundscape.play_effect("heartbeat", 0.5 * critical)
 	else:
 		beat_clock = 0.0
 	if not card.is_empty():
@@ -489,6 +502,20 @@ func announce() -> void:
 	last_card_dish = dish.name
 	if game.soundscape != null:
 		game.soundscape.play_effect("swell", 0.55 if card.boss or card.caption == "A NEW DISH" else 0.3)
+
+func fizzle(points: PackedVector2Array) -> void:
+	if not motion():
+		return
+	var muted := Color(0.62, 0.72, 0.74)
+	for i in points.size() - 1:
+		var a: Vector2 = points[i]
+		var b: Vector2 = points[i + 1]
+		var direction := (b - a).normalized()
+		a += direction * 27.0
+		b -= direction * 27.0
+		for k in 3 if detail() > 0 else 1:
+			var at := a.lerp(b, randf())
+			spark_at(at, Vector2.from_angle(randf() * TAU) * randf_range(8.0, 22.0) + Vector2(0, 10), randf_range(0.35, 0.6), randf_range(1.4, 2.2), muted)
 
 func spark_at(at: Vector2, velocity: Vector2, life: float, size: float, color: Color) -> void:
 	if not motion():

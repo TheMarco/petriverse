@@ -154,7 +154,11 @@ func exercise() -> void:
 	live.selection.visit(caption_path[2])
 	live.selection.visit(caption_path[0])
 	expect(game.start_caption() == "RELEASE", "A closed loop is captioned RELEASE")
+	game._process(1.0 / 60.0)
+	var sparks_before: int = game.feel.sparks.size()
 	live.selection.cancel()
+	game._process(1.0 / 60.0)
+	expect(game.feel.sparks.size() > sparks_before, "An abandoned loop dissolves with a fizzle")
 	# Reduced motion: no travelling motes or shake; values settle at once.
 	game.reduced_motion = true
 	frames(game, 3.5)

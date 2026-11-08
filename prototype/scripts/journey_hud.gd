@@ -899,7 +899,13 @@ func brief_content(paint: bool, top: float) -> float:
 	var art_bottom := section + 112.0
 	if paint:
 		var texture: Texture2D = game.microscope.enemy_texture(featured)
-		canvas.draw_texture_rect(texture, Rect2(left, section + 28, 125, 49) if featured == "bacterium" else Rect2(left + 10, section, 105, 105), false)
+		var art := Rect2(left, section + 28, 125, 49) if featured == "bacterium" else Rect2(left + 10, section, 105, 105)
+		# The specimen breathes and sways slightly, as it does in the dish.
+		var t: float = 0.0 if game.reduced_motion else game.feel.clock if game.get("feel") != null else 0.0
+		var pivot := art.get_center()
+		canvas.draw_set_transform(pivot, sin(t * 0.7) * 0.05, Vector2.ONE * (1.0 + sin(t * 1.3) * 0.025))
+		canvas.draw_texture_rect(texture, Rect2(art.position - pivot, art.size), false)
+		canvas.draw_set_transform(Vector2.ZERO)
 	if captioned:
 		if paint:
 			label_at({"bacterium":"A bacterial food thief", "amoeba":"Swallows a cell", "grazer":"Steals food", "parasite":"Blocks a cell", "divider":"Splits into two"}[featured], Vector2(left, section + 136), 13, CYAN, UI.SEMIBOLD)
@@ -1001,7 +1007,7 @@ func draw_help() -> void:
 		canvas.draw_texture_rect(icons[i], Rect2(714, 578 + i * 29, 26, 26), false)
 		label_at(captions[i], Vector2(750, 597 + i * 29), 13, INK)
 	wrapped("Nudge: click a cyst, then clear water. Free every 6 seconds." if game.click_mode else "Nudge: drag a purple cyst into clear water. Free every 6 seconds.", Vector2(718, 708), 290, 12, CYAN)
-	centered("Space pause   ·   Esc cancel   ·   J journal   ·   V settings   ·   C input mode   ·   M motion", HELP.end.y - 96, 12, UI.FAINT, UI.MEDIUM)
+	centered("Space pause   ·   Esc cancel   ·   J journal   ·   V settings   ·   C input mode   ·   M motion   ·   F11 full screen", HELP.end.y - 96, 12, UI.FAINT, UI.MEDIUM)
 
 func toggle_advanced() -> void:
 	advanced_open = not advanced_open

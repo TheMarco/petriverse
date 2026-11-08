@@ -89,6 +89,7 @@ func view_offset() -> Vector2:
 var preferences_enabled := true
 var preferences_path := "user://preferences.cfg"
 var visual_quality := 2 # 0 Light, 1 Balanced, 2 Full; gameplay detail is unchanged.
+var fullscreen := false
 var pause_on_focus_loss := true
 var last_pointer := Vector2.ZERO
 var hovered := -1
@@ -368,6 +369,13 @@ func toggle_deliberation() -> void:
 	deliberate_capture = not deliberate_capture
 	save_preferences()
 
+## F11 or Alt+Enter. The choice is remembered with the other preferences.
+func toggle_fullscreen() -> void:
+	var window := get_window()
+	fullscreen = window.mode not in [Window.MODE_FULLSCREEN, Window.MODE_EXCLUSIVE_FULLSCREEN]
+	window.mode = Window.MODE_FULLSCREEN if fullscreen else Window.MODE_WINDOWED
+	save_preferences()
+
 func toggle_quality() -> void:
 	visual_quality = (visual_quality + 2) % 3
 	save_preferences()
@@ -384,6 +392,9 @@ func load_preferences() -> void:
 		deliberate_capture = bool(config.get_value("comfort", "deliberate_capture", false))
 		click_mode = bool(config.get_value("comfort", "click_mode", false))
 		visual_quality = clampi(int(config.get_value("comfort", "visual_quality", 2)), 0, 2)
+		fullscreen = bool(config.get_value("display", "fullscreen", false))
+		if fullscreen and is_inside_tree() and DisplayServer.get_name() != "headless":
+			get_window().mode = Window.MODE_FULLSCREEN
 
 func save_preferences() -> void:
 	if not preferences_enabled:
@@ -397,6 +408,7 @@ func save_preferences() -> void:
 	config.set_value("comfort", "deliberate_capture", deliberate_capture)
 	config.set_value("comfort", "click_mode", click_mode)
 	config.set_value("comfort", "visual_quality", visual_quality)
+	config.set_value("display", "fullscreen", fullscreen)
 	config.save(preferences_path)
 
 func choose_evolution(index: int) -> void:
@@ -432,6 +444,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			evolution_reveal.dismiss()
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F11 or (event.keycode in [KEY_ENTER, KEY_KP_ENTER] and event.alt_pressed):
+			toggle_fullscreen()
+			return
 		if run.journey and help_open:
 			if event.keycode in [KEY_ESCAPE, KEY_H]:
 				toggle_help()

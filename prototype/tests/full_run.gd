@@ -34,6 +34,9 @@ func best_path(run: RefCounted) -> Array:
 		if path.size() > run.selection.max_vertices or path.any(func(id): return not run.is_ready(id)):
 			continue
 		var polygon := Geometry.polygon_for(path, run.board.anchors)
+		# The live release rule: Mother must stay outside the membrane.
+		if Geometry.touches_mother(polygon, run.board.center, run.board.mother_radius):
+			continue
 		var value := 0.0
 		var safe_targets := 0
 		for enemy in run.enemies:
