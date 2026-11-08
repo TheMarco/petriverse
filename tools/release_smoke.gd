@@ -55,7 +55,7 @@ func exercise() -> void:
 	for plate in game.microscope.Appearance.PLATES:
 		expect(ResourceLoader.exists(plate),"Biome plate: "+plate)
 	expect(ProjectSettings.get_setting("application/config/name")=="Petriverse","Release title is Petriverse")
-	expect(ProjectSettings.get_setting("application/config/version")=="0.2.3","Release version is 0.2.3")
+	expect(ProjectSettings.get_setting("application/config/version")=="0.3.0","Release version is 0.3.0")
 	for asset in ["branding/petriverse-title-v2.png","organisms/copper-bacterium.png","organisms/silver-phage.png","fonts/Inter-Variable.ttf"]:
 		expect(ResourceLoader.exists("res://assets/"+asset),"Current release asset: "+asset)
 	for score in ["petriverse-stillwater","petriverse-glassgarden","petriverse-blue-deep"]:
