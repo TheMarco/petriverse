@@ -7,7 +7,10 @@ const CYAN := UI.ACCENT
 const Mutations = preload("res://scripts/mutations.gd")
 const Plan = preload("res://scripts/run_plan.gd")
 const MutationCard = preload("res://scripts/mutation_card.gd")
-const SETTINGS := Rect2(350, 130, 580, 640)
+const SETTINGS := Rect2(230, 150, 820, 600)
+## Tooltips appear after a short rest on a control and wrap to this width.
+const TIP_DELAY := 0.45
+const TIP_WIDTH := 300.0
 var game: Node2D
 ## Draw target for every HUD helper. Overlays redirect it to their own layer.
 var canvas: CanvasItem
@@ -28,6 +31,14 @@ var comfort_motion_button: Button
 var contrast_button: Button
 var text_button: Button
 var quality_button: Button
+var assist_button: Button
+var slow_button: Button
+var fullscreen_button: Button
+var tip_layer: Node2D
+var tip_target: Control
+var tip_wait := 0.0
+var tip_alpha := 0.0
+var tip_dismissed := false
 
 ## Native buttons with an optional keyboard hint and a drawn pause glyph.
 class HudButton extends Button:
@@ -48,6 +59,26 @@ class HudButton extends Button:
 		if alignment == HORIZONTAL_ALIGNMENT_CENTER and (size.x + label_width) * 0.5 + 14.0 > size.x - 16.0 - hint_width:
 			return
 		draw_string(hint_font, Vector2(size.x - 16.0 - hint_width, size.y * 0.5 + 4.5), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(ink, 0.55))
+	## The HUD draws its own wrapped tooltip; the engine's one-line popup stays silent.
+	func _get_tooltip(_at: Vector2) -> String:
+		return ""
+
+## A hover area over drawn text that carries a HUD tooltip.
+class TipZone extends Control:
+	func _get_tooltip(_at: Vector2) -> String:
+		return ""
+
+## Draws the current tooltip above every HUD control and dialog.
+class TipLayer extends Node2D:
+	var hud: Node2D
+	func _process(delta: float) -> void:
+		hud.update_tip(delta)
+	func _draw() -> void:
+		hud.draw_tip(self)
+	func _input(event: InputEvent) -> void:
+		# Acting on a control answers its tooltip; it stays away until the pointer moves on.
+		if (event is InputEventMouseButton or event is InputEventKey) and event.is_pressed():
+			hud.dismiss_tip()
 
 func _init() -> void:
 	canvas = self
@@ -72,6 +103,18 @@ func _ready() -> void:
 	comfort_motion_button = button("Full", Vector2(690, 0), Vector2(200, 38), game.toggle_motion)
 	contrast_button = button("Soft", Vector2(690, 0), Vector2(200, 38), game.toggle_contrast)
 	text_button = button("Standard", Vector2(690, 0), Vector2(200, 38), game.toggle_text)
+	assist_button = button("Off", Vector2(690, 0), Vector2(200, 38), game.toggle_assistance)
+	slow_button = button("Off", Vector2(690, 0), Vector2(200, 38), game.toggle_deliberation)
+	fullscreen_button = button("Off", Vector2(690, 0), Vector2(200, 38), game.toggle_fullscreen)
+	tip(mute_button, "Silences music and living sounds together. Your volume levels are kept.")
+	tip(fullscreen_button, "F11 or Alt+Enter switches at any time.")
+	tip(mode_button, "Drag through cells, or click each cell and press Enter to capture.")
+	tip(comfort_motion_button, "Reduced motion stills camera shake, drifting water and animated effects.")
+	tip(contrast_button, "Marks every ready cell and each organism's center, and keeps the lens crisp.")
+	tip(text_button, "Larger text also switches to a simpler, reflowed layout.")
+	tip(assist_button, "Closes a valid loop when you release just outside its starting cell.")
+	tip(slow_button, "The dish runs at 35% speed while you hold a closed loop, so you can read its preview.")
+	tip(quality_button, "Lowers lens and water effects for slower computers. Gameplay is unchanged.")
 	music_slider = volume_slider(Vector2(560, 0), game.soundscape.music_volume, game.soundscape.set_music_volume)
 	effects_slider = volume_slider(Vector2(560, 0), game.soundscape.effects_volume, game.soundscape.set_effects_volume)
 	for i in 3:
@@ -91,7 +134,91 @@ func _ready() -> void:
 		card.mouse_entered.connect(interface_sound.bind(card, "ui_hover"))
 		add_child(card)
 		cards.append(card)
+	tip_layer = TipLayer.new()
+	tip_layer.hud = self
+	tip_layer.z_index = 50 # above every control and dialog this HUD owns
+	add_child(tip_layer)
 	refresh()
+
+## A wrapped HUD tooltip with an optional bold title and key cap. The full
+## text stays in tooltip_text for assistive technology.
+func tip(control: Control, body: String, title: String = "", key: String = "") -> void:
+	control.tooltip_text = (title + "\n" + body if not body.is_empty() else title) if not title.is_empty() else body
+	control.set_meta("tip_title", title)
+	control.set_meta("tip_key", key)
+
+func dismiss_tip() -> void:
+	tip_dismissed = true
+	tip_alpha = 0.0
+	if tip_layer != null:
+		tip_layer.queue_redraw()
+
+func update_tip(delta: float) -> void:
+	var hovered: Control = get_viewport().gui_get_hovered_control() if is_inside_tree() else null
+	if hovered != null and (hovered.tooltip_text.is_empty() or not is_ancestor_of(hovered) or not hovered.is_visible_in_tree() or hovered.modulate.a < 0.6):
+		hovered = null
+	if hovered != tip_target:
+		# Moving from one tooltip straight to the next shows it at once.
+		var warm := tip_alpha > 0.5 and hovered != null
+		tip_target = hovered
+		tip_dismissed = false
+		tip_wait = TIP_DELAY if warm else 0.0
+		tip_alpha = 0.0
+		tip_layer.queue_redraw()
+	if tip_target == null or tip_dismissed:
+		if tip_alpha > 0.0:
+			tip_alpha = 0.0
+			tip_layer.queue_redraw()
+		return
+	tip_wait += delta
+	if tip_wait >= TIP_DELAY:
+		tip_alpha = minf(1.0, tip_alpha + delta / 0.12) if not game.reduced_motion else 1.0
+		tip_layer.queue_redraw()
+
+func draw_tip(layer: CanvasItem) -> void:
+	if tip_target == null or tip_alpha <= 0.0 or not is_instance_valid(tip_target):
+		return
+	var title: String = tip_target.get_meta("tip_title", "")
+	var key: String = tip_target.get_meta("tip_key", "")
+	var body: String = tip_target.tooltip_text
+	if not title.is_empty():
+		body = body.trim_prefix(title).trim_prefix("\n")
+	if title.is_empty() and body.strip_edges().is_empty():
+		return
+	var inner := TIP_WIDTH - 28.0
+	var lines := PackedStringArray()
+	for paragraph in body.split("\n"):
+		if not paragraph.strip_edges().is_empty():
+			lines.append_array(lines_for(paragraph.strip_edges(), inner, 13, UI.REGULAR))
+	var body_face := UI.font(UI.REGULAR)
+	var title_face := UI.font(UI.SEMIBOLD)
+	var key_face := UI.font(UI.MEDIUM)
+	var key_width := key_face.get_string_size(key, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x + 12.0 if not key.is_empty() else 0.0
+	var width := title_face.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x + (key_width + 10.0 if key_width > 0.0 else 0.0)
+	for line in lines:
+		width = maxf(width, body_face.get_string_size(line, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x)
+	width = minf(TIP_WIDTH, ceilf(width) + 28.0)
+	var height := 22.0 + (17.0 if not title.is_empty() else 0.0) + (6.0 if not title.is_empty() and not lines.is_empty() else 0.0) + (lines.size() * 19.0 - 5.0 if not lines.is_empty() else 0.0)
+	var anchor := tip_target.get_global_rect()
+	var y := anchor.end.y + 8.0
+	if y + height > 888.0:
+		y = anchor.position.y - 8.0 - height
+	var x := clampf(anchor.get_center().x - width * 0.5, 12.0, 1268.0 - width)
+	var rise := (1.0 - tip_alpha) * 4.0
+	var box := Rect2(x, y + rise, width, height)
+	layer.modulate.a = tip_alpha
+	layer.draw_style_box(UI.tip_box(), box)
+	var cursor := box.position + Vector2(14.0, 11.0)
+	if not title.is_empty():
+		layer.draw_string(title_face, cursor + Vector2(0, 14), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, INK)
+		if key_width > 0.0:
+			var cap := Rect2(box.end.x - 14.0 - key_width, cursor.y + 1.0, key_width, 18.0)
+			layer.draw_style_box(UI.box(Color(1, 1, 1, 0.06), 5, UI.LINE, Vector2.ZERO), cap)
+			layer.draw_string(key_face, Vector2(cap.position.x + 6.0, cap.position.y + 13.0), key, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, MUTED)
+		cursor.y += 23.0
+	for line in lines:
+		layer.draw_string(body_face, cursor + Vector2(0, 13), line, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, INK if title.is_empty() else UI.MUTED)
+		cursor.y += 19.0
 
 func volume_slider(at: Vector2, value: float, action: Callable) -> HSlider:
 	var slider := HSlider.new()
@@ -173,27 +300,53 @@ func refresh() -> void:
 			cards[i].configure(Mutations.definition(game.run.offered_mutations[i]), i, game.run.mutations)
 	queue_redraw()
 
-const SETTING_ROWS := ["Music", "Living sounds", "All sound", "Input", "Motion", "Markers", "Text size", "Visual detail"]
-const SETTING_KEYS := ["", "", "", "C", "M", "", "", ""]
+## Two columns of grouped rows: [group, caption, key].
+const SETTING_COLUMNS := [
+	[["Sound", "Music", ""], ["", "Living sounds", ""], ["", "All sound", ""], ["Play", "Input", "C"], ["", "Closure assistance", ""], ["", "Slow closed loops", ""]],
+	[["Display", "Motion", "M"], ["", "Markers", ""], ["", "Text size", ""], ["", "Visual detail", ""], ["", "Full screen", "F11"]],
+]
+const SETTING_COLUMN_WIDTH := 340.0
 
-func setting_row(index: int) -> float:
-	return SETTINGS.position.y + 132.0 + index * 54.0
+func setting_x(column: int) -> float:
+	return SETTINGS.position.x + 44.0 + column * (SETTING_COLUMN_WIDTH + 56.0)
+
+## Group header baselines (-1 when a row starts no group) and row centers.
+func setting_layout(column: int) -> Array:
+	var result := []
+	var y := SETTINGS.position.y + 112.0
+	for i in SETTING_COLUMNS[column].size():
+		var header := -1.0
+		if not SETTING_COLUMNS[column][i][0].is_empty():
+			if i > 0:
+				y += 24.0
+			header = y
+			y += 34.0
+		result.append({"header": header, "center": y})
+		y += 46.0
+	return result
+
+func setting_controls() -> Array:
+	return [[music_slider, effects_slider, mute_button, mode_button, assist_button, slow_button], [comfort_motion_button, contrast_button, text_button, quality_button, fullscreen_button]]
 
 ## Every comfort option lives in one dialog; gameplay screens stay uncluttered.
 func refresh_settings() -> void:
 	var open: bool = game.settings_open
-	for control in [sound_close, mute_button, music_slider, effects_slider, comfort_motion_button, contrast_button, text_button, quality_button]:
+	for control in [sound_close, mute_button, music_slider, effects_slider, comfort_motion_button, contrast_button, text_button, quality_button, assist_button, slow_button, fullscreen_button]:
 		control.visible = open
 	if not open:
 		return
 	mode_button.visible = true
-	var right := SETTINGS.end.x - 40.0
-	for slider in [music_slider, effects_slider]:
-		slider.position = Vector2(right - 312.0, setting_row(0 if slider == music_slider else 1) - 13.0)
-	var toggles := [mute_button, mode_button, comfort_motion_button, contrast_button, text_button, quality_button]
-	var values := ["Muted" if game.soundscape.muted else "On", "Clicks" if game.click_mode else "Drag", "Reduced" if game.reduced_motion else "Full", "High contrast" if game.high_contrast else "Soft", "Larger" if game.large_text else "Standard", ["Light", "Balanced", "Full"][game.visual_quality]]
-	for i in toggles.size():
-		place(toggles[i], Vector2(right - 200.0, setting_row(i + 2) - 19.0), Vector2(200, 38), "secondary", values[i], "", 14)
+	var values := {mute_button: "Muted" if game.soundscape.muted else "On", mode_button: "Clicks" if game.click_mode else "Drag", assist_button: "On" if game.assisted_closure else "Off", slow_button: "On" if game.deliberate_capture else "Off", comfort_motion_button: "Reduced" if game.reduced_motion else "Full", contrast_button: "High contrast" if game.high_contrast else "Standard", text_button: "Larger" if game.large_text else "Standard", quality_button: ["Light", "Balanced", "Full"][game.visual_quality], fullscreen_button: "On" if game.fullscreen else "Off"}
+	for column in 2:
+		var layout := setting_layout(column)
+		var right := setting_x(column) + SETTING_COLUMN_WIDTH
+		for i in layout.size():
+			var control: Control = setting_controls()[column][i]
+			if control is HSlider:
+				control.size = Vector2(168, 26)
+				control.position = Vector2(right - 216.0, layout[i].center - 13.0)
+			else:
+				place(control, Vector2(right - 150.0, layout[i].center - 18.0), Vector2(150, 36), "secondary", values[control], "", 14)
 	place(sound_close, Vector2(SETTINGS.get_center().x - 100.0, SETTINGS.end.y - 76.0), Vector2(200, 44), "primary", "Done", "Esc", 15)
 
 func overlay_visible() -> bool:
@@ -373,19 +526,28 @@ func _draw() -> void:
 func draw_sound_settings() -> void:
 	scrim()
 	dialog(SETTINGS)
-	centered("Settings", SETTINGS.position.y + 64.0, 28)
-	centered("Changes save automatically.", SETTINGS.position.y + 92.0, 13, MUTED)
-	var left := SETTINGS.position.x + 40.0
-	var right := SETTINGS.end.x - 40.0
-	for i in SETTING_ROWS.size():
-		var y := setting_row(i)
-		if i in [2, 3]:
-			canvas.draw_line(Vector2(left, y - 30.0), Vector2(right, y - 30.0), UI.LINE, 1.0)
-		label_at(SETTING_ROWS[i], Vector2(left, y + 5.0), 15, INK)
-		if not SETTING_KEYS[i].is_empty():
-			label_at(SETTING_KEYS[i], Vector2(left + measure(SETTING_ROWS[i], 15) + 10.0, y + 5.0), 12, UI.FAINT, UI.MEDIUM)
-	right_at("%d%%" % roundi(game.soundscape.music_volume * 100.0), Vector2(right, setting_row(0) + 5.0), 13, MUTED)
-	right_at("%d%%" % roundi(game.soundscape.effects_volume * 100.0), Vector2(right, setting_row(1) + 5.0), 13, MUTED)
+	centered("Settings", SETTINGS.position.y + 58.0, 28)
+	centered("Changes save automatically. Hover an option to learn what it does.", SETTINGS.position.y + 84.0, 13, MUTED)
+	var divider := SETTINGS.position.x + 44.0 + SETTING_COLUMN_WIDTH + 28.0
+	canvas.draw_line(Vector2(divider, SETTINGS.position.y + 104.0), Vector2(divider, SETTINGS.end.y - 104.0), UI.LINE, 1.0)
+	for column in 2:
+		var layout := setting_layout(column)
+		var left := setting_x(column)
+		var right := left + SETTING_COLUMN_WIDTH
+		for i in layout.size():
+			var row: Array = SETTING_COLUMNS[column][i]
+			if layout[i].header >= 0.0:
+				var group: String = row[0].to_upper()
+				label_at(group, Vector2(left, layout[i].header), 11, CYAN, UI.SEMIBOLD)
+				var after := left + measure(group, 11, UI.SEMIBOLD) + 12.0
+				canvas.draw_line(Vector2(after, layout[i].header - 4.0), Vector2(right, layout[i].header - 4.0), UI.LINE, 1.0)
+			label_at(row[1], Vector2(left, layout[i].center + 5.0), 15, INK)
+			if not row[2].is_empty():
+				label_at(row[2], Vector2(left + measure(row[1], 15) + 10.0, layout[i].center + 5.0), 12, UI.FAINT, UI.MEDIUM)
+	var sound := setting_layout(0)
+	var edge := setting_x(0) + SETTING_COLUMN_WIDTH
+	right_at("%d%%" % roundi(game.soundscape.music_volume * 100.0), Vector2(edge, sound[0].center + 5.0), 13, MUTED)
+	right_at("%d%%" % roundi(game.soundscape.effects_volume * 100.0), Vector2(edge, sound[1].center + 5.0), 13, MUTED)
 
 func draw_harvest() -> void:
 	var run = game.run

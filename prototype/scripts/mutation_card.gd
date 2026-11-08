@@ -17,6 +17,8 @@ var text_multiplier := 1.0
 var specimen: Sprite2D
 var bud: Sprite2D
 var guided_choice := false
+## Compare details: the card turns over to show its full description.
+var detailed := false
 var reduced_motion := false
 var cost := -1
 var balance := 0
@@ -33,6 +35,10 @@ func _process(delta: float) -> void:
 		var target := 1.0 if (is_hovered() or has_focus()) and not disabled else 0.0
 		hover = move_toward(hover, target, delta * (7.0 if target > hover else 4.0))
 		queue_redraw()
+
+## Every detail is printed on one face of the card; no tooltip repeats it.
+func _get_tooltip(_at: Vector2) -> String:
+	return ""
 
 func _ready() -> void:
 	specimen = Sprite2D.new()
@@ -55,7 +61,6 @@ func configure_journey(run: RefCounted, id: String, index: int) -> void:
 	# configure clears the comparison for legacy callers; restore journey data.
 	comparison = Comparison.compare(run, id)
 	detail_summary = comparison.detail_summary
-	tooltip_text = detail_summary
 
 func configure(definition: Dictionary, index: int, owned: Array = []) -> void:
 	data = definition
@@ -70,8 +75,8 @@ func configure(definition: Dictionary, index: int, owned: Array = []) -> void:
 	if specimen != null:
 		specimen.position.x = size.x / 2.0
 		Anatomy.apply(specimen,Anatomy.recipe(preview_traits))
-		specimen.visible = not guided_choice
-		bud.visible = not guided_choice and preview_traits.has("fission")
+		specimen.visible = not guided_choice and not detailed
+		bud.visible = not guided_choice and not detailed and preview_traits.has("fission")
 	queue_redraw()
 
 func line(value: String, at: Vector2, size_px: int, color: Color, weight: int = 0) -> void:
@@ -93,7 +98,7 @@ func draw_key() -> void:
 
 func draw_comparison() -> void:
 	centered(data.name, 148, 20, UI.INK, UI.SEMIBOLD)
-	centered(comparison.playstyle.capitalize(), 170, 11, UI.ACCENT, UI.MEDIUM)
+	centered(UI.sentence(comparison.playstyle), 170, 11, UI.ACCENT, UI.MEDIUM)
 	var before: Dictionary = comparison.before
 	var after: Dictionary = comparison.after
 	var sample: Dictionary = Comparison.sample_for(data.id)
@@ -104,6 +109,51 @@ func draw_comparison() -> void:
 	centered("Poison %d → %d" % [before.poison,after.poison] if after.poison>0 or before.poison>0 else "Short links · see Compare details",282,11,UI.MUTED)
 	draw_line(Vector2(24,304),Vector2(size.x-24,304),UI.LINE,1.0)
 	centered("Need %d more food" % (cost-balance) if disabled else "Evolve for %d food" % cost,330,13,UI.FAINT if disabled else UI.ACCENT,UI.MEDIUM)
+
+## Left-aligned wrapped text; returns the baseline of the last line drawn.
+## Text that would pass the footer ends with an ellipsis instead.
+func paragraph(value: String, top: float, size_px: int, color: Color, weight: int = 0, limit: float = 292.0) -> float:
+	var actual := roundi(size_px * text_multiplier)
+	var face := UI.text_font(actual, weight)
+	var width := size.x - 40.0
+	var step := roundf(actual * 1.42)
+	var y := top
+	var text := ""
+	for word in value.split(" "):
+		var next: String = word if text.is_empty() else text + " " + word
+		if text.is_empty() or face.get_string_size(next, HORIZONTAL_ALIGNMENT_LEFT, -1, actual).x <= width:
+			text = next
+			continue
+		if y + step > limit:
+			draw_string(face, Vector2(20, y), text + " …", HORIZONTAL_ALIGNMENT_LEFT, -1, actual, color)
+			return y
+		draw_string(face, Vector2(20, y), text, HORIZONTAL_ALIGNMENT_LEFT, -1, actual, color)
+		y += step
+		text = word
+	draw_string(face, Vector2(20, y), text, HORIZONTAL_ALIGNMENT_LEFT, -1, actual, color)
+	return y
+
+## The back of the card: what the trait does, its cost, and how it combines.
+func draw_details() -> void:
+	var y := paragraph(data.name, 56, 17, UI.INK, UI.SEMIBOLD)
+	var style: String = comparison.get("playstyle", "")
+	if not style.is_empty():
+		y += 20.0
+		line(UI.sentence(style), Vector2(20, y), 11, UI.ACCENT, UI.MEDIUM)
+	y = paragraph(data.detail.replace("\n", " "), y + 26.0, 12, UI.INK)
+	line("TRADEOFF", Vector2(20, y + 26.0), 10, UI.FAINT, UI.SEMIBOLD)
+	y = paragraph(data.tradeoff, y + 43.0, 12, UI.MUTED)
+	var effect: String = comparison.get("effect", "")
+	if not effect.is_empty() and y + 40.0 < 292.0:
+		y = paragraph(effect, y + 24.0, 12, UI.ACCENT)
+	var synergy: String = comparison.get("synergy", "")
+	if not synergy.is_empty() and y + 40.0 < 292.0:
+		paragraph(synergy, y + 24.0, 12, UI.MUTED)
+	draw_line(Vector2(24, 304), Vector2(size.x - 24, 304), UI.LINE, 1.0)
+	if disabled:
+		centered("Need %d more food" % (cost - balance), 330, 13, UI.FAINT, UI.MEDIUM)
+	else:
+		centered("Evolve for %d food" % cost if cost >= 0 else "Evolve", 330, 13, UI.ACCENT, UI.SEMIBOLD)
 
 func draw_hover() -> void:
 	if hover <= 0.01:
@@ -123,6 +173,9 @@ func _draw() -> void:
 		return
 	draw_hover()
 	draw_key()
+	if detailed:
+		draw_details()
+		return
 	if guided_choice:
 		draw_guided(UI.INK, UI.MUTED, UI.ACCENT)
 		return

@@ -68,7 +68,7 @@ Choose **New journey** on the title screen. The first encounter is a guided less
 | Full screen | F11 or Alt+Enter |
 | Retry a failed encounter | R |
 
-Settings cover music and effect volume, input mode, motion, text size and visual detail. Losing window focus pauses the game.
+Settings cover music and effect volume, input mode, closure assistance, slower closed loops, motion, markers, text size, visual detail and full screen; hover any option for a short explanation. Losing window focus pauses the game.
 
 Saves, unlocks and preferences are stored in Godot's user data folder, in `Godot/app_userdata/MICROVERSE` under `~/Library/Application Support` on macOS or `%APPDATA%` on Windows, and in `~/.local/share/godot/app_userdata/MICROVERSE` on Linux.
 

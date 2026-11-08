@@ -22,6 +22,7 @@ const HELP := Rect2(230, 80, 820, 772)
 const JOURNAL := Rect2(222, 96, 836, 716)
 const COLONIES := Rect2(241, 170, 798, 540)
 const RENAME := Rect2(370, 296, 540, 290)
+const CONFIRM := Rect2(390, 290, 500, 300)
 var advanced_open := false
 var new_button: Button
 var compare_button: Button
@@ -52,6 +53,8 @@ var dish_labels := DishLabels.new()
 var marker_boxes: Array[Rect2] = []
 var specimen_boxes: Dictionary = {}
 var rename_button: Button
+var confirm_keep: Button
+var confirm_replace: Button
 var name_input: LineEdit
 var name_save: Button
 var name_cancel: Button
@@ -97,9 +100,7 @@ func _ready() -> void:
 	travel_button = button("Keep food and travel", Vector2.ZERO, Vector2(320, 44), game.travel_without_evolution)
 	for i in 3:
 		var colony: Dictionary = Journey.COLONIES[i]
-		var control := button(colony.name, Vector2(COLONIES.position.x + 43 + i * 248, COLONIES.position.y + 250), Vector2(220, 48), game.request_new_journey.bind(colony.id))
-		control.tooltip_text = colony.detail + "\n" + colony.unlock
-		colony_buttons.append(control)
+		colony_buttons.append(button(colony.name, Vector2(COLONIES.position.x + 43 + i * 248, COLONIES.position.y + 250), Vector2(220, 48), game.request_new_journey.bind(colony.id)))
 	for slot in JOURNAL_PAGE_SIZE:
 		var control := button("Watch film",Vector2(JOURNAL.position.x+40+(slot%2)*388+18,JOURNAL.position.y+124+(slot/2)*248+80),Vector2(110,32),watch_creature_film.bind(slot))
 		UI.style_button(control,"quiet",12)
@@ -110,15 +111,15 @@ func _ready() -> void:
 	help_close = button("Close", Vector2(HELP.get_center().x - 90, HELP.end.y - 70), Vector2(180, 44), game.toggle_help, "Esc")
 	UI.style_button(help_close, "primary", 15)
 	pause_button.set("glyph", "pause")
-	pause_button.tooltip_text = "Pause  (Space)"
+	tip(pause_button, "", "Pause", "Space")
+	tip(help_button, "", "How to play", "H")
 	for i in TRAIT_LIMIT:
-		var tip := Control.new()
-		tip.position = Vector2(LEFT - 4, TRAIT_TOP + i * TRAIT_STEP - 18)
-		tip.size = Vector2(COLUMN + 8, TRAIT_STEP)
-		tip.mouse_filter = Control.MOUSE_FILTER_PASS
-		tip.theme = UI.theme()
-		add_child(tip)
-		trait_tooltips.append(tip)
+		var zone := TipZone.new()
+		zone.position = Vector2(LEFT - 4, TRAIT_TOP + i * TRAIT_STEP - 18)
+		zone.size = Vector2(COLUMN + 8, TRAIT_STEP)
+		zone.mouse_filter = Control.MOUSE_FILTER_PASS
+		add_child(zone)
+		trait_tooltips.append(zone)
 	rename_button = button("Give it a name", Vector2.ZERO, Vector2(172, 38), begin_rename)
 	name_blocker = Control.new()
 	name_blocker.size = Vector2(1280, 900)
@@ -137,10 +138,13 @@ func _ready() -> void:
 	name_cancel = button("Cancel", Vector2(RENAME.position.x + 40, RENAME.end.y - 78), Vector2(220, 44), cancel_rename, "Esc")
 	name_save = button("Save name", Vector2(RENAME.end.x - 260, RENAME.end.y - 78), Vector2(220, 44), save_name, "Enter")
 	UI.style_button(name_save, "primary", 15)
+	confirm_keep = button("Keep my journey", Vector2(CONFIRM.position.x + 40, CONFIRM.end.y - 76), Vector2(200, 44), game.cancel_new_journey, "Esc")
+	confirm_replace = button("Start new journey", Vector2(CONFIRM.end.x - 240, CONFIRM.end.y - 76), Vector2(200, 44), game.confirm_new_journey)
+	UI.style_button(confirm_replace, "danger", 15)
 	refresh()
 
 func managed_controls() -> Array:
-	return [pause_button, restart_button, debug_button, mode_button, motion_button, center_button, sound_button, journal_button, film_watch_button, film_later_button, help_button, help_close, new_button, continue_button, pond_button, advanced_button, experiments_button, compare_button, pond_previous, pond_next, journal_close, journal_previous, journal_next, repair_button, travel_button, rename_button, name_blocker, name_input, name_save, name_cancel] + journal_films + habitat_buttons + growth_buttons + colony_buttons + cards + trait_tooltips
+	return [pause_button, restart_button, debug_button, mode_button, motion_button, center_button, sound_button, journal_button, film_watch_button, film_later_button, help_button, help_close, new_button, continue_button, pond_button, advanced_button, experiments_button, compare_button, pond_previous, pond_next, journal_close, journal_previous, journal_next, repair_button, travel_button, rename_button, name_blocker, name_input, name_save, name_cancel, confirm_keep, confirm_replace] + journal_films + habitat_buttons + growth_buttons + colony_buttons + cards + trait_tooltips
 
 ## Each screen lists only the controls it needs; everything else is hidden.
 func refresh() -> void:
@@ -150,12 +154,17 @@ func refresh() -> void:
 	var state: String = run.state
 	var home: bool = state == "home"
 	var habitat: bool = home and game.home_pond_open
-	var blocked: bool = game.settings_open or game.journal_open or game.help_open or renaming() or (game.evolution_reveal != null and game.evolution_reveal.visible)
+	var confirming: bool = not game.pending_new_colony.is_empty()
+	var blocked: bool = confirming or game.settings_open or game.journal_open or game.help_open or renaming() or (game.evolution_reveal != null and game.evolution_reveal.visible)
 	var overlay: bool = not home and not blocked and state in ["brief", "paused", "loss", "success"] and overlay_visible() and not game.round_result_showing()
 	var shown: Array = []
 	if home and not habitat and not blocked and not advanced_open: shown.append(experiments_button)
 	if renaming():
 		shown.append_array([name_blocker, name_input, name_save, name_cancel])
+	elif confirming:
+		place(confirm_keep, Vector2(CONFIRM.get_center().x - 212, CONFIRM.end.y - 76), Vector2(200, 44), "secondary", "Keep my journey", "Esc", 15)
+		place(confirm_replace, Vector2(CONFIRM.get_center().x + 12, CONFIRM.end.y - 76), Vector2(200, 44), "danger", "Start new journey", "", 15)
+		shown.append_array([name_blocker, confirm_keep, confirm_replace])
 	elif game.journal_open:
 		shown.append(journal_close)
 		for slot in JOURNAL_PAGE_SIZE:
@@ -176,10 +185,12 @@ func refresh() -> void:
 	else:
 		shown.append_array(refresh_encounter(overlay))
 	for control in managed_controls():
-		control.visible = shown.has(control) and not game.comfort_layout() and not game.comparisons_open
+		control.visible = shown.has(control) and not game.comfort_layout()
 	refresh_settings()
-	if game.settings_open or game.comfort_layout():
-		for control in [sound_close, mute_button, music_slider, effects_slider, comfort_motion_button, contrast_button, text_button, quality_button, mode_button]:
+	if game.settings_open and not game.comfort_layout():
+		shown.append_array([sound_close, mute_button, music_slider, effects_slider, comfort_motion_button, contrast_button, text_button, quality_button, mode_button, assist_button, slow_button, fullscreen_button])
+	if game.comfort_layout():
+		for control in [sound_close, mute_button, music_slider, effects_slider, comfort_motion_button, contrast_button, text_button, quality_button, mode_button, assist_button, slow_button, fullscreen_button]:
 			control.hide()
 	var key := overlay_key()
 	if key != overlay_shown:
@@ -254,7 +265,6 @@ func refresh_encounter(overlay: bool) -> Array:
 	if state == "active":
 		place(help_button, Vector2(RIGHT + COLUMN - 80, 30), Vector2(36, 36), "icon", "?", "", 16)
 		place(pause_button, Vector2(RIGHT + COLUMN - 36, 30), Vector2(36, 36), "icon", " ", "", 15)
-		help_button.tooltip_text = "How to play  (H)"
 		pause_button.disabled = false
 		shown.append_array([help_button, pause_button])
 		if game.creature_cinema != null and not game.creature_cinema.pending_ids.is_empty():
@@ -264,11 +274,10 @@ func refresh_encounter(overlay: bool) -> Array:
 		for i in trait_tooltips.size():
 			if i < run.mutations.size():
 				var definition: Dictionary = Mutations.journey_definition(run.mutations[i])
-				trait_tooltips[i].tooltip_text = definition.name + "\n" + definition.detail + "\n" + definition.tradeoff
+				tip(trait_tooltips[i], definition.detail.replace("\n", " ") + "\n" + definition.tradeoff, definition.name)
 				shown.append(trait_tooltips[i])
 	elif state == "brief":
 		place(help_button, Vector2(RIGHT + COLUMN - 36, 30), Vector2(36, 36), "icon", "?", "", 16)
-		help_button.tooltip_text = "How to play  (H)"
 		shown.append(help_button)
 		if run.growth_slot() >= 0:
 			for i in growth_buttons.size():
@@ -284,12 +293,17 @@ func refresh_encounter(overlay: bool) -> Array:
 			place(restart_button, Vector2(brief.position.x + 24, brief.end.y - 70), Vector2(snug("Return home", "", 13), 36), "quiet", "Return home", "", 13)
 			shown.append_array([center_button, restart_button])
 	elif run.evolution_ready() and not game.round_result_showing():
-		if not run.offered_mutations.is_empty(): shown.append(compare_button)
+		if not run.offered_mutations.is_empty():
+			var caption := "Show cards" if game.comparisons_open else "Compare details"
+			var width := snug(caption, "", 13)
+			place(compare_button, Vector2(EVOLVE.end.x - 20.0 - width, EVOLVE.position.y + 18.0), Vector2(width, 34), "quiet", caption, "", 13)
+			shown.append(compare_button)
 		var first_choice: bool = run.mutations.is_empty() and run.offered_mutations.size() == 2
 		var top := EVOLVE.position.y + 160.0
 		for i in cards.size():
 			if i < run.offered_mutations.size():
 				cards[i].guided_choice = first_choice
+				cards[i].detailed = game.comparisons_open
 				cards[i].reduced_motion = game.reduced_motion
 				cards[i].cost = run.evolution_cost()
 				cards[i].balance = run.biomass
@@ -304,9 +318,10 @@ func refresh_encounter(overlay: bool) -> Array:
 		var width := 320.0 if span == EVOLVE else 270.0
 		repair_button.disabled = run.integrity >= run.max_integrity or run.biomass < run.repair_cost() or run.repair_waiting() or run.repair_needs_deeper_wound()
 		place(repair_button, Vector2(middle - width - 8, row), Vector2(width, 44), "secondary", "Mother is healthy, no repair needed" if run.integrity >= run.max_integrity else "Repair needs two wounded cores" if run.repair_needs_deeper_wound() else "Repair tissue still resting" if run.repair_waiting() else "Repair +%d health for %d food" % [mini(2, run.max_integrity - run.integrity), run.repair_cost()], "", 14)
-		repair_button.tooltip_text = "Late-route repair becomes available when at least two cores are wounded." if run.repair_needs_deeper_wound() else "Repair becomes available after the next encounter." if run.repair_waiting() else "Restore up to 2 of the mother's %d health cores, then travel. You have %d food; repair costs %d." % [run.max_integrity, run.biomass, run.repair_cost()]
+		var repair_note := "Late-route repair becomes available when at least two cores are wounded." if run.repair_needs_deeper_wound() else "Repair becomes available after the next encounter." if run.repair_waiting() else "Restore up to 2 of the mother's %d health cores, then travel. You have %d food; repair costs %d." % [run.max_integrity, run.biomass, run.repair_cost()]
+		tip(repair_button, "" if run.integrity >= run.max_integrity else repair_note)
 		place(travel_button, Vector2(middle + 8, row), Vector2(width, 44), "secondary", "Keep all %d food and travel" % run.biomass, "", 14)
-		travel_button.tooltip_text = "Skip this upgrade. Your saved food carries into the next encounter."
+		tip(travel_button, "Skip this upgrade. Your saved food carries into the next encounter.")
 		place(restart_button, Vector2(span.position.x + 24, span.end.y - (62.0 if span == EVOLVE else 54.0)), Vector2(snug("Save and return home", "", 13), 36), "quiet", "Save and return home", "", 13)
 		shown.append_array([repair_button, travel_button, restart_button])
 	elif state == "paused" and overlay:
@@ -398,9 +413,10 @@ func _draw() -> void:
 		return
 	var run = game.run
 	var topmost: bool = game.settings_open or game.journal_open or game.help_open
-	if game.settings_open or game.comparisons_open:
-		return # Native, scrollable settings own this screen at every size.
 	if game.comfort_layout():
+		# The reflowed, scrollable layout owns every dialog in small windows.
+		if game.settings_open or game.comparisons_open:
+			return
 		if run.state == "active" and not topmost:
 			canvas.draw_set_transform(game.view_offset(), 0.0, Vector2.ONE * game.dish_scale())
 			draw_targets()
@@ -436,7 +452,7 @@ func draw_overlays() -> void:
 		return
 	var run = game.run
 	var topmost: bool = game.settings_open or game.journal_open or game.help_open
-	if game.settings_open or game.comparisons_open or game.comfort_layout():
+	if game.comfort_layout():
 		return
 	if run.state == "home":
 		if not topmost:
@@ -468,11 +484,14 @@ func draw_overlays() -> void:
 		draw_help()
 	if renaming():
 		draw_rename()
+	elif not game.pending_new_colony.is_empty():
+		draw_confirm()
 
 ## A short name for what currently covers the dish. A change starts an entrance.
 func overlay_key() -> String:
 	var run = game.run
 	if renaming(): return "rename"
+	if not game.pending_new_colony.is_empty(): return "confirm"
 	if game.settings_open: return "settings"
 	if game.journal_open: return "journal"
 	if game.help_open: return "help"
@@ -592,6 +611,7 @@ func draw_status() -> void:
 			popped("Flow ×%d  ·  +%d next" % [flow, harvest.FLOW_STEP * mini(flow, 5)], Vector2(RIGHT, y + 22.0), 12, UI.FOOD, UI.SEMIBOLD, feel_pop("flow"))
 			canvas.draw_rect(Rect2(RIGHT, y + 29.0, COLUMN, 2.0), Color(1, 1, 1, 0.08))
 			canvas.draw_rect(Rect2(RIGHT, y + 29.0, COLUMN * window / harvest.FLOW_WINDOW, 2.0), Color(UI.FOOD, 0.7))
+			y += 16.0 # the next step moves down so the chain bar keeps its own space
 	if run.state in ["active", "paused"]:
 		var guide: Dictionary = Guidance.next_action(run, game.click_mode)
 		var title_bottom := wrapped(guide.title, Vector2(RIGHT, y + 56.0), COLUMN, 17, UI.DANGER if guide.urgent else INK, UI.SEMIBOLD)
@@ -1276,6 +1296,31 @@ func draw_rename() -> void:
 	centered("Name this resident", RENAME.position.y + 60, 26)
 	centered("The name stays with its story in your home pond.", RENAME.position.y + 90, 14, MUTED)
 	centered("Leave it empty to use the species name." if name_error.is_empty() else name_error, RENAME.position.y + 192, 12, MUTED if name_error.is_empty() else UI.DANGER)
+
+## What a new journey would replace, read from the saved snapshot.
+func confirm_summary() -> String:
+	if game.resume_data.is_empty():
+		return ""
+	var snapshot: Dictionary = game.resume_data.snapshot
+	var stage: int = int(snapshot.run.get("stage_index", 0))
+	var route: Dictionary = snapshot.get("route", {})
+	var plan: Array = route.get("plan", [])
+	var position: int = int(route.get("position", stage))
+	var total: int = plan.size() if not plan.is_empty() else Journey.STAGES.size()
+	var evolutions: int = (snapshot.run.get("mutations", []) as Array).size()
+	return "Encounter %d of %d in %s  ·  %d evolution%s" % [position + 1, total, Journey.dish(stage).name, evolutions, "" if evolutions == 1 else "s"]
+
+func draw_confirm() -> void:
+	scrim()
+	dialog(CONFIRM)
+	centered("Start a new journey?", CONFIRM.position.y + 62, 26)
+	var summary := confirm_summary()
+	var y := CONFIRM.position.y + 98.0
+	if not summary.is_empty():
+		centered("Your journey so far", y, 12, UI.FAINT, UI.SEMIBOLD)
+		centered(summary, y + 24.0, 15, CYAN, UI.MEDIUM)
+		y += 66.0
+	wrapped_centered("A new journey ends this one. Your home pond residents, discoveries and unlocked colonies stay with you.", y, CONFIRM.size.x - 88.0, 14, MUTED)
 
 func draw_ecology(highlighted: int = -1) -> void:
 	var run = game.run

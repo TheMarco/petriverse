@@ -8,6 +8,10 @@ func exercise() -> void:
 	game.preferences_enabled = false
 	game.pause_on_focus_loss = false
 	game.journey_path = "/tmp/microverse-rare-native-unused.cfg"
+	# A profile left by an earlier run would change what this run discovers.
+	for leftover in ["/tmp/microverse-rare-native-profile.cfg", "/tmp/microverse-rare-native-profile.cfg.bak"]:
+		if FileAccess.file_exists(leftover):
+			DirAccess.remove_absolute(leftover)
 	game.journey_profile.path = "/tmp/microverse-rare-native-profile.cfg"
 	root.add_child(game)
 	game.set_process(false)
@@ -42,6 +46,10 @@ func exercise() -> void:
 			chosen = path
 			break
 	expect(not chosen.is_empty(),"The director puts the visitor inside a real capture opportunity")
+	if chosen.is_empty():
+		print("RARE VISITORS VISUAL: %d checks; %d failures" % [checks,failures.size()])
+		quit(1)
+		return
 	await gesture(chosen)
 	expect(game.run.rescued_specimens.any(func(r): return r.form=="glass_harp"),"A real two-segments-per-second mouse gesture rescues the visitor")
 	var ghosts: Array = game.microscope.pulses[-1].get_meta("ghosts")

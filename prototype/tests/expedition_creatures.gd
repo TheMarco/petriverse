@@ -16,6 +16,10 @@ func exercise() -> void:
 	game.preferences_enabled = false
 	game.pause_on_focus_loss = false
 	game.journey_path = "/tmp/microverse-expedition-unused.cfg"
+	# A profile left by an earlier run would change what this run discovers.
+	for leftover in ["/tmp/microverse-expedition-profile-unused.cfg", "/tmp/microverse-expedition-profile-unused.cfg.bak"]:
+		if FileAccess.file_exists(leftover):
+			DirAccess.remove_absolute(leftover)
 	game.journey_profile.path = "/tmp/microverse-expedition-profile-unused.cfg"
 	root.add_child(game)
 	# Each check begins with a genuinely new collector; prior fixture runs may

@@ -8,6 +8,11 @@ static func begin(run: RefCounted) -> void:
 	if run.stage_index==stage:
 		run.harvest.visitor_at = 36.0+variation.randf_range(0.0,8.0)
 
+## The outer ring's cells sit about 340 px out, and the chord between two of
+## them about 314 px. A visitor that sways past this radius could not be
+## enclosed by any loop, so its drift is held inside it.
+const REACH := 290.0
+
 static func site(run: RefCounted) -> Vector2:
 	return run.harvest.ecology.pocket(run,(run.harvest.rotation+5)%8,true)
 
@@ -30,6 +35,10 @@ static func step(run: RefCounted, delta: float = 0.0) -> void:
 		run.discover(visitor.form)
 		harvest.ecology.announce("A %s is visiting · watch it help, or bring it home" % name_for(run))
 	for body in run.enemies.duplicate():
+		if body.visitor:
+			var offset: Vector2 = body.nucleus-run.board.center
+			if offset.length()>REACH:
+				body.origin -= offset.normalized()*(offset.length()-REACH)
 		if body.visitor and body.form=="glowdrift":
 			if body.opening()>0.45:
 				for hunter in run.enemies:

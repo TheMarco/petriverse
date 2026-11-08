@@ -13,6 +13,10 @@ var goal: Label
 var instruction: Label
 var feedback: Label
 var controls: Array[Control] = []
+## The main dialog panel shrinks to its content, up to the full window height.
+var fitted: PanelContainer
+var fitted_column: VBoxContainer
+const FULL := Rect2(84, 38, 1112, 824)
 
 func _ready() -> void:
 	game = get_parent()
@@ -63,7 +67,12 @@ func panel(rect: Rect2, scrollable: bool = true) -> VBoxContainer:
 		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 		scroll.follow_focus = true
 		panel.add_child(scroll)
-		content = scroll
+		# Room for the scroll bar, so sliders and buttons never run beneath it.
+		var gutter := MarginContainer.new()
+		gutter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		gutter.add_theme_constant_override("margin_right", 18)
+		scroll.add_child(gutter)
+		content = gutter
 	var column := VBoxContainer.new()
 	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	column.add_theme_constant_override("separation", 18)
@@ -72,6 +81,7 @@ func panel(rect: Rect2, scrollable: bool = true) -> VBoxContainer:
 
 func screen_key() -> String:
 	var run = game.run
+	if not game.pending_new_colony.is_empty(): return "confirm"
 	if game.settings_open: return "settings"
 	if game.comparisons_open: return "comparisons"
 	if game.help_open: return "help"
@@ -83,7 +93,8 @@ func screen_key() -> String:
 	return run.state + ":" + str(run.offered_mutations)
 
 func sync() -> void:
-	var enabled: bool = game.comfort_layout() or game.settings_open or game.comparisons_open
+	# Normal windows draw every dialog in the HUD; this layout serves small windows and larger text.
+	var enabled: bool = game.comfort_layout()
 	var reveal: bool = game.evolution_reveal != null and game.evolution_reveal.visible
 	screen.visible = enabled and not reveal
 	game.hud.visible = true
@@ -94,12 +105,22 @@ func sync() -> void:
 		rebuild(key)
 	if status != null:
 		update_active()
+	fit()
+
+func fit() -> void:
+	if fitted == null or not is_instance_valid(fitted):
+		return
+	# Wrapped labels report their height once laid out at the panel's width.
+	var height := minf(FULL.size.y, fitted_column.get_combined_minimum_size().y + 44.0 + 18.0)
+	fitted.size = Vector2(FULL.size.x, height)
+	fitted.position = Vector2(FULL.position.x, roundf(450.0 - height * 0.5))
 
 func rebuild(key: String) -> void:
 	for child in screen.get_children():
 		screen.remove_child(child)
 		child.queue_free()
 	controls.clear()
+	fitted = null
 	status = null
 	goal = null
 	instruction = null
@@ -110,7 +131,9 @@ func rebuild(key: String) -> void:
 	if key.begins_with("pond"):
 		build_pond()
 		return
-	body = panel(Rect2(84, 38, 1112, 824))
+	body = panel(FULL)
+	fitted = body.get_parent().get_parent().get_parent()
+	fitted_column = body
 	if game.save_message.begins_with("Could not"):
 		label(game.save_message,24,UI.DANGER)
 	match key.split(":")[0]:
@@ -138,6 +161,13 @@ func rebuild(key: String) -> void:
 			label("%d lives rescued · %d evolutions · %d score" % [game.run.total_rescued,game.run.mutations.size(),game.run.score])
 			label("Meet the lives you brought home in your pond.")
 			button("Visit your home pond", game.return_home, true)
+		"confirm":
+			label("Start a new journey?", 38)
+			label(game.hud.confirm_summary(), 25, UI.ACCENT)
+			label("A new journey ends this one. Your home pond residents, discoveries and unlocked colonies stay with you.", 24, UI.MUTED)
+			button("Keep my journey · Escape", game.cancel_new_journey, true)
+			button("Start a new journey", game.confirm_new_journey)
+			controls[0].grab_focus.call_deferred()
 		"rename":
 			label("Give this life a name", 38)
 			var edit := LineEdit.new()
@@ -204,8 +234,7 @@ func update_active() -> void:
 
 func build_settings() -> void:
 	label("Sound and comfort", 38)
-	button("Done · Escape", game.toggle_sound_settings, true)
-	label("Small windows use this larger, reflowed layout automatically.", 24, UI.MUTED)
+	label("Small windows and larger text use this reflowed layout.", 24, UI.MUTED)
 	for entry in [["Music",game.soundscape.music_volume,game.soundscape.set_music_volume],["Living sounds",game.soundscape.effects_volume,game.soundscape.set_effects_volume]]:
 		var line := row()
 		var caption := label("%s · %d%%" % [entry[0],entry[1]*100],24,UI.INK,line)
@@ -229,6 +258,7 @@ func build_settings() -> void:
 	button("Slow down while holding a closed loop: " + ("On" if game.deliberate_capture else "Off"), game.toggle_deliberation)
 	label("The entire dish runs at 35% speed while you read a closed-loop preview.",23,UI.MUTED)
 	button("Visual detail: " + ["Light","Balanced","Full"][game.visual_quality], game.toggle_quality)
+	button("Full screen: " + ("On" if game.fullscreen else "Off") + " · F11", game.toggle_fullscreen)
 	button("Done · Escape", game.toggle_sound_settings, true)
 
 func build_home() -> void:

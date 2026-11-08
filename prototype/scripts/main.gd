@@ -62,7 +62,7 @@ var assisted_closure := false
 var deliberate_capture := false
 var capture_feedback := CaptureFeedback.new()
 var last_capture_warning := 0
-var replacement_dialog: ConfirmationDialog
+## A colony waiting on the player's answer to "Start a new journey?".
 var pending_new_colony := ""
 var readable_ui: CanvasLayer
 var feel: Node2D
@@ -154,16 +154,6 @@ func _ready() -> void:
 		add_child(creature_cinema)
 	for error in run.board.validate_board():
 		push_error(error)
-	replacement_dialog = ConfirmationDialog.new()
-	replacement_dialog.title = "Replace your unfinished journey?"
-	replacement_dialog.dialog_text = "Your current encounter and evolution will be replaced.\nRescued residents, discoveries and unlocked colonies stay with you."
-	replacement_dialog.ok_button_text = "Replace journey"
-	replacement_dialog.cancel_button_text = "Keep playing"
-	replacement_dialog.theme = UI.theme()
-	replacement_dialog.add_theme_font_size_override("font_size", 20)
-	replacement_dialog.confirmed.connect(confirm_new_journey)
-	replacement_dialog.canceled.connect(func(): pending_new_colony = "")
-	add_child(replacement_dialog)
 	if run.journey:
 		readable_ui = load("res://scripts/readable_ui.gd").new()
 		add_child(readable_ui)
@@ -437,6 +427,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		comparisons_open = false
 		return
 	if creature_cinema!=null and creature_cinema.active: return
+	if not pending_new_colony.is_empty():
+		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+			cancel_new_journey()
+		return
 	if hud!=null and run.journey and hud.renaming():
 		if event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:
 			hud.cancel_rename()
@@ -847,9 +841,11 @@ func request_new_journey(id: String) -> void:
 	if not journey_profile.unlocked(id):
 		return
 	if not resume_data.is_empty() and resume_data.snapshot.run.state != Run.SUCCESS:
+		# The HUD asks first; keeping the journey is the focused, safe answer.
 		pending_new_colony = id
-		replacement_dialog.popup_centered(Vector2i(640, 230))
-		replacement_dialog.get_cancel_button().grab_focus()
+		hud.refresh()
+		if not comfort_layout():
+			hud.confirm_keep.grab_focus()
 		return
 	new_journey(id)
 
@@ -858,6 +854,10 @@ func confirm_new_journey() -> void:
 	pending_new_colony = ""
 	if not id.is_empty():
 		new_journey(id)
+
+func cancel_new_journey() -> void:
+	pending_new_colony = ""
+	hud.refresh()
 
 func recovery_notice() -> String:
 	if resume_data.get("recovered_from_backup", false) or journey_profile.recovered_from_backup:

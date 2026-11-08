@@ -65,6 +65,16 @@ static func dialog_box() -> StyleBoxFlat:
 		boxes.dialog = style
 	return boxes.dialog
 
+## Tooltips: a raised card that reads above both the dish and dialogs.
+static func tip_box() -> StyleBoxFlat:
+	if not boxes.has("tip"):
+		var style := box(Color(0.043, 0.094, 0.11, 0.98), 10, LINE_STRONG, Vector2.ZERO)
+		style.shadow_color = Color(0, 0, 0, 0.35)
+		style.shadow_size = 14
+		style.shadow_offset = Vector2(0, 4)
+		boxes.tip = style
+	return boxes.tip
+
 static func card_box(highlight: bool = false) -> StyleBoxFlat:
 	var key := "card_hi" if highlight else "card"
 	if not boxes.has(key):
@@ -80,7 +90,8 @@ static func toast_box() -> StyleBoxFlat:
 	return boxes.toast
 
 ## Button variants: primary (the one action that moves you on), secondary,
-## quiet (text-only menu items), menu (full-width rows) and icon (square).
+## quiet (text-only menu items), menu (full-width rows), icon (square) and
+## danger (an action that discards progress).
 static func style_button(control: Button, variant: String = "secondary", size_px: int = 15) -> void:
 	if control.get_meta("variant", "") == variant + str(size_px):
 		return
@@ -102,6 +113,10 @@ static func style_button(control: Button, variant: String = "secondary", size_px
 			ink = {"normal": INK if variant == "menu" else Color("c3d6d3"), "hover": Color.WHITE, "pressed": MUTED, "disabled": FAINT}
 		"icon":
 			radius = 12
+		"danger":
+			fill = {"normal": Color(DANGER, 0.08), "hover": Color(DANGER, 0.16), "pressed": Color(DANGER, 0.11), "disabled": Color(DANGER, 0.04)}
+			edge = {"normal": Color(DANGER, 0.45), "hover": Color(DANGER, 0.75), "pressed": Color(DANGER, 0.45), "disabled": Color(DANGER, 0.15)}
+			ink = {"normal": DANGER, "hover": Color("f8cfe0"), "pressed": Color(DANGER, 0.8), "disabled": Color(DANGER, 0.4)}
 	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
 		var key: String = state if state != "focus" else "hover"
 		var style := box(fill[key], radius, edge[key], Vector2(18 if variant == "menu" else 14, 6))

@@ -7,6 +7,10 @@ func exercise() -> void:
 	game.preferences_enabled = false
 	game.pause_on_focus_loss = false
 	game.journey_path = "/tmp/microverse-home-visual-journey.cfg"
+	# A profile left by an earlier run would change what this run discovers.
+	for leftover in ["/tmp/microverse-home-visual-profile.cfg", "/tmp/microverse-home-visual-profile.cfg.bak"]:
+		if FileAccess.file_exists(leftover):
+			DirAccess.remove_absolute(leftover)
 	game.journey_profile.path = "/tmp/microverse-home-visual-profile.cfg"
 	game.journey_profile.residents.clear()
 	root.add_child(game)

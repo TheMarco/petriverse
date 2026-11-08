@@ -73,9 +73,10 @@ func exercise() -> void:
 	var snapshot: Dictionary = game.resume_data.duplicate(true)
 	game.request_new_journey("wanderer")
 	expect(game.pending_new_colony=="wanderer" and game.resume_data==snapshot, "New journey asks before replacing unfinished progress")
-	game.replacement_dialog.hide()
-	game.replacement_dialog.canceled.emit()
-	expect(game.pending_new_colony.is_empty() and game.resume_data==snapshot, "Cancelling replacement preserves progress")
+	game._process(0.0)
+	expect(game.readable_ui.screen_key()=="confirm" and game.readable_ui.controls.size()==2, "Small windows ask in the reflowed layout")
+	key(KEY_ESCAPE)
+	expect(game.pending_new_colony.is_empty() and game.resume_data==snapshot, "Escape keeps the unfinished journey")
 	game.toggle_sound_settings()
 	game._process(0.0)
 	await process_frame
